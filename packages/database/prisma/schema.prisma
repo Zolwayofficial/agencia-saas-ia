@@ -1,0 +1,167 @@
+// ============================================================
+// PRISMA SCHEMA — Agencia SaaS IA (V6 Definitiva)
+// La Única Fuente de Verdad para los datos del sistema.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── MULTI-TENANCY ──────────────────────────────────────────
+
+model Organization {
+  id                     String   @id @default(cuid())
+  name                   String
+  slug                   String   @unique
+  industry               String   @default("default")
+  planId                 String?
+  plan                   Plan?    @relation(fields: [planId], references: [id])
+  stripeCustomerId       String?  @unique
+  stripeSubscriptionId   String?  @unique
+  subscriptionStatus     String   @default("inactive") // active, past_due, canceled, inactive
+  messagesUsedThisMonth  Int      @default(0)
+  agentRunsUsedThisMonth Int      @default(0)
+  billingCycleStart      DateTime @default(now())
+  creditBalance          Float    @default(0)   // Comisiones de referidos acumuladas
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  users          User[]
+  instances      WhatsappInstance[]
+  credits        CreditTransaction[]
+  referralCode   ReferralCode?
+  referredBy     String?
+
+  @@map("organizations")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  name           String?
+  role           Role     @default(MEMBER)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime @default(now())
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  RESELLER
+  MEMBER
+}
+
+// ─── PLANES & BILLING ──────────────────────────────────────
+
+model Plan {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  stripePriceId     String?  @unique  // Stripe Price ID (price_xxx)
+  priceMonthly      Float
+  messagesIncluded  Int          // Msgs WhatsApp incluidos/mes
+  agentRunsIncluded Int          // Ejecuciones IA/mes (-1 = ilimitado)
+  maxInstances      Int      @default(1)
+  organizations     Organization[]
+
+  @@map("plans")
+}
+
+model CreditTransaction {
+  id             String            @id @default(cuid())
+  organizationId String
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  amount         Float
+  type           TransactionType
+  description    String
+  createdAt      DateTime          @default(now())
+
+  @@index([organizationId, createdAt])
+  @@map("credit_transactions")
+}
+
+enum TransactionType {
+  CHARGE
+  RECHARGE
+  COMMISSION
+  REFUND
+  SUBSCRIPTION
+}
+
+// ─── WHATSAPP (SmartSend) ───────────────────────────────────
+
+model WhatsappInstance {
+  id               String           @id @default(cuid())
+  phoneNumber      String           @default("")
+  instanceName     String           @unique
+  displayName      String           @default("")
+  health           InstanceHealth   @default(WARMUP)
+  connectionStatus ConnectionStatus @default(DISCONNECTED)
+  isNew            Boolean          @default(true)
+  messagesLast24h  Int              @default(0)
+  organizationId   String
+  organization     Organization     @relation(fields: [organizationId], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("whatsapp_instances")
+}
+
+enum InstanceHealth {
+  WARMUP
+  ACTIVE
+  THROTTLED
+  BANNED
+}
+
+enum ConnectionStatus {
+  DISCONNECTED
+  QR_PENDING
+  CONNECTED
+}
+
+// ─── REFERIDOS ──────────────────────────────────────────────
+
+model ReferralCode {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  level1Percent  Float        @default(20)
+  level2Percent  Float        @default(5)
+  createdAt      DateTime     @default(now())
+
+  @@map("referral_codes")
+}
+
+// ─── AGENT TASKS (OpenClaw) ─────────────────────────────────
+
+model AgentTask {
+  id             String      @id @default(cuid())
+  organizationId String
+  model          String
+  status         TaskStatus  @default(PENDING)
+  output         String?
+  stepsUsed      Int         @default(0)
+  durationMs     Int?
+  createdAt      DateTime    @default(now())
+  completedAt    DateTime?
+
+  @@index([organizationId, createdAt])
+  @@map("agent_tasks")
+}
+
+enum TaskStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  ERROR
+  TIMEOUT
+}

@@ -1,0 +1,277 @@
+﻿<!-- 
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ FEATURES COMPONENT - MiNuevaLLC                                  │
+  │ Style: 3-Level Grid (Template -> Custom -> Enterprise)          │
+  │ Features:                                                        │
+  │ - Clean Cards with Shadow Lift                                  │
+  │ - SVG Icons (Boxicons/Feather)                                  │
+  │ - Responsive Grid (1col mobile -> 3col desktop)                 │
+  │ - Mailchimp-style Typography & Spacing                          │
+  └─────────────────────────────────────────────────────────────────┘
+-->
+
+<section class="features-section">
+    <div class="features-container">
+
+        <div class="section-header">
+            <h2>Crece con tu negocio</h2>
+            <p class="subtitle">Empieza con templates, personaliza cuando lo necesites, escala sin límites.</p>
+        </div>
+
+        <div class="levels-grid">
+
+            <!-- Level 1: Template -->
+            <div class="level-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </div>
+                <h3>Template</h3>
+                <p class="card-desc">Para empezar rápido</p>
+                <ul class="feature-list">
+                    <li>Flujos predefinidos</li>
+                    <li>CRM pre-configurado</li>
+                    <li>Dashboard listo</li>
+                    <li>Edición de textos simple</li>
+                </ul>
+                <div class="card-footer">
+                    <span class="check-icon">✅</span> Listo en 5 minutos
+                </div>
+            </div>
+
+            <!-- Level 2: Personalizado (Featured) -->
+            <div class="level-card featured">
+                <div class="badge-pop">MÁS POPULAR</div>
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                </div>
+                <h3>Personalizado</h3>
+                <p class="card-desc">Cuando necesites control</p>
+                <ul class="feature-list">
+                    <li><strong>Todo de Template +</strong></li>
+                    <li>Editor visual de flujos</li>
+                    <li>Crear desde cero</li>
+                    <li>Custom webhooks</li>
+                </ul>
+                <div class="card-footer">
+                    <span class="check-icon">🚀</span> Sin límites creativos
+                </div>
+            </div>
+
+            <!-- Level 3: Enterprise -->
+            <div class="level-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M3 3v18h18"></path>
+                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                        <line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="4 4"></line>
+                        <!-- Representing scale/infrastructure -->
+                    </svg>
+                    <!-- Alternative: Database/Server Icon -->
+                    <!-- <path d="M12 2c-4 0-8 1.5-8 4s4 4 8 4 8-1.5 8-4-4-4-8-4z"></path><path d="M4 6v6c0 2.5 4 4 8 4s8-1.5 8-4V6"></path><path d="M4 12v6c0 2.5 4 4 8 4s8-1.5 8-4v-6"></path> -->
+                </div>
+                <h3>Enterprise</h3>
+                <p class="card-desc">Para agencias y equipos</p>
+                <ul class="feature-list">
+                    <li><strong>Todo de Personalizado +</strong></li>
+                    <li>n8n completo</li>
+                    <li>API REST acceso total</li>
+                    <li>Multi-tenant / White-label</li>
+                </ul>
+                <div class="card-footer">
+                    <span class="check-icon">🏢</span> Infraestructura dedicada
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<style>
+    /* VARIABLES (Scoped if needed, but using global root ideally) */
+    .features-section {
+        background-color: #FFFFFF;
+        padding: 100px 2rem;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .features-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* HEADER */
+    .section-header {
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto 5rem;
+    }
+
+    .section-header h2 {
+        font-family: 'Cooper Light', 'Merriweather', serif;
+        font-size: 2.5rem;
+        color: var(--text-main, #241c15);
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }
+
+    .section-header .subtitle {
+        font-size: 1.25rem;
+        color: #5e5e5e;
+        line-height: 1.6;
+    }
+
+    /* GRID */
+    .levels-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    /* CARD STYLE */
+    .level-card {
+        background: #fff;
+        border: 1px solid #E2E2E2;
+        border-radius: 12px;
+        padding: 2.5rem 2rem;
+        text-align: left;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .level-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: transparent;
+    }
+
+    /* FEATURED CARD */
+    .level-card.featured {
+        background: #FFFDF9;
+        /* Warm cream */
+        border: 2px solid var(--primary, #F25722);
+        box-shadow: 0 10px 30px rgba(242, 87, 34, 0.1);
+    }
+
+    .badge-pop {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary, #F25722);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 100px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    /* CONTENT */
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        background: #F4F4F4;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        color: var(--text-main, #241c15);
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .level-card.featured .card-icon {
+        background: #FEECE6;
+        color: var(--primary, #F25722);
+    }
+
+    .card-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .level-card h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-main, #241c15);
+    }
+
+    .card-desc {
+        color: #5e5e5e;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2rem 0;
+        flex-grow: 1;
+        /* Pushes footer down */
+    }
+
+    .feature-list li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #444;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .feature-list li::before {
+        content: "•";
+        color: #CCC;
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+        font-size: 1.2rem;
+        line-height: 1;
+    }
+
+    .level-card.featured .feature-list li::before {
+        color: var(--primary, #F25722);
+    }
+
+    .card-footer {
+        border-top: 1px solid #EEE;
+        padding-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .check-icon {
+        font-size: 1.1rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+        .levels-grid {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+        }
+    }
+</style>

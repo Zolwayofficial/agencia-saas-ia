@@ -1,0 +1,28 @@
+# =========================================
+# LiveKit Server Configuration
+# MiNuevaLLC - Agente de Voz
+# =========================================
+
+port: 7880
+rtc:
+  port_range_start: 50000
+  port_range_end: 50200
+  tcp_port: 7881
+  use_external_ip: true
+
+keys:
+  # Generar con: openssl rand -base64 32
+  APIKeyFromEnv: ${LIVEKIT_API_SECRET}
+
+logging:
+  level: info
+
+# Configuración SIP para llamadas telefónicas
+sip:
+  enabled: true
+  # Trunk SIP (Twilio/Telnyx)
+  trunks:
+    - name: main
+      address: ${SIP_TRUNK_ADDRESS}
+      username: ${SIP_TRUNK_USERNAME}
+      password: ${SIP_TRUNK_PASSWORD}

@@ -1,0 +1,288 @@
+services:
+  # ============================================
+  # PHASE 1: CORE SERVICES (already running)
+  # ============================================
+
+  postgres:
+    image: pgvector/pgvector:pg15
+    restart: always
+    env_file: .env.prod
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: --appendonly no
+    networks:
+      - internal
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+      - internal
+
+  evolution-api:
+    image: atendai/evolution-api:latest
+    restart: always
+    env_file: .env.prod
+    depends_on: [ redis ]
+    networks:
+      - internal
+      - web
+
+  chatwoot:
+    image: chatwoot/chatwoot:latest
+    command: bundle exec rails s -b 0.0.0.0 -p 3000
+    restart: always
+    env_file: .env.prod
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USERNAME=fulllogin
+      - POSTGRES_PASSWORD=QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i
+      - POSTGRES_DATABASE=chatwoot_db
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY_BASE=d1f2a3b4c5e6f7890123456789abcdef0123456789abcdef0123456789abcdef
+      - RAILS_ENV=production
+      - FRONTEND_URL=https://chat.fulllogin.com
+      - NODE_ENV=production
+    depends_on: [ postgres, redis ]
+    networks:
+      - internal
+      - web
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - internal
+      - web
+
+  nocodb:
+    image: nocodb/nocodb:latest
+    restart: always
+    env_file: .env.prod
+    depends_on: [ postgres ]
+    networks:
+      - internal
+      - web
+
+  appsmith:
+    image: appsmith/appsmith-ce:latest
+    restart: always
+    volumes:
+      - appsmith_data:/appsmith-stacks
+    networks:
+      - web
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    restart: always
+    volumes:
+      - kuma_data:/app/data
+    networks:
+      - web
+
+  # ============================================
+  # PHASE 2: AI & AUTOMATION (new installs)
+  # ============================================
+
+  # --- Watchtower: Auto-update all containers ---
+  watchtower:
+    image: containrrr/watchtower:latest
+    restart: always
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=86400
+      - WATCHTOWER_INCLUDE_STOPPED=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - internal
+
+  # --- Portainer: Visual Docker management ---
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - web
+
+  # --- Ollama: Local LLM (Llama 3.1) ---
+  ollama:
+    image: ollama/ollama:latest
+    restart: always
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # --- Dify: AI Brain + RAG ---
+  dify-api:
+    image: langgenius/dify-api:latest
+    restart: always
+    environment:
+      - MODE=api
+      - SECRET_KEY=sk-d1f2a3b4c5e6f7890123456789abcdef
+      - DB_USERNAME=fulllogin
+      - DB_PASSWORD=QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=dify_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - STORAGE_TYPE=local
+      - STORAGE_LOCAL_PATH=/app/api/storage
+      - CONSOLE_WEB_URL=https://ai.fulllogin.com
+      - SERVICE_API_URL=https://ai.fulllogin.com
+      - APP_WEB_URL=https://ai.fulllogin.com
+    volumes:
+      - dify_storage:/app/api/storage
+    depends_on: [ postgres, redis ]
+    networks:
+      - internal
+      - web
+
+  dify-worker:
+    image: langgenius/dify-api:latest
+    restart: always
+    environment:
+      - MODE=worker
+      - SECRET_KEY=sk-d1f2a3b4c5e6f7890123456789abcdef
+      - DB_USERNAME=fulllogin
+      - DB_PASSWORD=QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=dify_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - STORAGE_TYPE=local
+      - STORAGE_LOCAL_PATH=/app/api/storage
+    volumes:
+      - dify_storage:/app/api/storage
+    depends_on: [ postgres, redis ]
+    networks:
+      - internal
+
+  dify-web:
+    image: langgenius/dify-web:latest
+    restart: always
+    environment:
+      - CONSOLE_API_URL=https://ai.fulllogin.com
+      - APP_API_URL=https://ai.fulllogin.com
+    depends_on: [ dify-api ]
+    networks:
+      - internal
+      - web
+
+  # --- Whisper: Speech-to-Text ---
+  whisper:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    restart: always
+    environment:
+      - ASR_MODEL=base
+      - ASR_ENGINE=openai_whisper
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # --- Kokoro: Text-to-Speech ---
+  kokoro:
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    restart: always
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # --- OpenClaw: Autonomous AI Agents ---
+  openclaw:
+    image: docker.io/openclaw/openclaw:latest
+    restart: always
+    volumes:
+      - openclaw_data:/app/data
+    networks:
+      - internal
+      - web
+
+  # ============================================
+  # PHASE 3: CUSTOM SAAS APPS
+  # ============================================
+
+  saas-api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: always
+    env_file: .env.prod
+    depends_on: [ postgres, redis ]
+    networks:
+      - internal
+      - web
+
+  saas-worker:
+    build:
+      context: ../..
+      dockerfile: apps/worker/Dockerfile
+    restart: always
+    env_file: .env.prod
+    depends_on: [ postgres, redis ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Para ejecutar agentes en Docker
+    networks:
+      - internal
+
+  saas-web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api.fulllogin.com/api/v1
+    depends_on: [ saas-api ]
+    networks:
+      - internal
+      - web
+
+volumes:
+  pg_data:
+  n8n_data:
+  appsmith_data:
+  kuma_data:
+  caddy_data:
+  caddy_config:
+  portainer_data:
+  ollama_data:
+  dify_storage:
+  openclaw_data:
+
+
+networks:
+  internal:
+    driver: bridge
+  web:
+    driver: bridge

@@ -1,0 +1,290 @@
+<section class="faq-section" aria-labelledby="faq-heading">
+    <div class="container">
+        <h2 id="faq-heading" class="section-title">Preguntas frecuentes</h2>
+
+        <div class="faq-grid">
+            <!-- Question 1 -->
+            <div class="faq-item">
+                <button class="faq-toggle" aria-expanded="false" aria-controls="faq-1">
+                    <span class="faq-question">¿Cuánto tiempo toma la implementación?</span>
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                </button>
+                <div id="faq-1" class="faq-content" hidden>
+                    <div class="faq-body">
+                        Nuestro proceso de onboarding es automático. Una vez conectado tu WhatsApp, el bot base queda
+                        funcionando en menos de 5 minutos. Para personalizaciones avanzadas, dedicamos 24-48 horas.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="faq-item">
+                <button class="faq-toggle" aria-expanded="false" aria-controls="faq-2">
+                    <span class="faq-question">¿Necesito conocimientos técnicos?</span>
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                </button>
+                <div id="faq-2" class="faq-content" hidden>
+                    <div class="faq-body">
+                        No. Nosotros nos encargamos de toda la configuración técnica (servidores, APIs, seguridad). Tú
+                        solo necesitas escanear un código QR con tu WhatsApp y llenar un formulario simple sobre tu
+                        negocio.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="faq-item">
+                <button class="faq-toggle" aria-expanded="false" aria-controls="faq-3">
+                    <span class="faq-question">¿Qué pasa si supero el límite de mensajes?</span>
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                </button>
+                <div id="faq-3" class="faq-content" hidden>
+                    <div class="faq-body">
+                        El sistema te notificará antes de llegar al límite. Puedes recargar créditos adicionales o
+                        actualizar tu plan en cualquier momento sin interrupciones en el servicio.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="faq-item">
+                <button class="faq-toggle" aria-expanded="false" aria-controls="faq-4">
+                    <span class="faq-question">¿Es seguro para mis datos?</span>
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                </button>
+                <div id="faq-4" class="faq-content" hidden>
+                    <div class="faq-body">
+                        Absolutamente. Utilizamos servidores encriptados en Alemania (Hetzner) y cumplimos con GDPR. Tus
+                        conversaciones son privadas y no se utilizan para entrenar modelos públicos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="faq-item">
+                <button class="faq-toggle" aria-expanded="false" aria-controls="faq-5">
+                    <span class="faq-question">¿Puedo cancelar en cualquier momento?</span>
+                    <span class="faq-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                </button>
+                <div id="faq-5" class="faq-content" hidden>
+                    <div class="faq-body">
+                        Sí, no hay contratos forzosos a largo plazo. Puedes cancelar tu suscripción desde tu panel de
+                        control y el servicio se detendrá al finalizar el ciclo de facturación actual.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* VARIABLES LOCALES (Fallback si no están definidas globalmente) */
+    .faq-section {
+        --faq-bg: #FFFFFF;
+        --faq-border: #EEEEEE;
+        --faq-text: #1A1A1A;
+        --faq-text-secondary: #595959;
+        --faq-hover: #FAFAFA;
+        --faq-transition: 300ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .faq-section {
+        background-color: var(--faq-bg);
+        padding: 5rem 0 0 0;
+        /* Padding superior generoso (approx 80px) */
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--faq-text);
+    }
+
+    .faq-section .container {
+        max-width: 900px;
+        /* Ancho contenido Mailchimp style */
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .faq-section .section-title {
+        font-size: 2.5rem;
+        /* ~40px */
+        font-weight: 400;
+        /* Regular weight es clave para look premium/editorial */
+        letter-spacing: -0.02em;
+        margin-bottom: 3.5rem;
+        text-align: left;
+        /* Mailchimp suele usar left-aligned headings en FAQs */
+    }
+
+    .faq-grid {
+        display: flex;
+        flex-direction: column;
+        border-top: 1px solid var(--faq-border);
+    }
+
+    .faq-item {
+        border-bottom: 1px solid var(--faq-border);
+    }
+
+    .faq-toggle {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem 0;
+        /* Buen hit area vertical */
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.2s ease;
+    }
+
+    .faq-toggle:hover {
+        /* Opcional: background sutil en hover */
+        /* background-color: var(--faq-hover); */
+    }
+
+    .faq-toggle:focus-visible {
+        outline: 2px solid #000;
+        outline-offset: 4px;
+        border-radius: 4px;
+    }
+
+    .faq-question {
+        font-size: 1.25rem;
+        /* ~20px */
+        font-weight: 500;
+        color: var(--faq-text);
+        padding-right: 1rem;
+    }
+
+    .faq-icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform var(--faq-transition);
+        color: var(--faq-text);
+    }
+
+    /* Rotación del icono al expandir */
+    .faq-toggle[aria-expanded="true"] .faq-icon {
+        transform: rotate(45deg);
+        /* Convierte el + en x */
+    }
+
+    .faq-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows var(--faq-transition), padding var(--faq-transition);
+        visibility: hidden;
+        /* Accessibility fix */
+    }
+
+    .faq-toggle[aria-expanded="true"]+.faq-content {
+        visibility: visible;
+        grid-template-rows: 1fr;
+    }
+
+    .faq-body {
+        overflow: hidden;
+        font-size: 1.125rem;
+        /* 18px */
+        line-height: 1.6;
+        color: var(--faq-text-secondary);
+        padding-bottom: 2rem;
+        max-width: 90%;
+        /* Evita líneas muy largas */
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .faq-section {
+            padding: 3rem 0;
+        }
+
+        .faq-section .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .faq-toggle {
+            padding: 1.5rem 0;
+        }
+
+        .faq-question {
+            font-size: 1.125rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggles = document.querySelectorAll('.faq-toggle');
+
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = document.getElementById(toggle.getAttribute('aria-controls'));
+                const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+                // Close all others (Accordion behavior - optional)
+                // Uncomment to allow only one open at a time:
+                /*
+                toggles.forEach(otherToggle => {
+                    if (otherToggle !== toggle) {
+                        otherToggle.setAttribute('aria-expanded', 'false');
+                        const otherContent = document.getElementById(otherToggle.getAttribute('aria-controls'));
+                        otherContent.hidden = true; 
+                    }
+                });
+                */
+
+                // Toggle current
+                toggle.setAttribute('aria-expanded', !isExpanded);
+
+                if (!isExpanded) {
+                    content.hidden = false;
+                } else {
+                    // Esperar a la transición si usáramos height, pero con grid es inmediato
+                    // Para accesibilidad 'hidden' debe sincronizarse con la transición visual
+                    setTimeout(() => {
+                        if (toggle.getAttribute('aria-expanded') === 'false') {
+                            content.hidden = true;
+                        }
+                    }, 300); // Duración de la transición
+                }
+            });
+        });
+    });
+</script>

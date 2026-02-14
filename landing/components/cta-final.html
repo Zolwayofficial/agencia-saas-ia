@@ -1,0 +1,115 @@
+<section class="cta-final-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-headline">Empieza a automatizar hoy.</h2>
+            <p class="cta-subheadline">Recupera tu tiempo y escala tu agencia sin contratar más personal.</p>
+            <a href="#" class="cta-button">Empezar prueba gratis</a>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* VARIABLES LOCALES */
+    .cta-final-section {
+        --cta-bg: #EAEAEA;
+        /* Gris suave/crema estilo Mailchimp */
+        --cta-text: #1A1A1A;
+        --cta-btn-bg: #F25722;
+        /* Brand Primary */
+        --cta-btn-text: #FFFFFF;
+        --cta-btn-hover: #D1400E;
+    }
+
+    .cta-final-section {
+        background-color: var(--cta-bg);
+        padding: 8rem 0;
+        /* Espaciado muy generoso (128px) */
+        font-family: 'Inter', system-ui, sans-serif;
+        color: var(--cta-text);
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cta-final-section .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .cta-headline {
+        font-size: 3.5rem;
+        /* ~56px Display Size */
+        font-weight: 400;
+        /* Regular weight para elegancia */
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 2rem;
+        font-family: 'Inter', serif;
+        /* Opcional: serif para distinción si hubiera */
+        color: var(--cta-text);
+    }
+
+    .cta-subheadline {
+        font-size: 1.5rem;
+        /* ~24px */
+        font-weight: 400;
+        line-height: 1.5;
+        color: #404040;
+        margin-bottom: 3.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cta-button {
+        display: inline-block;
+        background-color: var(--cta-btn-bg);
+        color: var(--cta-btn-text);
+        font-size: 1.125rem;
+        /* 18px */
+        font-weight: 600;
+        padding: 1.25rem 3rem;
+        border-radius: 9999px;
+        /* Pill shape */
+        text-decoration: none;
+        transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .cta-button:hover {
+        background-color: var(--cta-btn-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta-button:active {
+        transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .cta-final-section {
+            padding: 5rem 0;
+        }
+
+        .cta-headline {
+            font-size: 2.5rem;
+            /* ~40px en mobile */
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-subheadline {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-button {
+            width: 100%;
+            display: block;
+            text-align: center;
+            padding: 1.25rem 0;
+        }
+    }
+</style>

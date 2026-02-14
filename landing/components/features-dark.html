@@ -1,0 +1,470 @@
+<!-- 
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ FEATURES DARK COMPONENT - "Receta para el éxito"                 │
+  │ Style: Mailchimp Dark Theme (#241c15 Background)                │
+  │ Layout: Quote -> Title -> 3-Col Grid                            │
+  │ Visuals: CSS Art / SVG (Automation, Data, SMS)                  │
+  └─────────────────────────────────────────────────────────────────┘
+-->
+
+<section class="features-dark-section">
+    <div class="container-fluid">
+
+        <!-- Header Content -->
+        <div class="features-header">
+            <div class="quote-wrapper">
+                <p class="quote-text">“Es superintuitivo y fácil de buscar y configurar campañas automatizadas”.</p>
+                <p class="quote-author">— Hayden Kwast, director nacional de E-Commerce en City Winery</p>
+            </div>
+
+            <h2 class="section-title">Descubre la receta de Mailchimp para el éxito en marketing</h2>
+        </div>
+
+        <!-- 3-Column Grid -->
+        <div class="features-dark-grid">
+
+            <!-- Card 1: Automation -->
+            <div class="dark-card">
+                <div class="dark-visual visual-blue">
+                    <!-- CSS Art: Linear Flow -->
+                    <div class="flow-art">
+                        <div class="flow-node">
+                            <span class="icon-circle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg></span>
+                            <span class="node-text">Customer abandons cart</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-node">
+                            <span class="icon-mail">✉️</span>
+                            <span class="node-text">Send email</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-branch">
+                            <span class="node-text">Makes purchase?</span>
+                            <div class="branch-lines">
+                                <span class="yes">Yes</span>
+                                <span class="no">No</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dark-content">
+                    <h3>Convierte más clientes</h3>
+                    <p>Elabora correos electrónicos, utiliza datos de comportamiento para dirigirte a públicos con mayor
+                        precisión y optimiza tu estrategia.</p>
+                </div>
+            </div>
+
+            <!-- Card 2: Scaling (Data) -->
+            <div class="dark-card">
+                <div class="dark-visual visual-data">
+                    <!-- CSS Art: Bar Charts -->
+                    <div class="chart-container">
+                        <div class="chart-card-sm">
+                            <div class="chart-header">
+                                <div class="dot green"></div> <span class="txt">Open Rate</span>
+                            </div>
+                            <div class="bars-simple">
+                                <div class="bar" style="height: 40%"></div>
+                                <div class="bar" style="height: 70%"></div>
+                                <div class="bar" style="height: 50%"></div>
+                                <div class="bar highlight" style="height: 90%"></div>
+                                <div class="bar" style="height: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dark-content">
+                    <h3>Ve más y escala más rápido</h3>
+                    <p>Con todos tus datos en un solo lugar, Mailchimp te proporciona lo que necesitas para tomar la
+                        decisión correcta en el momento adecuado.</p>
+                </div>
+            </div>
+
+            <!-- Card 3: SMS -->
+            <div class="dark-card">
+                <div class="dark-visual visual-green">
+                    <!-- CSS Art: Phone Message -->
+                    <div class="phone-mockup">
+                        <div class="phone-notch"></div>
+                        <div class="phone-msg-bubble">
+                            <div class="msg-avatar">A</div>
+                            <div class="msg-lines">
+                                <div class="line w-80"></div>
+                                <div class="line w-60"></div>
+                                <div class="line-btn">STOP to opt out</div>
+                            </div>
+                        </div>
+                        <div class="phone-msg-bubble right">
+                            <div class="msg-lines">
+                                <div class="emoji">👋</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dark-content">
+                    <h3>Usa SMS para ampliar tu alcance</h3>
+                    <p>Comienza a enviar mensajes oportunos y sumamente relevantes a los clientes en el momento donde
+                        tengan más probabilidades de interactuar.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<style>
+    /* VARIABLES LOCAS */
+    .features-dark-section {
+        --bg-dark: #241c15;
+        /* Mailchimp Dark */
+        --text-light: #FFFFFF;
+        --accent-yellow: #FFE01B;
+        /* Mailchimp Yellow */
+
+        /* Visual Backgrounds */
+        --vis-p-blue: #E7F6FA;
+        /* Pastel Blue */
+        --vis-p-brown: #E8E0D5;
+        /* Earthy */
+        --vis-p-green: #E2F2D5;
+        /* Pastel Green */
+
+        padding: 5rem 2rem;
+        background-color: var(--bg-dark);
+        color: var(--text-light);
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* HEADER */
+    .features-header {
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto 4rem auto;
+    }
+
+    .quote-wrapper {
+        margin-bottom: 3rem;
+    }
+
+    .quote-text {
+        font-family: 'Cooper Light', 'Merriweather', serif;
+        /* Tipo serif elegante */
+        font-size: 1.5rem;
+        font-weight: 300;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+    }
+
+    .quote-author {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .section-title {
+        font-family: 'Cooper Light', 'Merriweather', serif;
+        font-size: 2.5rem;
+        font-weight: 300;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+
+    /* GRID */
+    .features-dark-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .dark-card {
+        display: flex;
+        flex-direction: column;
+        /* No border/bg for card itself, blends with section */
+    }
+
+    /* VISUALS */
+    .dark-visual {
+        height: 280px;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .visual-blue {
+        background-color: var(--vis-p-blue);
+    }
+
+    .visual-data {
+        background-color: var(--vis-p-brown);
+        background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800');
+        /* Fallback/Blend */
+        background-size: cover;
+        background-blend-mode: overlay;
+    }
+
+    .visual-green {
+        background-color: var(--vis-p-green);
+    }
+
+    /* CONTENT */
+    .dark-content h3 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        font-weight: 400;
+        /* Regular weight typical of minimalist design */
+    }
+
+    .dark-content p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    /* === CSS ART IMPLEMENTATIONS === */
+
+    /* 1. Flow Art */
+    .flow-art {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        transform: scale(0.9);
+    }
+
+    .flow-node {
+        background: white;
+        padding: 8px 16px;
+        border-radius: 50px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+    }
+
+    .node-text {
+        font-size: 0.75rem;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .flow-arrow {
+        font-size: 1rem;
+        color: #999;
+    }
+
+    .icon-circle {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-circle svg {
+        width: 10px;
+        height: 10px;
+    }
+
+    .flow-branch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .branch-lines {
+        display: flex;
+        gap: 20px;
+        font-size: 0.6rem;
+        margin-top: 5px;
+        color: #666;
+    }
+
+    .yes {
+        color: green;
+        font-weight: bold;
+    }
+
+    .no {
+        color: red;
+        font-weight: bold;
+    }
+
+    /* 2. Chart Art */
+    .chart-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(2px);
+    }
+
+    .chart-card-sm {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        width: 180px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .dot.green {
+        width: 8px;
+        height: 8px;
+        background: #4CAF50;
+        border-radius: 50%;
+    }
+
+    .chart-header .txt {
+        font-size: 0.7rem;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .bars-simple {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        height: 60px;
+        gap: 6px;
+    }
+
+    .bar {
+        width: 100%;
+        background: #E0E0E0;
+        border-radius: 3px 3px 0 0;
+    }
+
+    .bar.highlight {
+        background: #4CAF50;
+    }
+
+    /* 3. Phone Art */
+    .phone-mockup {
+        width: 140px;
+        height: 220px;
+        background: #111;
+        border-radius: 20px;
+        border: 4px solid #333;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        padding: 25px 10px;
+        gap: 10px;
+    }
+
+    .phone-notch {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 10px;
+        background: #333;
+        border-radius: 10px;
+    }
+
+    .phone-msg-bubble {
+        background: #F3F4F6;
+        border-radius: 12px 12px 12px 2px;
+        padding: 8px;
+        display: flex;
+        gap: 8px;
+        font-size: 0.6rem;
+    }
+
+    .phone-msg-bubble.right {
+        align-self: flex-end;
+        border-radius: 12px 12px 2px 12px;
+        background: #DCFCE7;
+        /* Greenish */
+        width: auto;
+    }
+
+    .msg-avatar {
+        width: 24px;
+        height: 24px;
+        background: #333;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.6rem;
+    }
+
+    .msg-lines {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+    }
+
+    .line {
+        height: 4px;
+        background: #DDD;
+        border-radius: 2px;
+    }
+
+    .w-80 {
+        width: 80%;
+    }
+
+    .w-60 {
+        width: 60%;
+    }
+
+    .line-btn {
+        font-size: 0.5rem;
+        color: #666;
+        background: #ddd;
+        padding: 2px 4px;
+        border-radius: 2px;
+        align-self: flex-start;
+        margin-top: 2px;
+        text-transform: uppercase;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+        .features-dark-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .features-dark-section {
+            padding: 4rem 1.5rem;
+        }
+    }
+</style>

@@ -1,0 +1,57 @@
+wa.fulllogin.com {
+    reverse_proxy evolution-api:8080
+}
+
+chat.fulllogin.com {
+    reverse_proxy chatwoot:3000
+}
+
+auto.fulllogin.com {
+    reverse_proxy n8n:5678
+}
+
+db.fulllogin.com {
+    reverse_proxy nocodb:8080
+}
+
+panel.fulllogin.com {
+    reverse_proxy appsmith:80
+}
+
+status.fulllogin.com {
+    reverse_proxy uptime-kuma:3001
+}
+
+ai.fulllogin.com {
+    handle /v1/* {
+        reverse_proxy dify-api:5001
+    }
+    handle /console/api/* {
+        reverse_proxy dify-api:5001
+    }
+    handle /api/* {
+        reverse_proxy dify-api:5001
+    }
+    handle /files/* {
+        reverse_proxy dify-api:5001
+    }
+    handle {
+        reverse_proxy dify-web:3000
+    }
+}
+
+docker.fulllogin.com {
+    reverse_proxy portainer:9000
+}
+
+agent.fulllogin.com {
+    reverse_proxy openclaw:18789
+}
+
+app.fulllogin.com {
+    reverse_proxy saas-web:3000
+}
+
+api.fulllogin.com {
+    reverse_proxy saas-api:3001
+}

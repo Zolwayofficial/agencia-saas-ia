@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Component</title>
+</head>
+
+<body>
+    <section class="solutions-section">
+        <div class="container-fluid">
+            <div class="solutions-grid">
+
+                <!-- Card 1: Automation -->
+                <div class="solution-card">
+                    <div class="solution-visual visual-automation">
+                        <!-- CSS Art: High-Fidelity Workflow -->
+                        <!-- CSS Art: High-Fidelity Workflow (Diagonal Layout) -->
+                        <div class="workflow-container">
+
+                            <!-- The Connector Layer (Absolute SVG) -->
+                            <svg class="wf-connector-layer" viewBox="0 0 300 400" preserveAspectRatio="none">
+                                <!-- Line Trigger (30,20+H/2=41) -> Email (30,80) -->
+                                <!-- Node Height approx 42px. Center ~21px offset. -->
+                                <!-- Trigger Center(110, 46). Email Center(110, 111). Decision Center(110, 165ish). -->
+                                <path d="M110,55 L110,80" stroke="#CBD5E0" stroke-width="2" />
+
+                                <!-- Email (110, 80+H/2=101) -> Decision (110, 140) -->
+                                <path d="M110,122 L110,140" stroke="#CBD5E0" stroke-width="2" />
+
+                                <!-- Decision -> Card (Curved line to the right) -->
+                                <path d="M140,155 C170,155 180,185 190,215" stroke="#CBD5E0" stroke-width="2"
+                                    stroke-dasharray="4 4" fill="none" />
+                            </svg>
+
+                            <!-- Trigger -->
+                            <div class="wf-node node-1">
+                                <div class="wf-icon-box shopify-green">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M20,6H16V4a2,2,0,0,0-2-2H10A2,2,0,0,0,8,4V6H4A2,2,0,0,0,2,8v9a5,5,0,0,0,5,5H17a5,5,0,0,0,5-5V8A2,2,0,0,0,20,6ZM10,4h4V6H10Z" />
+                                    </svg>
+                                </div>
+                                <div class="wf-content-text">
+                                    <span class="wf-title">Vio producto</span>
+                                    <span class="wf-subtitle">Tienda Shopify</span>
+                                </div>
+                            </div>
+
+                            <!-- Action -->
+                            <div class="wf-node node-2">
+                                <div class="wf-icon-box gray">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                                    </svg>
+                                </div>
+                                <div class="wf-content-text">
+                                    <span class="wf-title">Enviar correo</span>
+                                    <span class="wf-subtitle">Plantilla #3</span>
+                                </div>
+                            </div>
+
+                            <!-- Logic -->
+                            <div class="wf-node node-3">
+                                <span>¿Compró?</span>
+                            </div>
+
+                            <!-- Card (Absolute Bottom Right) -->
+                            <div class="wf-popover-card">
+                                <div class="popover-header">
+                                    <div class="popover-dot red"></div>
+                                    <div class="popover-dot yellow"></div>
+                                    <div class="popover-dot green"></div>
+                                </div>
+                                <div class="popover-hero">
+                                    <!-- Inline SVG Sneaker (Nike-style) -->
+                                    <svg width="100%" height="100%" viewBox="0 0 100 60"
+                                        preserveAspectRatio="xMidYMid slice">
+                                        <defs>
+                                            <linearGradient id="shoeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#FF8E8E;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <!-- Background shape -->
+                                        <rect width="100" height="60" fill="#f8f9fa" />
+                                        <!-- Shoe Body -->
+                                        <path
+                                            d="M15,35 Q15,25 25,20 L55,15 Q75,12 85,25 Q90,35 85,45 L20,45 Q15,45 15,35 Z"
+                                            fill="url(#shoeGradient)" />
+                                        <!-- Sole -->
+                                        <path d="M15,45 L85,45 Q90,45 90,50 L10,50 Q10,45 15,45 Z" fill="#DDD" />
+                                        <!-- Swoosh-like detail -->
+                                        <path d="M35,30 Q55,25 75,35" stroke="white" stroke-width="3" fill="none"
+                                            stroke-linecap="round" />
+                                        <!-- Laces -->
+                                        <path d="M30,22 L45,20" stroke="white" stroke-width="2"
+                                            stroke-linecap="round" />
+                                        <path d="M32,26 L47,24" stroke="white" stroke-width="2"
+                                            stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                <div class="popover-body">
+                                    <div class="popover-line w-80"></div>
+                                    <div class="popover-line w-60"></div>
+                                    <div class="popover-btn">COMPRAR</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="solution-content">
+                        <h3>Automatización</h3>
+                        <p>Convierte visitantes en clientes mientras duermes con flujos inteligentes.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: AI Generation -->
+                <div class="solution-card">
+                    <div class="solution-visual visual-ai">
+                        <!-- CSS Art: Magic AI Editor -->
+                        <div class="ai-interface-container">
+                            <!-- Floating Sparkles -->
+                            <div class="ai-float-sparkle s1">✨</div>
+                            <div class="ai-float-sparkle s2">✨</div>
+
+                            <!-- Main Interface -->
+                            <div class="ai-window">
+                                <div class="ai-win-header">
+                                    <div class="win-dots">
+                                        <div class="dot red"></div>
+                                        <div class="dot yellow"></div>
+                                        <div class="dot green"></div>
+                                    </div>
+                                    <div class="win-title">Generador de Copy</div>
+                                </div>
+                                <div class="ai-win-body">
+                                    <!-- Prompt Input -->
+                                    <div class="ai-input-group">
+                                        <div class="ai-label-tiny">Tu instrucción:</div>
+                                        <div class="ai-prompt-box">
+                                            <span class="typing-text">Post para Instagram...</span>
+                                            <div class="cursor-blink">|</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Magic Button -->
+                                    <div class="ai-generate-btn">
+                                        <span>Generar con IA</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M21 12m-9-9a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                            <path d="M15 12l-4 4l-4 -4" />
+                                            <path d="M11 8l0 8" />
+                                        </svg>
+                                    </div>
+
+                                    <!-- Result Preview (Glassmorphism) -->
+                                    <div class="ai-result-card">
+                                        <div class="result-line w-100"></div>
+                                        <div class="result-line w-90"></div>
+                                        <div class="result-line w-60"></div>
+                                        <div class="ai-badge">✨ Nuevo</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="solution-content">
+                        <h3>IA Generativa</h3>
+                        <p>Crea contenido personalizado para cada cliente en segundos.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Segmentation -->
+                <div class="solution-card">
+                    <div class="solution-visual visual-segmentation">
+                        <!-- CSS Art: Avatars & Tags -->
+                        <!-- CSS Art: Smart CRM List -->
+                        <div class="segment-crm-card">
+                            <!-- Header -->
+                            <div class="crm-header">
+                                <div class="crm-icon">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <span class="crm-title">Segmento: <strong>Compradores VIP</strong></span>
+                            </div>
+                            <!-- List -->
+                            <div class="crm-list">
+                                <!-- User 1 -->
+                                <div class="crm-row">
+                                    <div class="crm-avatar av-1">AM</div>
+                                    <div class="crm-info">
+                                        <div class="crm-name">Ana M.</div>
+                                        <div class="crm-meta">ana@gmail.com</div>
+                                    </div>
+                                    <div class="crm-tag">💎 VIP</div>
+                                </div>
+                                <!-- User 2 -->
+                                <div class="crm-row">
+                                    <div class="crm-avatar av-2">CR</div>
+                                    <div class="crm-info">
+                                        <div class="crm-name">Carlos R.</div>
+                                        <div class="crm-meta">carlos@outlook.com</div>
+                                    </div>
+                                    <div class="crm-tag">🔥 Hot</div>
+                                </div>
+                                <!-- User 3 -->
+                                <div class="crm-row">
+                                    <div class="crm-avatar av-3">SL</div>
+                                    <div class="crm-info">
+                                        <div class="crm-name">Sofía L.</div>
+                                        <div class="crm-meta">sofia@tech.co</div>
+                                    </div>
+                                    <div class="crm-tag">💎 VIP</div>
+                                </div>
+                            </div>
+                            <!-- Floating Check -->
+                            <div class="crm-floating-check">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white"
+                                    stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="solution-content">
+                        <h3>Segmentación</h3>
+                        <p>Divide tu audiencia automáticamente por comportamiento y valor.</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Analytics -->
+                <div class="solution-card">
+                    <div class="solution-visual visual-analytics">
+                        <!-- CSS Art: Growth Dashboard -->
+                        <div class="analytics-dashboard-card">
+                            <!-- Header -->
+                            <div class="dash-header">
+                                <div class="dash-title">Ingresos Recurrentes</div>
+                                <div class="dash-badge">Live</div>
+                            </div>
+
+                            <!-- Main Metric -->
+                            <div class="dash-hero-metric">
+                                <span class="metric-value">$8,450</span>
+                                <span class="metric-trend positive">+12.5%</span>
+                            </div>
+
+                            <!-- Graph Area -->
+                            <div class="dash-graph">
+                                <svg width="100%" height="100%" viewBox="0 0 200 60" preserveAspectRatio="none">
+                                    <defs>
+                                        <linearGradient id="graphGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#48BB78" stop-opacity="0.2" />
+                                            <stop offset="100%" stop-color="#48BB78" stop-opacity="0" />
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- Area -->
+                                    <path
+                                        d="M0,50 C20,45 40,55 60,40 C80,25 100,30 120,20 C140,10 160,15 200,5 V60 H0 Z"
+                                        fill="url(#graphGradient)" />
+                                    <!-- Line -->
+                                    <path d="M0,50 C20,45 40,55 60,40 C80,25 100,30 120,20 C140,10 160,15 200,5"
+                                        fill="none" stroke="#48BB78" stroke-width="2" stroke-linecap="round" />
+                                    <!-- Dot -->
+                                    <circle cx="200" cy="5" r="3" fill="#48BB78" stroke="white" stroke-width="2" />
+                                </svg>
+                            </div>
+
+                            <!-- Sub-stats -->
+                            <div class="dash-footer">
+                                <div class="mini-stat">
+                                    <span class="ms-label">Conversión</span>
+                                    <span class="ms-val">4.2%</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <span class="ms-label">Churn</span>
+                                    <span class="ms-val good">0.8%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="solution-content">
+                        <h3>Analítica</h3>
+                        <p>Optimiza tus campañas con datos reales y reportes detallados.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <style>
+        /* VARIABLES */
+        .solutions-section {
+            --sol-bg-art: #F4F4F4;
+            /* Gris muy claro Mailchimp-esque */
+            --sol-bg-content: #E7B75F;
+            /* Mailchimp Yellow/Mustard tone */
+            --sol-border: #D1D1D1;
+            --sol-text: #1A1A1A;
+            --sol-height: 600px;
+        }
+
+        .solutions-section {
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            border-top: 1px solid var(--sol-border);
+            border-bottom: 1px solid var(--sol-border);
+        }
+
+        .container-fluid {
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+        }
+
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-left: 1px solid var(--sol-border);
+            /* Start border */
+        }
+
+        .solution-card {
+            height: var(--sol-height);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--sol-border);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .solution-card:hover .solution-visual {
+            transform: scale(1.02);
+            /* Subtle zoom effect */
+        }
+
+        /* --- ART AREA (Top 60% -> 360px) --- */
+        .solution-visual {
+            height: 360px;
+            /* Explicit pixel height */
+            flex: none;
+            /* Disable flex sizing to avoid squashing/growing */
+            width: 100%;
+            background-color: var(--sol-bg-art);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.5s ease;
+            padding: 2rem;
+            box-sizing: border-box;
+            /* Critical for padding */
+            overflow: hidden;
+        }
+
+        /* --- CONTENT AREA (Bottom 40% -> 240px) --- */
+        .solution-content {
+            height: 240px;
+            /* Explicit pixel height */
+            flex: none;
+            width: 100%;
+            background-color: var(--sol-bg-content);
+            padding: 2.5rem;
+            box-sizing: border-box;
+            /* Critical for padding */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            color: var(--sol-text);
+            position: relative;
+            z-index: 2;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            /* Subtle divider if needed, but the color diff is enough */
+        }
+
+        .solution-content h3 {
+            font-family: 'Inter', serif;
+            /* Or standard Inter if generic */
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+        }
+
+        .solution-content p {
+            font-size: 1.125rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        /* === CSS ART GRAPHICS === */
+
+        /* 1. Automation Workflow (Diagonal Layout - No Overlap) */
+        .visual-automation {
+            background-color: #F8F6F4;
+            isolation: isolate;
+            display: flex;
+            /* Changed from block */
+            align-items: flex-start;
+            /* Added */
+            padding: 0;
+            padding-left: 2rem;
+            /* Added */
+            position: relative;
+        }
+
+        .workflow-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            /* Removed padding-top: 2rem; */
+        }
+
+        .wf-connector-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Nodes: Align Left */
+        .wf-node {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            width: 160px;
+            /* Compact */
+            z-index: 2;
+            position: absolute;
+            /* Absolute positioning for total control */
+            /* Removed margin-bottom: 25px; */
+        }
+
+        /* Explicit positioning: Super Compact Vertical Flow */
+        .node-1 {
+            top: 20px;
+            left: 30px;
+            border-left: 3px solid #008060;
+        }
+
+        .node-2 {
+            top: 80px;
+            left: 30px;
+            border-left: 3px solid #555;
+        }
+
+        .node-3 {
+            top: 140px;
+            left: 50px;
+            width: auto;
+            background: #EDF2F7;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid #CBD5E0;
+        }
+
+        /* Inner Text */
+        .wf-content-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wf-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2D3748;
+        }
+
+        .wf-subtitle {
+            font-size: 0.6rem;
+            color: #718096;
+        }
+
+        /* Icons */
+        .wf-icon-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .shopify-green {
+            background: #E0F2F1;
+            color: #008060;
+        }
+
+        .gray {
+            background: #EDF2F7;
+            color: #4A5568;
+        }
+
+        /* Popover Card: Hugs bottom right corner */
+        .wf-popover-card {
+            position: absolute;
+            bottom: 15px;
+            /* Lower anchor */
+            right: 15px;
+            width: 110px;
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 8px -5px rgba(0, 0, 0, 0.04);
+            transform: rotate(-3deg);
+            z-index: 10;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: rotate(-3deg) translateY(0);
+            }
+
+            50% {
+                transform: rotate(-3deg) translateY(-5px);
+            }
+        }
+
+        .popover-header {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .popover-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .red {
+            background: #FC8181;
+        }
+
+        .yellow {
+            background: #F6E05E;
+        }
+
+        .green {
+            background: #68D391;
+        }
+
+        .popover-hero {
+            width: 100%;
+            height: 60px;
+            background-color: white;
+            /* Fallback */
+            border-radius: 5px;
+            margin-bottom: 6px;
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            /* Ensure SVG doesn't bleed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popover-line {
+            height: 5px;
+            background: #EDF2F7;
+            border-radius: 2px;
+            margin-bottom: 3px;
+        }
+
+        .popover-btn {
+            margin-top: 6px;
+            width: 100%;
+            background: #1A1A1A;
+            /* Changed */
+            height: 16px;
+            /* Changed */
+            border-radius: 3px;
+            color: white;
+            font-size: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* Changed */
+
+
+        /* 2. AI Editor (Magic Interface) */
+        .visual-ai {
+            background-color: #F0F4F8;
+        }
+
+        .ai-interface-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-float-sparkle {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: floatSparkle 3s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        .s1 {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .s2 {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 1.5s;
+            font-size: 1rem;
+        }
+
+        @keyframes floatSparkle {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: translateY(-10px) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .ai-window {
+            width: 240px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-win-header {
+            background: #F8FAFC;
+            padding: 10px 15px;
+            border-bottom: 1px solid #EEF2F6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .win-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .win-dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Reusing .red, .yellow, .green from prev card if available, else re-declare */
+
+
+        .win-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-win-body {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ai-label-tiny {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #94A3B8;
+            text-transform: uppercase;
+        }
+
+        .ai-prompt-box {
+            background: #F1F5F9;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            border: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .ai-prompt-box:hover {
+            border-color: #CBD5E1;
+        }
+
+        .typing-text {
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .cursor-blink {
+            margin-left: 2px;
+            color: #6366F1;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .ai-generate-btn {
+            background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+            color: white;
+            border-radius: 6px;
+            padding: 6px 0;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px -2px rgba(99, 102, 241, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .ai-generate-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .ai-result-card {
+            margin-top: 5px;
+            background: radial-gradient(circle at top right, #F5F3FF 0%, #FFFFFF 60%);
+            border: 1px solid #E0E7FF;
+            border-radius: 8px;
+            padding: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: #6366F1;
+        }
+
+        .result-line {
+            height: 6px;
+            background: #E2E8F0;
+            border-radius: 3px;
+            margin-bottom: 6px;
+            animation: pulseLoad 2s infinite ease-in-out;
+        }
+
+        .result-line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .result-line:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulseLoad {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .ai-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.55rem;
+            background: #EEF2FF;
+            color: #4F46E5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #C7D2FE;
+            font-weight: 700;
+        }
+
+        /* 3. Segmentation */
+        .visual-segmentation {
+            background-color: #FDF4E3;
+        }
+
+        /* 3. Segmentation (Smart CRM) */
+        .visual-segmentation {
+            background-color: #FDF4E3;
+        }
+
+        .segment-crm-card {
+            width: 240px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08);
+            /* Soft shadow */
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .crm-header {
+            background: #FFF8E1;
+            /* Light yellow tint */
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #F9F1D8;
+            color: #B7791F;
+        }
+
+        .crm-icon {
+            display: flex;
+            align-items: center;
+        }
+
+        .crm-title {
+            font-size: 0.75rem;
+            color: #744210;
+            letter-spacing: 0.3px;
+        }
+
+        .crm-list {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .crm-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: default;
+        }
+
+        .crm-row:hover {
+            background: #F7FAFC;
+        }
+
+        .crm-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .av-1 {
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 99%, #FECFEF 100%);
+        }
+
+        /* Warm gradient */
+        .av-2 {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        /* Cool gradient */
+        .av-3 {
+            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+
+        /* Lavender gradient */
+
+        .crm-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .crm-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #2D3748;
+        }
+
+        .crm-meta {
+            font-size: 0.6rem;
+            color: #A0AEC0;
+        }
+
+        .crm-tag {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            background: #F0FFF4;
+            color: #276749;
+            border: 1px solid #C6F6D5;
+            white-space: nowrap;
+        }
+
+        .crm-floating-check {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            background: #48BB78;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(72, 187, 120, 0.4);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+            animation-delay: 1s;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 4. Analytics (Growth Dashboard) */
+        .visual-analytics {
+            background-color: #E8F5E9;
+        }
+
+        .analytics-dashboard-card {
+            width: 220px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dash-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        .dash-badge {
+            font-size: 0.55rem;
+            background: #F0FFF4;
+            color: #38A169;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dash-badge::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #38A169;
+            animation: pulseLive 1.5s infinite;
+        }
+
+        @keyframes pulseLive {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        .dash-hero-metric {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1A202C;
+            letter-spacing: -0.5px;
+        }
+
+        .metric-trend {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .metric-trend.positive {
+            background: #F0FFF4;
+            color: #38A169;
+        }
+
+        .dash-graph {
+            height: 60px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .dash-footer {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid #EDF2F7;
+        }
+
+        .mini-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ms-label {
+            font-size: 0.6rem;
+            color: #A0AEC0;
+        }
+
+        .ms-val {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4A5568;
+        }
+
+        .ms-val.good {
+            color: #38A169;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .solutions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .solution-card:nth-child(2) {
+                border-right: none;
+            }
+
+            /* End of row 1 */
+        }
+
+        @media (max-width: 768px) {
+            .solutions-grid {
+                grid-template-columns: 1fr;
+                border-left: none;
+            }
+
+            .solution-card {
+                border-right: none;
+                border-bottom: 1px solid var(--sol-border);
+                height: auto;
+                min-height: 500px;
+            }
+
+            .solution-visual {
+                height: 300px;
+            }
+
+            .solution-content {
+                height: auto;
+                padding: 2rem;
+            }
+        }
+    </style>
+</body>
+
+</html>

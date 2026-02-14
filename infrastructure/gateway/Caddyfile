@@ -1,0 +1,24 @@
+# =========================================
+# Caddyfile - Proxy Reverso con SSL Automático
+# MiNuevaLLC - Agencia SaaS IA V3.3
+# =========================================
+
+chat.tudominio.com {
+    reverse_proxy chatwoot_web:3000
+}
+
+wa.tudominio.com {
+    reverse_proxy evolution_api:8080
+}
+
+app.tudominio.com {
+    reverse_proxy appsmith:80
+}
+
+n8n.tudominio.com {
+    reverse_proxy n8n:5678
+}
+
+minio.tudominio.com {
+    reverse_proxy minio:9001
+}

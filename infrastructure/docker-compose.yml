@@ -1,0 +1,235 @@
+# =========================================
+# MiNuevaLLC - Docker Compose V3.3 "BLINDADA"
+# VERSIÓN FINAL DEFINITIVA - BIBLIA MAESTRA
+# =========================================
+# Incluye:
+# - Autoheal (Auto-recuperación)
+# - MinIO (Almacenamiento S3)
+# - Caddy (HTTPS/SSL)
+# - Moltbot (Cerebro)
+# - Whisper + LiveKit + Voice Agent (Voz)
+# - Gotenberg (PDFs/Facturas)
+# - Chatwoot + Evolution API (Omnicanal)
+# - LiteLLM (IA Universal)
+# - n8n + Appsmith (Automatización)
+# - Postgres + Redis + Qdrant (Datos)
+# =========================================
+
+version: '3.9'
+
+networks:
+  agencia-net:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+  chatwoot_data:
+  n8n_data:
+  appsmith_data:
+  minio_data:
+
+
+services:
+  # =========================================
+  # 🛡️ 0. VIGILANCIA & RECUPERACIÓN
+  # =========================================
+  autoheal:
+    # Reinicia servicios si se congelan
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  # =========================================
+  # 🌐 1. GATEWAY (ACCESO HTTPS)
+  # =========================================
+  caddy:
+    image: caddy:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./gateway/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 🧠 2. CEREBRO (MOLTBOT)
+  # =========================================
+  moltbot:
+    build: ../apps/moltbot
+    restart: always
+    environment:
+      - DATABASE_URL=postgres://user:pass@postgres:5432/agencia
+      - REDIS_URL=redis://redis:6379
+      - LITELLM_URL=http://litellm:4000
+      - CHATWOOT_URL=http://chatwoot_web:3000
+      - MINIO_ENDPOINT=minio
+      - MINIO_BUCKET=agencia-assets
+      - GOTENBERG_URL=http://gotenberg:3000
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - litellm
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+      interval: 40s
+      timeout: 10s
+      retries: 3
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 📦 3. ALMACENAMIENTO (S3)
+  # =========================================
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # API Interna
+      - "9001:9001" # Panel Web Admin
+    environment:
+      - MINIO_ROOT_USER=${MINIO_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_PASS}
+    volumes:
+      - minio_data:/data
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 🎙️ 4. VOZ & LLAMADAS (SIP + STT)
+  # =========================================
+  whisper:
+    # Transcripción Audio -> Texto
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    environment:
+      - ASR_MODEL=small
+    networks:
+      - agencia-net
+
+  livekit:
+    # Servidor de Llamadas
+    image: livekit/livekit-server:latest
+    command: --config /livekit.yaml
+    ports:
+      - "7880:7880"
+      - "50000-50200:50000-50200/udp"
+    volumes:
+      - ./voice/livekit.yaml:/livekit.yaml
+    networks:
+      - agencia-net
+
+  voice-agent:
+    # IA que contesta el teléfono
+    build: ../apps/voice-agent
+    depends_on:
+      - livekit
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 📄 5. DOCUMENTOS & FACTURAS
+  # =========================================
+  gotenberg:
+    image: gotenberg/gotenberg:latest
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 💬 6. CANALES (OMNICANAL)
+  # =========================================
+  chatwoot_web:
+    image: chatwoot/chatwoot:latest
+    environment:
+      - FRONTEND_URL=https://chat.tudominio.com
+      - POSTGRES_HOST=postgres
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - chatwoot_data:/app/storage
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - agencia-net
+
+  evolution_api:
+    # WhatsApp
+    image: atendai/evolution-api:v2.1.1
+    environment:
+      - SERVER_URL=https://wa.tudominio.com
+      - DATABASE_ENABLED=true
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 🤖 7. IA PROXY
+  # =========================================
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    ports:
+      - "4000:4000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_KEY}
+    networks:
+      - agencia-net
+
+  # =========================================
+  # ⚡ 8. TOOLS & DASHBOARDS
+  # =========================================
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - agencia-net
+
+  appsmith:
+    image: appsmith/appsmith-ce
+    volumes:
+      - appsmith_data:/appsmith-stacks
+    networks:
+      - agencia-net
+
+  # =========================================
+  # 💾 9. DATOS (CORE)
+  # =========================================
+  postgres:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=agencia
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agencia-net
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - agencia-net
+
+  qdrant:
+    image: qdrant/qdrant
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - agencia-net

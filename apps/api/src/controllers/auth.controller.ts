@@ -1,0 +1,191 @@
+import { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import { prisma } from '@repo/database';
+import { logger } from '@repo/logger';
+import { generateToken } from '../middlewares/auth';
+
+const SALT_ROUNDS = 12;
+
+export const authController = {
+    /**
+     * POST /api/v1/auth/register
+     * Crea un usuario y su organización, devuelve JWT.
+     */
+    register: async (req: Request, res: Response) => {
+        try {
+            const { email, password, name, organizationName } = req.body;
+
+            if (!email || !password || !organizationName) {
+                return res.status(400).json({
+                    error: 'MISSING_FIELDS',
+                    message: 'Se requieren: email, password, organizationName.',
+                });
+            }
+
+            // Verificar si el email ya existe
+            const existing = await prisma.user.findUnique({ where: { email } });
+            if (existing) {
+                return res.status(409).json({
+                    error: 'EMAIL_EXISTS',
+                    message: 'Este correo ya está registrado.',
+                });
+            }
+
+            // Crear organización + usuario en una transacción
+            const slug = organizationName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+            const result = await prisma.$transaction(async (tx) => {
+                const org = await tx.organization.create({
+                    data: {
+                        name: organizationName,
+                        slug: `${slug}-${Date.now().toString(36)}`,
+                        referredBy: req.body.referralCode || null,
+                    },
+                });
+
+                const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+                const user = await tx.user.create({
+                    data: {
+                        email,
+                        passwordHash,
+                        name: name || null,
+                        role: 'ADMIN',
+                        organizationId: org.id,
+                    },
+                });
+
+                return { user, org };
+            });
+
+            const token = generateToken({
+                userId: result.user.id,
+                organizationId: result.org.id,
+                role: result.user.role,
+            });
+
+            logger.info({ userId: result.user.id, orgId: result.org.id }, 'New user registered');
+
+            // Send welcome email
+            import('../services/email.service').then(({ emailService }) => {
+                emailService.sendWelcome(email, name || 'Usuario');
+            }).catch(err => logger.error({ err }, 'Failed to send welcome email'));
+
+            res.status(201).json({
+                token,
+                user: {
+                    id: result.user.id,
+                    email: result.user.email,
+                    name: result.user.name,
+                    role: result.user.role,
+                },
+                organization: {
+                    id: result.org.id,
+                    name: result.org.name,
+                    slug: result.org.slug,
+                },
+            });
+        } catch (error) {
+            logger.error(error, 'Error en registro');
+            res.status(500).json({ error: 'Error al crear cuenta' });
+        }
+    },
+
+    /**
+     * POST /api/v1/auth/login
+     * Valida credenciales y devuelve JWT.
+     */
+    login: async (req: Request, res: Response) => {
+        try {
+            const { email, password } = req.body;
+
+            if (!email || !password) {
+                return res.status(400).json({
+                    error: 'MISSING_FIELDS',
+                    message: 'Se requieren: email, password.',
+                });
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { email },
+                include: { organization: true },
+            });
+
+            if (!user) {
+                return res.status(401).json({
+                    error: 'INVALID_CREDENTIALS',
+                    message: 'Correo o contraseña incorrectos.',
+                });
+            }
+
+            const passwordValid = await bcrypt.compare(password, user.passwordHash);
+            if (!passwordValid) {
+                return res.status(401).json({
+                    error: 'INVALID_CREDENTIALS',
+                    message: 'Correo o contraseña incorrectos.',
+                });
+            }
+
+            const token = generateToken({
+                userId: user.id,
+                organizationId: user.organizationId,
+                role: user.role,
+            });
+
+            logger.info({ userId: user.id }, 'User logged in');
+
+            res.json({
+                token,
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                },
+                organization: {
+                    id: user.organization.id,
+                    name: user.organization.name,
+                    slug: user.organization.slug,
+                    balance: user.organization.creditBalance,
+                },
+            });
+        } catch (error) {
+            logger.error(error, 'Error en login');
+            res.status(500).json({ error: 'Error al iniciar sesión' });
+        }
+    },
+
+    /**
+     * GET /api/v1/auth/me
+     * Retorna datos del usuario actual (requiere token).
+     */
+    me: async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).userId;
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                include: { organization: { include: { plan: true } } },
+            });
+
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            res.json({
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                },
+                organization: {
+                    id: user.organization.id,
+                    name: user.organization.name,
+                    balance: user.organization.creditBalance,
+                    plan: user.organization.plan?.name || 'Sin plan',
+                },
+            });
+        } catch (error) {
+            logger.error(error, 'Error obteniendo perfil');
+            res.status(500).json({ error: 'Error al obtener perfil' });
+        }
+    },
+};
