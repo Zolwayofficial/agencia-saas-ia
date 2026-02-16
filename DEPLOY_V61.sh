@@ -158,8 +158,13 @@ echo "🏗️ [6/7] Construyendo y levantando servicios con Docker..."
 
 cd "$PROJECT_DIR/infrastructure/production"
 
-# Construir imágenes custom (saas-api, saas-worker, saas-web)
-docker compose build --no-cache saas-api saas-worker saas-web
+# Construir imágenes custom UNA A LA VEZ (evitar falta de memoria)
+echo "   Construyendo saas-api..."
+docker compose build --no-cache saas-api
+echo "   Construyendo saas-worker..."
+docker compose build --no-cache saas-worker
+echo "   Construyendo saas-web..."
+docker compose build --no-cache saas-web
 
 # Levantar TODO (core + saas)
 docker compose up -d
