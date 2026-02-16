@@ -23,6 +23,7 @@ RUN pnpm turbo run build --filter=api...
 
 # ─── Runner ──────────────────────────────────────────
 FROM node:20-alpine AS runner
+RUN apk add --no-cache openssl
 WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 apiuser
