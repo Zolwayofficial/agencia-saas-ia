@@ -95,7 +95,7 @@ export const whatsappController = {
 
             // Optionally sync status with Evolution API
             const enriched = await Promise.all(
-                instances.map(async (inst) => {
+                instances.map(async (inst: any) => {
                     try {
                         const status = await evolutionApi.getInstanceStatus(inst.instanceName);
                         const state = status?.instance?.state || status?.state || 'close';

@@ -11,7 +11,7 @@ const headers = {
     'apikey': EVOLUTION_KEY,
 };
 
-async function evoFetch(path: string, options: RequestInit = {}) {
+async function evoFetch(path: string, options: RequestInit = {}): Promise<any> {
     const res = await fetch(`${EVOLUTION_URL}${path}`, {
         ...options,
         headers: { ...headers, ...(options.headers || {}) },
