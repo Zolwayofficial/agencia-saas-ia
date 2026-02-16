@@ -220,14 +220,14 @@ services:
           memory: 1G
 
   # --- OpenClaw: Autonomous AI Agents ---
-  openclaw:
-    image: docker.io/openclaw/openclaw:latest
-    restart: always
-    volumes:
-      - openclaw_data:/app/data
-    networks:
-      - internal
-      - web
+  # openclaw:
+  #   image: docker.io/openclaw/openclaw:latest
+  #   restart: always
+  #   volumes:
+  #     - openclaw_data:/app/data
+  #   networks:
+  #     - internal
+  #     - web
 
   # ============================================
   # PHASE 3: CUSTOM SAAS APPS
@@ -278,7 +278,7 @@ volumes:
   portainer_data:
   ollama_data:
   dify_storage:
-  openclaw_data:
+    # openclaw_data:
 
 
 networks:
