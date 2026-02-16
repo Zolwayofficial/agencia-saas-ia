@@ -120,7 +120,7 @@ export const llmClient = {
         });
 
         if (!res.ok) throw new Error(`Ollama error: ${res.status}`);
-        const data = await res.json();
+        const data = await res.json() as any;
 
         return {
             content: data.message?.content || '',
@@ -149,7 +149,7 @@ export const llmClient = {
         });
 
         if (!res.ok) throw new Error(`LLM API error: ${res.status}`);
-        const data = await res.json();
+        const data = await res.json() as any;
 
         const choice = data.choices?.[0];
         return {
