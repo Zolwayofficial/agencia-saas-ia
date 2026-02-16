@@ -6,7 +6,7 @@ import { stripeController } from './controllers/stripe.controller';
 import { errorHandler } from './middlewares/error-handler';
 import { apiRateLimiter } from './middlewares/rate-limit';
 
-const app = express();
+const app: express.Application = express();
 
 // Global Middleware
 app.use(cors());
