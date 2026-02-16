@@ -73,7 +73,7 @@ export function createAgentWorker(connection: IORedis) {
             },
         });
 
-        // ── 4. Cobrar por la ejecución ──────────────────────────
+        // ── 4. Confirmar reserva de crédito [V6.1] ──────────────
         await prisma.$transaction([
             prisma.organization.update({
                 where: { id: organizationId },
@@ -87,6 +87,10 @@ export function createAgentWorker(connection: IORedis) {
                     description: `Agent run: ${model} (${result.status})`,
                 },
             }),
+            prisma.creditReservation.update({
+                where: { jobId: job.id },
+                data: { status: 'CONFIRMED' },
+            }),
         ]);
 
         logger.info({ taskId, status: result.status, durationMs: result.durationMs }, 'Agent: execution complete');
@@ -97,8 +101,38 @@ export function createAgentWorker(connection: IORedis) {
         concurrency: 2, // Máximo 2 agentes simultáneos (proteger RAM)
     });
 
-    worker.on('failed', (job, err) => {
+    worker.on('failed', async (job, err) => {
         logger.error({ jobId: job?.id, err: err.message }, 'Agent: job failed');
+
+        // [V6.1] Mark reservation as FAILED
+        if (job?.id) {
+            try {
+                await prisma.creditReservation.update({
+                    where: { jobId: job.id },
+                    data: { status: 'FAILED' },
+                });
+            } catch (e) {
+                logger.error({ jobId: job.id }, 'Agent: failed to update reservation');
+            }
+        }
+
+        // [V6.1] DLQ for permanently failed jobs
+        if (job && job.attemptsMade >= 3) {
+            try {
+                await prisma.failedMessage.create({
+                    data: {
+                        organizationId: job.data.organizationId,
+                        jobId: job.id,
+                        payload: job.data as any,
+                        error: err.message,
+                        attempts: job.attemptsMade,
+                    },
+                });
+                logger.warn({ jobId: job.id }, 'Agent: moved to DLQ after max retries');
+            } catch (dlqErr) {
+                logger.error({ jobId: job.id, dlqErr }, 'Agent: failed to save to DLQ');
+            }
+        }
     });
 
     return worker;

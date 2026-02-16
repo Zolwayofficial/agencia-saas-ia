@@ -20,7 +20,18 @@ const NORMAL_LIMITER = { max: 10, duration: 60_000 };
 export function createSmartSendWorker(connection: IORedis) {
     const worker = new Worker<SendMessagePayload>('whatsapp-send', async (job: Job<SendMessagePayload>) => {
         const { instanceId, to, text, organizationId, priority } = job.data;
-        logger.info({ jobId: job.id, to, priority }, 'SmartSend: processing message');
+        logger.info({ jobId: job.id, to, instanceId }, 'SmartSend: starting');
+
+        // ── [V6.1] Idempotency check ────────────────────────────
+        if (job.data.idempotencyKey) {
+            const existing = await prisma.sentMessage.findUnique({
+                where: { idempotencyKey: job.data.idempotencyKey },
+            });
+            if (existing) {
+                logger.info({ idempotencyKey: job.data.idempotencyKey }, 'SmartSend: duplicate detected, skipping');
+                return;
+            }
+        }
 
         // ── 1. Verificar salud de la instancia ──────────────────
         const instance = await prisma.whatsappInstance.findUnique({
@@ -69,6 +80,18 @@ export function createSmartSendWorker(connection: IORedis) {
             data: { messagesUsedThisMonth: { increment: 1 } },
         });
 
+        // ── [V6.1] 7. Registrar para idempotencia ───────────────
+        await prisma.sentMessage.create({
+            data: {
+                idempotencyKey: job.data.idempotencyKey || null,
+                organizationId,
+                instanceId,
+                to,
+                jobId: job.id,
+                status: 'sent',
+            },
+        });
+
         // ── 7. Incrementar contador de mensajes de instancia ────
         await prisma.whatsappInstance.update({
             where: { id: instanceId },
@@ -82,8 +105,26 @@ export function createSmartSendWorker(connection: IORedis) {
         limiter: NORMAL_LIMITER,
     });
 
-    worker.on('failed', (job, err) => {
+    worker.on('failed', async (job, err) => {
         logger.error({ jobId: job?.id, err: err.message }, 'SmartSend: job failed');
+
+        // [V6.1] DLQ: persist permanently failed jobs
+        if (job && job.attemptsMade >= 3) {
+            try {
+                await prisma.failedMessage.create({
+                    data: {
+                        organizationId: job.data.organizationId,
+                        jobId: job.id,
+                        payload: job.data as any,
+                        error: err.message,
+                        attempts: job.attemptsMade,
+                    },
+                });
+                logger.warn({ jobId: job.id }, 'SmartSend: moved to DLQ after max retries');
+            } catch (dlqErr) {
+                logger.error({ jobId: job.id, dlqErr }, 'SmartSend: failed to save to DLQ');
+            }
+        }
     });
 
     return worker;

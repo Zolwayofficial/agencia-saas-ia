@@ -2,24 +2,34 @@ import { Request, Response } from 'express';
 import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
 import { queueService } from '../services/queue.service';
+import { RunAgentSchema } from '@repo/types';
+
+const COST_PER_AGENT_RUN = parseFloat(process.env.COST_PER_AGENT_RUN || '0.50');
 
 export const agentController = {
     /**
      * POST /api/v1/agents/run
      * Crea una tarea de agente y la encola para ejecución en Docker.
      * Protegido por credit-guard (verificación de saldo).
+     * [V6.1] Validación Zod + CreditReservation.
      */
     run: async (req: Request, res: Response) => {
         try {
             const organizationId = (req as any).organizationId;
-            const { model, maxSteps, timeout } = req.body;
 
-            if (!model) {
+            // [V6.1] Zod validation
+            const parsed = RunAgentSchema.safeParse(req.body);
+            if (!parsed.success) {
                 return res.status(400).json({
-                    error: 'MISSING_FIELDS',
-                    message: 'Se requiere: model.',
+                    error: 'VALIDATION_ERROR',
+                    details: parsed.error.errors.map(e => ({
+                        field: e.path.join('.'),
+                        message: e.message,
+                    })),
                 });
             }
+
+            const { model, maxSteps, timeout } = parsed.data;
 
             // Crear registro de tarea en DB + incrementar uso mensual
             const [task] = await prisma.$transaction([
@@ -40,12 +50,23 @@ export const agentController = {
             const job = await queueService.runAgent({
                 taskId: task.id,
                 model,
-                maxSteps: maxSteps || 10,
-                timeout: timeout || 120000,
+                maxSteps,
+                timeout,
                 organizationId,
             });
 
-            logger.info({ taskId: task.id, jobId: job.id, model }, 'Agent task enqueued');
+            // [V6.1] Reservar crédito ANTES de ejecutar
+            await prisma.creditReservation.create({
+                data: {
+                    organizationId,
+                    amount: COST_PER_AGENT_RUN,
+                    status: 'PENDING',
+                    jobId: job.id,
+                    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min
+                },
+            });
+
+            logger.info({ taskId: task.id, jobId: job.id, model }, 'Agent task enqueued with credit reservation');
 
             res.status(202).json({
                 message: 'Agente encolado para ejecución',

@@ -1,4 +1,5 @@
 export interface SendMessagePayload {
+    idempotencyKey?: string;
     instanceId: string;
     to: string;
     text: string;

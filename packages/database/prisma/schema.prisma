@@ -69,6 +69,7 @@ model Plan {
   messagesIncluded  Int          // Msgs WhatsApp incluidos/mes
   agentRunsIncluded Int          // Ejecuciones IA/mes (-1 = ilimitado)
   maxInstances      Int      @default(1)
+  rateLimit         Int      @default(60)  // [V6.1] Requests por minuto
   organizations     Organization[]
 
   @@map("plans")
@@ -125,6 +126,60 @@ enum ConnectionStatus {
   DISCONNECTED
   QR_PENDING
   CONNECTED
+}
+
+// ─── [V6.1] IDEMPOTENCIA — Tracking de mensajes enviados ────
+
+model SentMessage {
+  id              String   @id @default(cuid())
+  idempotencyKey  String?  @unique
+  organizationId  String
+  instanceId      String
+  to              String
+  jobId           String?
+  status          String   @default("sent")
+  createdAt       DateTime @default(now())
+
+  @@index([organizationId, createdAt])
+  @@map("sent_messages")
+}
+
+// ─── [V6.1] CREDIT RESERVATION — Previene cobros fallidos ───
+
+model CreditReservation {
+  id             String            @id @default(cuid())
+  organizationId String
+  amount         Float
+  status         ReservationStatus @default(PENDING)
+  jobId          String?           @unique
+  createdAt      DateTime          @default(now())
+  expiresAt      DateTime
+
+  @@index([organizationId, status])
+  @@map("credit_reservations")
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  EXPIRED
+}
+
+// ─── [V6.1] DEAD LETTER QUEUE — Jobs fallidos persistidos ───
+
+model FailedMessage {
+  id             String   @id @default(cuid())
+  organizationId String
+  jobId          String?
+  payload        Json
+  error          String
+  attempts       Int      @default(0)
+  failedAt       DateTime @default(now())
+  resolved       Boolean  @default(false)
+
+  @@index([organizationId, resolved])
+  @@map("failed_messages")
 }
 
 // ─── REFERIDOS ──────────────────────────────────────────────

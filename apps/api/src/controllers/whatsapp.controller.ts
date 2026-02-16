@@ -5,6 +5,11 @@ import { evolutionApi } from '../lib/evolution';
 import { queueService } from '../services/queue.service';
 import type { SendMessagePayload } from '@repo/types';
 import { env } from '../config/env';
+import { SendMessageSchema, CreateInstanceSchema } from '@repo/types';
+import { complianceService } from '../services/compliance.service';
+
+const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://evolution_api:8080';
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
 
 export const whatsappController = {
     /**

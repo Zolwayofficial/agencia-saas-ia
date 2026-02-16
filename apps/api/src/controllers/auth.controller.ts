@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
 import { generateToken } from '../middlewares/auth';
+import { RegisterSchema, LoginSchema } from '@repo/types';
 
 const SALT_ROUNDS = 12;
 
@@ -10,17 +11,22 @@ export const authController = {
     /**
      * POST /api/v1/auth/register
      * Crea un usuario y su organización, devuelve JWT.
+     * [V6.1] Validación con Zod.
      */
     register: async (req: Request, res: Response) => {
         try {
-            const { email, password, name, organizationName } = req.body;
-
-            if (!email || !password || !organizationName) {
+            const parsed = RegisterSchema.safeParse(req.body);
+            if (!parsed.success) {
                 return res.status(400).json({
-                    error: 'MISSING_FIELDS',
-                    message: 'Se requieren: email, password, organizationName.',
+                    error: 'VALIDATION_ERROR',
+                    details: parsed.error.errors.map(e => ({
+                        field: e.path.join('.'),
+                        message: e.message,
+                    })),
                 });
             }
+
+            const { email, password, name, organizationName, referralCode } = parsed.data;
 
             // Verificar si el email ya existe
             const existing = await prisma.user.findUnique({ where: { email } });
@@ -39,7 +45,7 @@ export const authController = {
                     data: {
                         name: organizationName,
                         slug: `${slug}-${Date.now().toString(36)}`,
-                        referredBy: req.body.referralCode || null,
+                        referredBy: referralCode || null,
                     },
                 });
 
@@ -95,16 +101,23 @@ export const authController = {
      * POST /api/v1/auth/login
      * Valida credenciales y devuelve JWT.
      */
+    /**
+     * [V6.1] Validación con Zod.
+     */
     login: async (req: Request, res: Response) => {
         try {
-            const { email, password } = req.body;
-
-            if (!email || !password) {
+            const parsed = LoginSchema.safeParse(req.body);
+            if (!parsed.success) {
                 return res.status(400).json({
-                    error: 'MISSING_FIELDS',
-                    message: 'Se requieren: email, password.',
+                    error: 'VALIDATION_ERROR',
+                    details: parsed.error.errors.map(e => ({
+                        field: e.path.join('.'),
+                        message: e.message,
+                    })),
                 });
             }
+
+            const { email, password } = parsed.data;
 
             const user = await prisma.user.findUnique({
                 where: { email },
