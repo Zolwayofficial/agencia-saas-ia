@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -47,7 +47,7 @@ const PLANS = [
     },
 ];
 
-export default function BillingPage() {
+function BillingContent() {
     const [sub, setSub] = useState<Subscription | null>(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState<string | null>(null);
@@ -192,5 +192,13 @@ export default function BillingPage() {
                 ))}
             </div>
         </>
+    );
+}
+
+export default function BillingPage() {
+    return (
+        <Suspense fallback={<div className="page-loading">Cargando facturación...</div>}>
+            <BillingContent />
+        </Suspense>
     );
 }

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { Suspense, useState, FormEvent } from 'react';
 import { useAuth } from '../../lib/auth-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { INDUSTRY_TEMPLATES, IndustryKey } from '../../lib/kpi-templates';
 
-export default function RegisterPage() {
+function RegisterContent() {
     const { register } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -156,5 +156,13 @@ export default function RegisterPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={<div className="auth-container"><div className="auth-card"><p>Cargando...</p></div></div>}>
+            <RegisterContent />
+        </Suspense>
     );
 }
