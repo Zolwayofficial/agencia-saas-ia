@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
-RUN pnpm turbo run db:generate
+RUN cd packages/database && npx prisma generate
 
 COPY --from=builder /app/out/full/ .
 RUN pnpm turbo run build --filter=api...
