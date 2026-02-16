@@ -113,9 +113,11 @@ STRIPE_WEBHOOK_SECRET=whsec_CAMBIAR_ESTO
 EVOLUTION_API_URL=http://evolution-api:8080
 EVOLUTION_API_KEY=CAMBIAR_ESTO_evolution_key
 
-# ─── AI (Agentes) ───────────────────────────────────────────
-OPENAI_API_KEY=CAMBIAR_ESTO_openai_key
-GROQ_API_KEY=CAMBIAR_ESTO_groq_key
+# ─── AI Local (Ollama — corre en tu VPS) ────────────────────
+# No necesitas claves externas. Ollama corre local.
+OLLAMA_URL=http://ollama:11434
+OPENAI_API_BASE=http://ollama:11434/v1
+AI_MODEL=llama3.1
 
 # ─── URLs del SaaS ──────────────────────────────────────────
 API_URL=https://api.fulllogin.com
