@@ -261,6 +261,8 @@ services:
     build:
       context: ../..
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.fulllogin.com/api/v1}
     restart: always
     environment:
       - NEXT_PUBLIC_API_URL=https://api.fulllogin.com/api/v1

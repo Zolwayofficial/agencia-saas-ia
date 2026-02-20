@@ -17,6 +17,11 @@ RUN pnpm install --frozen-lockfile
 
 COPY --from=builder /app/out/full/ .
 ENV NODE_OPTIONS="--max_old_space_size=2048"
+
+# Pasamos la variable pública al build de Next.js
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN pnpm turbo run build --filter=web...
 
 FROM node:20-alpine AS runner
