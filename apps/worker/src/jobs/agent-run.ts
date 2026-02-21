@@ -26,7 +26,9 @@ export function createAgentWorker(connection: IORedis) {
         // ── 2. Ejecutar agente en jaula Docker ──────────────────
         let result: TaskResult;
         try {
-            const containerResult = await dockerClient.runAgent(taskId, model, maxSteps, timeout);
+            // Pasamos la URL del servidor MCP para que la jaula Docker la reciba como variable de entorno
+            const mcpServerUrl = process.env.MCP_SERVER_URL || "http://postgres-mcp:3000/sse";
+            const containerResult = await dockerClient.runAgent(taskId, model, maxSteps, timeout, { mcpServerUrl });
 
             if (containerResult.statusCode === 0) {
                 result = {

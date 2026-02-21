@@ -257,6 +257,17 @@ services:
     networks:
       - internal
 
+  postgres-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db # Need to verify correct DB
+    depends_on: [ postgres ]
+    networks:
+      - internal
+
   saas-web:
     build:
       context: ../..

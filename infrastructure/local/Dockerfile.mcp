@@ -1,0 +1,10 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Ensure we have the latest MCP server globally installed
+RUN npm install -g @modelcontextprotocol/server-postgres
+
+# By default, the Postgres MCP server requires a connection string as the first argument.
+ENTRYPOINT ["npx", "-y", "@modelcontextprotocol/server-postgres"]
+CMD ["${DATABASE_URL}"]

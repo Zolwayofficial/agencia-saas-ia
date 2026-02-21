@@ -64,6 +64,16 @@ services:
       EVOLUTION_API_KEY: dev-key
     depends_on: [ postgres, redis ]
 
+  postgres-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres:5432/saas_db
+    ports:
+      - "3002:3000"
+    depends_on: [ postgres ]
+
 volumes:
   pg_data:
   minio_data:

@@ -19,6 +19,10 @@ export interface AgentContainerResult {
     durationMs: number;
 }
 
+export interface AgentRunContext {
+    mcpServerUrl?: string;
+}
+
 export const dockerClient = {
     /**
      * Ejecuta un agente en un contenedor Docker efímero (jaula aislada).
@@ -26,7 +30,7 @@ export const dockerClient = {
      * - Límite de memoria configurable
      * - Se auto-destruye al terminar (AutoRemove: true)
      */
-    async runAgent(taskId: string, model: string, maxSteps: number, timeout: number): Promise<AgentContainerResult> {
+    async runAgent(taskId: string, model: string, maxSteps: number, timeout: number, context?: AgentRunContext): Promise<AgentContainerResult> {
         const startTime = Date.now();
 
         logger.info({ taskId, model, maxSteps, image: AGENT_IMAGE }, 'Docker: creating ephemeral container');
@@ -34,6 +38,9 @@ export const dockerClient = {
         const container = await docker.createContainer({
             Image: AGENT_IMAGE,
             Cmd: ['python', 'main.py', '--task', taskId, '--model', model, '--max-steps', String(maxSteps)],
+            Env: [
+                ...(context?.mcpServerUrl ? [`MCP_SERVER_URL=${context.mcpServerUrl}`] : [])
+            ],
             HostConfig: {
                 Memory: AGENT_MEMORY_MB * 1024 * 1024,
                 NetworkMode: AGENT_NETWORK,
