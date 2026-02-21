@@ -15,7 +15,7 @@ class MCPClientService {
             },
             {
                 capabilities: {
-                    tools: {},
+                    experimental: {},
                 },
             }
         );
@@ -51,12 +51,12 @@ class MCPClientService {
         }
     }
 
-    async getAvailableTools() {
+    async getAvailableTools(): Promise<any> {
         if (!this.isConnected) await this.connect();
         return await this.client.listTools();
     }
 
-    async executeTool(toolName: string, args: any) {
+    async executeTool(toolName: string, args: any): Promise<any> {
         if (!this.isConnected) await this.connect();
 
         logger.info({ service: 'mcp-client', tool: toolName }, "Executing MCP tool");
