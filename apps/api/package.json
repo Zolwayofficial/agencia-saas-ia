@@ -21,7 +21,8 @@
         "stripe": "^17.5.0",
         "resend": "^4.0.1",
         "bcryptjs": "^2.4.3",
-        "jsonwebtoken": "^9.0.2"
+        "jsonwebtoken": "^9.0.2",
+        "axios": "^1.6.0"
     },
     "devDependencies": {
         "@types/cors": "^2.8.17",
