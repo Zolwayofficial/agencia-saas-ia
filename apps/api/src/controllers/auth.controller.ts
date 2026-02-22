@@ -4,6 +4,7 @@ import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
 import { generateToken } from '../middlewares/auth';
 import { RegisterSchema, LoginSchema } from '@repo/types';
+import { IntegrationsService } from '../services/integrations.service';
 
 const SALT_ROUNDS = 12;
 
@@ -27,6 +28,15 @@ export const authController = {
             }
 
             const { email, password, name, organizationName, referralCode } = parsed.data;
+
+            // [FREE API] Validar correo con Disify
+            const isEmailValid = await IntegrationsService.validateEmail(email);
+            if (!isEmailValid) {
+                return res.status(400).json({
+                    error: 'INVALID_EMAIL_DOMAIN',
+                    message: 'Lo sentimos, no permitimos correos temporales o inválidos.'
+                });
+            }
 
             // Verificar si el email ya existe
             const existing = await prisma.user.findUnique({ where: { email } });
