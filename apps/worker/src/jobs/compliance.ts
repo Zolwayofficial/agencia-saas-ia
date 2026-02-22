@@ -57,12 +57,20 @@ export function createComplianceWorker(connection: IORedis) {
                     limit: messagesLimit,
                 }, `Compliance: ALERT ${threshold.level} — ${threshold.message}`);
 
-                // TODO: Enviar notificación real al cliente
-                // Opciones:
-                //   - Email via Mailpit/SendGrid
-                //   - WhatsApp via Evolution API al admin
-                //   - Webhook a n8n
-                //   - Push notification al dashboard
+                // ── Enviar notificación real [V6.1] ──────────────────
+                try {
+                    const admin = await prisma.user.findFirst({
+                        where: { organizationId, role: 'ADMIN' },
+                    });
+
+                    if (admin?.email) {
+                        const { emailService } = await import('@repo/email');
+                        await emailService.sendUsageAlert(admin.email, threshold.percent, 'mensajes WhatsApp');
+                        logger.info({ organizationId, email: admin.email }, 'Compliance: email alert sent');
+                    }
+                } catch (emailErr) {
+                    logger.error({ organizationId, emailErr }, 'Compliance: failed to send email alert');
+                }
             }
         }
 

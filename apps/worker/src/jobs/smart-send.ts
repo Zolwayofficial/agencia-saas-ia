@@ -19,7 +19,7 @@ const NORMAL_LIMITER = { max: 10, duration: 60_000 };
 
 export function createSmartSendWorker(connection: IORedis) {
     const worker = new Worker<SendMessagePayload>('whatsapp-send', async (job: Job<SendMessagePayload>) => {
-        const { instanceId, to, text, organizationId, priority } = job.data;
+        const { instanceId, to, text, organizationId } = job.data;
         logger.info({ jobId: job.id, to, instanceId }, 'SmartSend: starting');
 
         // ── [V6.1] Idempotency check ────────────────────────────
@@ -38,70 +38,61 @@ export function createSmartSendWorker(connection: IORedis) {
             where: { id: instanceId },
         });
 
-        if (!instance) {
-            throw new Error(`Instance ${instanceId} not found`);
-        }
+        if (!instance) throw new Error(`Instance ${instanceId} not found`);
 
         if (instance.health === 'BANNED') {
             logger.error({ instanceId }, 'SmartSend: instance is BANNED, skipping');
             throw new Error(`Instance ${instanceId} is banned`);
         }
 
-        if (instance.health === 'THROTTLED') {
-            logger.warn({ instanceId }, 'SmartSend: instance is THROTTLED, applying extra delay');
-            await new Promise((r) => setTimeout(r, 10_000)); // 10s extra
-        }
-
         // ── 2. Simular "escribiendo..." ─────────────────────────
         try {
             await evolutionApi.setPresence(instanceId, 'composing');
         } catch (err) {
-            logger.warn({ instanceId, err }, 'SmartSend: failed to set presence (non-fatal)');
+            logger.warn({ instanceId, err }, 'SmartSend: failed to set presence');
         }
 
-        // ── 3. Jitter Anti-Bot (2s a 7s aleatorio) ──────────────
-        const jitter = Math.random() * 5_000 + 2_000;
-        await new Promise((r) => setTimeout(r, jitter));
+        // ── 3. Jitter Anti-Bot + Warmup Logic ───────────────────
+        // Si es WARMUP, forzamos un delay mínimo de 1 minuto (60s)
+        const isWarmup = instance.health === 'WARMUP';
+        const jitter = Math.random() * 5_000 + 2_000; // Base 2-7s
+        const totalDelay = isWarmup ? Math.max(60_000, jitter) : jitter;
+
+        if (isWarmup) logger.info({ instanceId }, 'SmartSend: numbers in WARMUP mode; applying 60s delay');
+        await new Promise((r) => setTimeout(r, totalDelay));
 
         // ── 4. Enviar mensaje via Evolution API ─────────────────
         await evolutionApi.sendText(instanceId, to, text);
-        logger.info({ to, instanceId, delay: Math.round(jitter) }, 'SmartSend: message sent');
+        logger.info({ to, instanceId, delay: Math.round(totalDelay) }, 'SmartSend: message sent');
 
-        // ── 5. Quitar estado "escribiendo" ──────────────────────
-        try {
-            await evolutionApi.setPresence(instanceId, 'paused');
-        } catch {
-            // Non-fatal
-        }
+        // ── 5. Registrar y Limpiar ──────────────────────────────
+        try { await evolutionApi.setPresence(instanceId, 'paused'); } catch { }
 
-        // ── 6. Incrementar contador mensual de uso ──────────────
-        await prisma.organization.update({
-            where: { id: organizationId },
-            data: { messagesUsedThisMonth: { increment: 1 } },
-        });
-
-        // ── [V6.1] 7. Registrar para idempotencia ───────────────
-        await prisma.sentMessage.create({
-            data: {
-                idempotencyKey: job.data.idempotencyKey || null,
-                organizationId,
-                instanceId,
-                to,
-                jobId: job.id,
-                status: 'sent',
-            },
-        });
-
-        // ── 7. Incrementar contador de mensajes de instancia ────
-        await prisma.whatsappInstance.update({
-            where: { id: instanceId },
-            data: { messagesLast24h: { increment: 1 } },
-        });
+        await prisma.$transaction([
+            prisma.organization.update({
+                where: { id: organizationId },
+                data: { messagesUsedThisMonth: { increment: 1 } },
+            }),
+            prisma.sentMessage.create({
+                data: {
+                    idempotencyKey: job.data.idempotencyKey || null,
+                    organizationId,
+                    instanceId,
+                    to,
+                    jobId: job.id,
+                    status: 'sent',
+                },
+            }),
+            prisma.whatsappInstance.update({
+                where: { id: instanceId },
+                data: { messagesLast24h: { increment: 1 } },
+            }),
+        ]);
 
         logger.info({ jobId: job.id, to }, 'SmartSend: complete');
     }, {
         connection,
-        concurrency: 3,
+        concurrency: 5, // Aumentado ligeramente para mayor throughput
         limiter: NORMAL_LIMITER,
     });
 

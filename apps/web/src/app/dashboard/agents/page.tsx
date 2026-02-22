@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { api } from '../../../lib/api';
+import { api } from '@/lib/api';
+import { Icons } from '@/components/icons';
 
-const STATUS_MAP: Record<string, { label: string; class: string }> = {
-    PENDING: { label: 'Pendiente', class: 'neutral' },
-    RUNNING: { label: 'Ejecutando', class: 'info' },
-    SUCCESS: { label: 'Exitoso', class: 'success' },
-    ERROR: { label: 'Error', class: 'danger' },
-    TIMEOUT: { label: 'Timeout', class: 'warning' },
+const STATUS_MAP: Record<string, { label: string; class: string; icon: any }> = {
+    PENDING: { label: 'PENDING', class: 'neutral', icon: Icons.Credits },
+    RUNNING: { label: 'PROCESSING', class: 'info', icon: Icons.AI },
+    SUCCESS: { label: 'SUCCESSFUL', class: 'success', icon: Icons.Check },
+    ERROR: { label: 'CRITICAL', class: 'danger', icon: Icons.Logout },
+    TIMEOUT: { label: 'TIMEOUT', class: 'warning', icon: Icons.Clock },
 };
 
 export default function AgentsPage() {
@@ -24,61 +25,104 @@ export default function AgentsPage() {
 
     useEffect(() => {
         loadTasks();
-        const interval = setInterval(loadTasks, 10_000); // Polling cada 10s
+        const interval = setInterval(loadTasks, 10_000);
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <>
-            <h1 className="page-title">🤖 Agentes IA</h1>
-            <p className="page-subtitle">Tareas de inteligencia artificial ejecutadas por tu organización</p>
+        <div className="animate-in max-w-7xl mx-auto">
+            {/* Header Section */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                            Intelligence Core
+                        </span>
+                    </div>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">AI Personnel</h1>
+                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                        Monitoring real-time cognitive executions and neural task cycles.
+                    </p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="glass-panel px-4 py-2 flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
+                        <span className="text-[10px] font-black tracking-widest text-header uppercase">Synchronizing Telemetry</span>
+                    </div>
+                </div>
+            </header>
 
-            <div className="glass-card">
+            <div className="glass-panel overflow-hidden border-white/[0.03]">
                 {loading ? (
-                    <p style={{ color: 'var(--text-muted)' }}>Cargando tareas...</p>
+                    <div className="p-12 space-y-4 animate-pulse">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="h-10 bg-white/5 rounded-lg w-full" />
+                        ))}
+                    </div>
                 ) : tasks.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🤖</div>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>No hay tareas aún</p>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                            Ejecuta tu primer agente desde la API: <code>POST /agents/run</code>
+                    <div className="text-center py-24 px-8">
+                        <div className="w-20 h-20 bg-white/[0.02] border border-white/[0.05] rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Icons.Agents size={32} className="text-muted opacity-20" />
+                        </div>
+                        <h3 className="text-lg font-bold text-header mb-2">Null Task Matrix</h3>
+                        <p className="text-xs text-muted max-w-sm mx-auto opacity-60 italic leading-relaxed">
+                            No active AI cycles detected. Initialize your first agency protocol via API to populate this neural log.
                         </p>
                     </div>
                 ) : (
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Estado</th>
-                                <th>Modelo</th>
-                                <th>Pasos</th>
-                                <th>Duración</th>
-                                <th>Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {tasks.map((task) => {
-                                const status = STATUS_MAP[task.status] || STATUS_MAP.PENDING;
-                                return (
-                                    <tr key={task.id}>
-                                        <td>
-                                            <span className={`badge ${status.class}`}>
-                                                {(task.status === 'RUNNING') && <span className="pulse-dot" />}
-                                                {status.label}
-                                            </span>
-                                        </td>
-                                        <td style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{task.model}</td>
-                                        <td>{task.stepsUsed || '—'}</td>
-                                        <td>{task.durationMs ? `${(task.durationMs / 1000).toFixed(1)}s` : '—'}</td>
-                                        <td style={{ color: 'var(--text-muted)' }}>
-                                            {new Date(task.createdAt).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-white/[0.05]">
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Execution Status</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Neural Model</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Task Steps</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Cycle Dur.</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase text-right">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/[0.02]">
+                                {tasks.map((task) => {
+                                    const status = STATUS_MAP[task.status] || STATUS_MAP.PENDING;
+                                    return (
+                                        <tr key={task.id} className="group hover:bg-white/[0.01] transition-all">
+                                            <td className="px-8 py-4">
+                                                <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-[9px] font-black tracking-widest border 
+                                                    ${task.status === 'RUNNING' ? 'bg-info/10 text-info border-info/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]' :
+                                                        task.status === 'SUCCESS' ? 'bg-success/10 text-success border-success/20' :
+                                                            task.status === 'ERROR' ? 'bg-danger/10 text-danger border-danger/20' :
+                                                                'bg-white/5 text-muted border-white/10'}`}>
+                                                    {task.status === 'RUNNING' && <div className="w-1 h-1 rounded-full bg-info animate-ping" />}
+                                                    {status.label}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1 h-3 bg-brand-primary/20 rounded-full" />
+                                                    <span className="text-xs font-mono font-bold text-header uppercase tracking-tight opacity-80">{task.model}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-4">
+                                                <span className="text-xs font-black text-header">{task.stepsUsed || '0'}</span>
+                                            </td>
+                                            <td className="px-8 py-4">
+                                                <span className="text-xs font-bold text-muted tabular-nums">
+                                                    {task.durationMs ? `${(task.durationMs / 1000).toFixed(2)}s` : '—'}
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-4 text-right">
+                                                <span className="text-[10px] font-bold text-muted uppercase opacity-40">
+                                                    {new Date(task.createdAt).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }

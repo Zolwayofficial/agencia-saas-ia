@@ -99,77 +99,40 @@ export function createBillingWorker(connection: IORedis) {
 }
 
 /**
- * Calcula y acredita comisiones de referidos (2 niveles).
- * Nivel 1: 20% al referidor directo
- * Nivel 2: 5% al referidor del referidor
+ * Calcula y acredita comisiones de referidos (Nivel 1 único).
+ * Pago: 20% al referidor directo.
  */
 async function payReferralCommissions(
     payingOrgId: string,
     referralCode: string,
     planPrice: number,
 ) {
-    // ── Nivel 1: Referidor directo ───────────────────────────
-    const level1Referral = await prisma.referralCode.findUnique({
+    const referral = await prisma.referralCode.findUnique({
         where: { code: referralCode },
-        include: { organization: true },
     });
 
-    if (!level1Referral) return;
+    if (!referral) return;
 
-    const level1Commission = planPrice * (level1Referral.level1Percent / 100);
+    const commission = planPrice * (referral.level1Percent / 100);
 
     await prisma.$transaction([
         prisma.organization.update({
-            where: { id: level1Referral.organizationId },
-            data: { creditBalance: { increment: level1Commission } },
+            where: { id: referral.organizationId },
+            data: { creditBalance: { increment: commission } },
         }),
         prisma.creditTransaction.create({
             data: {
-                organizationId: level1Referral.organizationId,
-                amount: level1Commission,
+                organizationId: referral.organizationId,
+                amount: commission,
                 type: 'COMMISSION',
-                description: `Comisión Nivel 1 (${level1Referral.level1Percent}%) — Suscripción de referido`,
+                description: `Comisión de Referido (${referral.level1Percent}%) — Suscripción de organización apoyada`,
             },
         }),
     ]);
 
     logger.info({
-        referrerId: level1Referral.organizationId,
+        referrerId: referral.organizationId,
         payingOrgId,
-        commission: level1Commission,
-        level: 1,
-    }, 'Billing: Level 1 referral commission paid');
-
-    // ── Nivel 2: Referidor del referidor ─────────────────────
-    if (level1Referral.organization.referredBy) {
-        const level2Referral = await prisma.referralCode.findUnique({
-            where: { code: level1Referral.organization.referredBy },
-        });
-
-        if (level2Referral) {
-            const level2Commission = planPrice * (level1Referral.level2Percent / 100);
-
-            await prisma.$transaction([
-                prisma.organization.update({
-                    where: { id: level2Referral.organizationId },
-                    data: { creditBalance: { increment: level2Commission } },
-                }),
-                prisma.creditTransaction.create({
-                    data: {
-                        organizationId: level2Referral.organizationId,
-                        amount: level2Commission,
-                        type: 'COMMISSION',
-                        description: `Comisión Nivel 2 (${level1Referral.level2Percent}%) — Suscripción de referido indirecto`,
-                    },
-                }),
-            ]);
-
-            logger.info({
-                referrerId: level2Referral.organizationId,
-                payingOrgId,
-                commission: level2Commission,
-                level: 2,
-            }, 'Billing: Level 2 referral commission paid');
-        }
-    }
+        commission,
+    }, 'Billing: Referral commission paid (Level 1)');
 }

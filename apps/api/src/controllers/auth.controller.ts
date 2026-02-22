@@ -73,7 +73,7 @@ export const authController = {
             logger.info({ userId: result.user.id, orgId: result.org.id }, 'New user registered');
 
             // Send welcome email
-            import('../services/email.service').then(({ emailService }) => {
+            import('@repo/email').then(({ emailService }) => {
                 emailService.sendWelcome(email, name || 'Usuario');
             }).catch(err => logger.error({ err }, 'Failed to send welcome email'));
 

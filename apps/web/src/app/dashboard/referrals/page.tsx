@@ -1,26 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { api } from '../../../lib/api';
-
-// Professional SVG Icons
-const Icons = {
-    Copy: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
-    ),
-    Check: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-    ),
-    Share: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" x2="12" y1="2" y2="15" /></svg>
-    ),
-    UserPlus: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" x2="19" y1="8" y2="14" /><line x1="22" x2="16" y1="11" y2="11" /></svg>
-    ),
-    TrendingUp: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>
-    ),
-};
+import { api } from '@/lib/api';
+import { Icons } from '@/components/icons';
 
 export default function ReferralsPage() {
     const [referral, setReferral] = useState<any>(null);
@@ -49,11 +31,11 @@ export default function ReferralsPage() {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '2rem' }}>
-                <div style={{ height: 40, width: '200px', background: 'var(--bg-glass)', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    {[1, 2, 3].map(i => (
-                        <div key={i} style={{ flex: 1, height: 120, background: 'var(--bg-glass)', borderRadius: 'var(--radius-md)', animation: 'pulse 1.5s infinite' }} />
+            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
+                <div className="h-10 w-80 bg-white/5 rounded-lg" />
+                <div className="grid grid-cols-3 gap-6">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-32 bg-white/5 rounded-2xl" />
                     ))}
                 </div>
             </div>
@@ -61,166 +43,142 @@ export default function ReferralsPage() {
     }
 
     return (
-        <>
-            <div style={{ marginBottom: '2rem' }}>
-                <h1 className="page-title">🤝 Programa de Referidos</h1>
-                <p className="page-subtitle">Gana el 20% de comisión recurrente y vitalicia por cada agencia que refieras</p>
-            </div>
+        <div className="animate-in max-w-7xl mx-auto">
+            {/* Header Section */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                            Partnership Ecosystem
+                        </span>
+                    </div>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Referral Authority</h1>
+                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                        Multiply your revenue through deep-tech network partnerships.
+                    </p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <div className="px-4 py-2 rounded-lg bg-success/5 border border-success/20 flex items-center gap-3">
+                        <Icons.Check className="text-success" size={14} />
+                        <span className="text-[11px] font-black tracking-widest text-success">PROGRAM STATUS: ACTIVE</span>
+                    </div>
+                </div>
+            </header>
 
-            <div className="grid-stats" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', marginBottom: '1.5rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {/* Referral Code Card */}
-                <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div className="glass-panel stat-card-premium flex flex-col justify-between">
                     <div>
-                        <div className="stat-label">Tu Código de Invitación</div>
-                        <div style={{
-                            marginTop: '0.5rem',
-                            padding: '1rem',
-                            background: 'rgba(0,0,0,0.2)',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid var(--border-subtle)',
-                            fontFamily: 'monospace',
-                            fontSize: '1.25rem',
-                            fontWeight: 700,
-                            letterSpacing: '0.1em',
-                            color: 'var(--brand-primary)',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            {referral?.code || 'NO-CODE'}
+                        <div className="label mb-4">Your Invitation Protocol</div>
+                        <div className="p-4 bg-black/40 rounded-xl border border-white/[0.05] flex justify-between items-center group">
+                            <span className="text-lg font-mono font-black tracking-wider text-brand-primary">
+                                {referral?.code || 'X7-CORE'}
+                            </span>
+                            <Icons.QrCode size={16} className="text-muted opacity-40" />
                         </div>
                     </div>
                     <button
                         onClick={copyLink}
-                        className="btn btn-primary"
-                        style={{ marginTop: '1.25rem', width: '100%', gap: '0.5rem' }}
+                        className={`btn-premium w-full mt-6 !py-3 ${copied ? 'btn-premium-primary' : 'btn-premium-outline'}`}
                     >
-                        {copied ? <Icons.Check /> : <Icons.Copy />}
-                        {copied ? '¡Enlace Copiado!' : 'Copiar Enlace de Afiliado'}
+                        {copied ? <Icons.Check size={14} /> : <Icons.Copy size={14} />}
+                        {copied ? 'LINK DUPLICATED' : 'COPY PARTNER LINK'}
                     </button>
                 </div>
 
                 {/* Flat Commission Card */}
-                <div className="stat-card">
-                    <div className="stat-label">Modelo de Comisión</div>
-                    <div className="stat-value" style={{ color: 'var(--status-success)', fontSize: '2.5rem' }}>
+                <div className="glass-panel stat-card-premium">
+                    <div className="label mb-2">Commission Logic</div>
+                    <div className="text-4xl font-black text-brand-primary font-display mb-1 flex items-baseline gap-1">
                         20%
+                        <span className="text-xs font-bold text-muted opacity-40 uppercase tracking-widest">Lifetime</span>
                     </div>
-                    <div className="stat-detail" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                        Directa y Vitalicia
-                    </div>
-                    <div style={{
-                        marginTop: '0.75rem',
-                        fontSize: '0.75rem',
-                        color: 'var(--text-muted)',
-                        padding: '0.5rem',
-                        background: 'rgba(16,185,129,0.05)',
-                        border: '1px solid rgba(16,185,129,0.2)',
-                        borderRadius: '4px'
-                    }}>
-                        Ganas por cada renovación que realice tu invitado. Sin límites, sin niveles complejos.
-                    </div>
+                    <div className="text-[11px] font-black tracking-widest text-header uppercase mb-3">Single-Tier Protocol</div>
+                    <p className="text-[10px] text-muted leading-relaxed opacity-60 italic">
+                        Recursive yield on every subscription renewal. No complexity, direct settlements in Mint Green.
+                    </p>
                 </div>
 
                 {/* Performance Card */}
-                <div className="stat-card">
-                    <div className="stat-label">Tus Resultados</div>
-                    <div className="stat-value">{network?.referrals?.length || 0}</div>
-                    <div className="stat-detail">Agencias Activas</div>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Pendientes</div>
-                            <div style={{ fontWeight: 600 }}>0</div>
+                <div className="glass-panel stat-card-premium">
+                    <div className="label mb-2">Network Yield</div>
+                    <div className="text-4xl font-black text-header font-display mb-1">
+                        {network?.referrals?.length || 0}
+                    </div>
+                    <div className="text-[11px] font-black tracking-widest text-muted uppercase opacity-40 mb-4">Active Partners</div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="p-3 bg-white/[0.02] border border-white/[0.03] rounded-lg">
+                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Pending</div>
+                            <div className="text-sm font-black text-header">0</div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tasa Conv.</div>
-                            <div style={{ fontWeight: 600 }}>0%</div>
+                        <div className="p-3 bg-white/[0.02] border border-white/[0.03] rounded-lg">
+                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Conv. Rate</div>
+                            <div className="text-sm font-black text-header">0%</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Steps Section */}
-            <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-primary)' }}>
-                    🎯 Cómo Maximizar tus Ganancias
+            <section className="glass-panel p-8 mb-12">
+                <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-10 flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shadow-[0_0_10px_var(--brand-primary)]" />
+                    Growth Optimization Strategy
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div style={{
-                            width: 40, height: 40, borderRadius: '50%', background: 'rgba(80,205,149,0.1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-primary)', flexShrink: 0
-                        }}>
-                            <Icons.Share />
-                        </div>
-                        <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.25rem' }}>1. Difunde el enlace</div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.4 }}>
-                                Comparte en tus redes, comunidades o con agencias aliadas.
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    {[
+                        { icon: Icons.Share, label: '1. NETWORK BROADCAST', color: 'var(--brand-primary)', desc: 'Deploy your link in high-intent circles, communities, and tech boards.' },
+                        { icon: Icons.UserPlus, label: '2. PARTNER ONBOARDING', color: '#3b82f6', desc: 'Guests register via your protocol. Track real-time telemetry here.' },
+                        { icon: Icons.TrendingUp, label: '3. RECURSIVE REVENUE', color: 'var(--brand-primary)', desc: 'Receive 20% net for every successful subscription lifecycle.' }
+                    ].map((step, i) => (
+                        <div key={i} className="flex gap-4 group">
+                            <div className="w-10 h-10 rounded-full bg-white/[0.02] border border-white/[0.05] flex items-center justify-center shrink-0 group-hover:border-brand-primary/30 transition-all" style={{ color: step.color }}>
+                                <step.icon size={18} />
+                            </div>
+                            <div>
+                                <h4 className="text-[11px] font-black tracking-widest text-header uppercase mb-1">{step.label}</h4>
+                                <p className="text-[10px] text-muted leading-relaxed opacity-60 font-medium">{step.desc}</p>
                             </div>
                         </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div style={{
-                            width: 40, height: 40, borderRadius: '50%', background: 'rgba(59,130,246,0.1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6', flexShrink: 0
-                        }}>
-                            <Icons.UserPlus />
-                        </div>
-                        <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.25rem' }}>2. Registro y Prueba</div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.4 }}>
-                                Recibe seguimiento en tiempo real cuando un invitado se registre.
-                            </div>
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div style={{
-                            width: 40, height: 40, borderRadius: '50%', background: 'rgba(16,185,129,0.1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0
-                        }}>
-                            <Icons.TrendingUp />
-                        </div>
-                        <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.25rem' }}>3. Ingreso Recurrente</div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.4 }}>
-                                Cobra el 20% neto de cada factura pagada por tus referidos.
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
-            </div>
+            </section>
 
-            {/* Projections */}
-            <div className="glass-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>💰 Proyección de Ingresos (20%)</h3>
-                    <span style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', background: 'var(--bg-elevated)', borderRadius: '4px', border: '1px solid var(--border-subtle)' }}>
-                        Valores estimados basados en planes promedio
-                    </span>
+            {/* Projections Table */}
+            <section className="glass-panel p-8 mb-8">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">YIELD PROJECTIONS</h3>
+                        <p className="text-[10px] text-muted font-medium uppercase tracking-widest opacity-40">ESTIMATED ANNUAL PERFORMANCE</p>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1 rounded bg-white/[0.02] border border-white/[0.05]">
+                        <Icons.Credits size={12} className="text-brand-primary" />
+                        <span className="text-[9px] font-bold text-muted uppercase italic tracking-widest">Protocol V1.0</span>
+                    </div>
                 </div>
-                <div style={{ overflowX: 'auto' }}>
-                    <table className="data-table">
+
+                <div className="overflow-x-auto">
+                    <table className="w-full">
                         <thead>
-                            <tr>
-                                <th>Nº Agencias Invitadas</th>
-                                <th>Plan Promedio Tarifa</th>
-                                <th>Tu Comisión Mensual</th>
-                                <th>Tu Ingreso Anual</th>
+                            <tr className="text-left border-b border-white/[0.03]">
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">PARTNER COUNT</th>
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">AVG PLAN</th>
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">MONTHLY YIELD</th>
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">EST. ANNUAL INCOME</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/[0.02]">
                             {[
-                                { count: 5, avg: 79, color: 'var(--text-primary)' },
-                                { count: 10, avg: 149, color: 'var(--text-primary)' },
-                                { count: 25, avg: 149, color: 'var(--brand-primary)', bold: true },
-                                { count: 50, avg: 199, color: 'var(--status-success)', bold: true },
-                            ].map((row) => (
-                                <tr key={row.count} style={{ fontWeight: row.bold ? 600 : 400 }}>
-                                    <td>{row.count} agencias</td>
-                                    <td style={{ color: 'var(--text-muted)' }}>${row.avg} / mes</td>
-                                    <td style={{ color: row.color }}>${(row.count * row.avg * 0.20).toFixed(0)}</td>
-                                    <td style={{ color: row.color, fontWeight: row.bold ? 700 : 600 }}>
+                                { count: 5, avg: 79, color: 'var(--text-header)' },
+                                { count: 10, avg: 149, color: 'var(--text-header)' },
+                                { count: 25, avg: 149, color: 'var(--brand-primary)', highlight: true },
+                                { count: 50, avg: 199, color: 'var(--brand-primary)', highlight: true },
+                            ].map((row, i) => (
+                                <tr key={i} className={`group hover:bg-white/[0.01] transition-all ${row.highlight ? 'bg-brand-primary/[0.02]' : ''}`}>
+                                    <td className="py-5 px-4 text-xs font-black text-header uppercase tracking-widest">{row.count} Nodes</td>
+                                    <td className="py-5 text-xs font-bold text-muted opacity-60 tracking-wider">${row.avg} Standard</td>
+                                    <td className="py-5 text-xs font-black" style={{ color: row.color }}>${(row.count * row.avg * 0.20).toLocaleString()}</td>
+                                    <td className="py-5 text-right px-4 text-sm font-black" style={{ color: row.color }}>
                                         ${(row.count * row.avg * 0.20 * 12).toLocaleString()}
                                     </td>
                                 </tr>
@@ -228,7 +186,7 @@ export default function ReferralsPage() {
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </>
+            </section>
+        </div>
     );
 }

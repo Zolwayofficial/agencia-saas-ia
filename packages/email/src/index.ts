@@ -1,7 +1,6 @@
 /**
- * Email Service — Notificaciones por correo
- * Usa Resend API para enviar emails transaccionales.
- * Si RESEND_API_KEY no está configurado, solo logea (modo desarrollo).
+ * Shared Email Service (@repo/email)
+ * transactional emails using Resend API.
  */
 
 import { logger } from '@repo/logger';
@@ -37,8 +36,6 @@ async function send(to: string, subject: string, html: string): Promise<void> {
     }
 }
 
-// ── Email Templates ─────────────────────────────────────────
-
 const sharedStyles = `
   body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; margin: 0; padding: 20px; }
   .container { max-width: 520px; margin: 0 auto; background: #13131a; border: 1px solid #2a2a3a; border-radius: 12px; padding: 32px; }
@@ -51,9 +48,6 @@ const sharedStyles = `
 `;
 
 export const emailService = {
-    /**
-     * Email de bienvenida al registrarse
-     */
     sendWelcome: (to: string, name: string) =>
         send(to, '🎉 Bienvenido a FullLogin', `
             <html><head><style>${sharedStyles}</style></head><body>
@@ -70,9 +64,6 @@ export const emailService = {
             </body></html>
         `),
 
-    /**
-     * Confirmación de pago
-     */
     sendPaymentConfirmation: (to: string, planName: string, amount: number) =>
         send(to, '✅ Pago confirmado — FullLogin', `
             <html><head><style>${sharedStyles}</style></head><body>
@@ -90,9 +81,6 @@ export const emailService = {
             </body></html>
         `),
 
-    /**
-     * Alerta de desconexión de WhatsApp
-     */
     sendWhatsAppDisconnected: (to: string, instanceName: string) =>
         send(to, '⚠️ WhatsApp desconectado — FullLogin', `
             <html><head><style>${sharedStyles}</style></head><body>
@@ -109,9 +97,6 @@ export const emailService = {
             </body></html>
         `),
 
-    /**
-     * Alerta de uso elevado (70%, 85%, 95%)
-     */
     sendUsageAlert: (to: string, percentage: number, resource: string) =>
         send(to, `⚠️ ${percentage}% de ${resource} usado — FullLogin`, `
             <html><head><style>${sharedStyles}</style></head><body>

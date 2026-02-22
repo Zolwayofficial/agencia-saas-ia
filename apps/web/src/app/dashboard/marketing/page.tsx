@@ -1,26 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { api } from '../../../lib/api';
-
-// Professional SVG Icons
-const Icons = {
-    Rocket: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /><path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" /><path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" /></svg>
-    ),
-    Plus: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-    ),
-    Zap: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
-    ),
-    Shield: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z" /></svg>
-    ),
-    Smartphone: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg>
-    ),
-};
+import { api } from '@/lib/api';
+import { Icons } from '@/components/icons';
+import Link from 'next/link';
 
 export default function MarketingPage() {
     const [instances, setInstances] = useState<any[]>([]);
@@ -34,155 +17,190 @@ export default function MarketingPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const activeInstances = instances.filter(i => i.status === 'open').length;
-    const warmupLevel = activeInstances > 0 ? 3 : 0; // Simulated level
+    const activeInstances = instances.filter(i => i.status === 'open' || i.connectionStatus === 'CONNECTED').length;
+    const warmupLevel = activeInstances > 0 ? 3 : 0;
+
+    if (loading) {
+        return (
+            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
+                <div className="h-10 w-64 bg-white/5 rounded-lg" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="h-48 bg-white/5 rounded-2xl md:col-span-2" />
+                    <div className="h-48 bg-white/5 rounded-2xl" />
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <>
-            <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="animate-in max-w-7xl mx-auto">
+            {/* Header section */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
                 <div>
-                    <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <Icons.Rocket />
-                        Marketing & Campañas
-                    </h1>
-                    <p className="page-subtitle">Envía mensajes masivos inteligentes con sistemas anti-ban avanzados SmartSend™.</p>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                            Growth Layer
+                        </span>
+                    </div>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Campaign Engine</h1>
+                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                        SmartSend™ high-velocity messaging with anti-ban calibration.
+                    </p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="btn btn-primary"
-                    style={{ gap: '0.5rem' }}
+                    className="btn-premium btn-premium-primary !py-3 !px-6 shadow-[0_10px_30px_-10px_rgba(var(--brand-primary-rgb),0.3)]"
                 >
-                    <Icons.Plus />
-                    Nueva Campaña
+                    <Icons.Plus size={18} />
+                    Deploy Campaign
                 </button>
-            </div>
+            </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
                 {/* SmartSend System */}
-                <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div style={{
-                            width: 48, height: 48, borderRadius: '12px', background: 'rgba(80, 205, 149, 0.1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-primary)'
-                        }}>
-                            <Icons.Zap />
+                <div className="lg:col-span-2 glass-panel p-8">
+                    <div className="flex items-center gap-4 mb-8">
+                        <div className="w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary border border-brand-primary/20 shadow-[0_0_15px_rgba(var(--brand-primary-rgb),0.1)]">
+                            <Icons.Rocket size={24} />
                         </div>
                         <div>
-                            <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>SmartSend™ Engine Status</h2>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Calibración de velocidad y protección anti-ban activa</p>
+                            <h2 className="text-lg font-bold font-display text-header">SmartSend™ Engine Status</h2>
+                            <p className="text-xs text-muted font-medium opacity-60 uppercase tracking-tight">Active Velocity Calibration & Neural Protection</p>
                         </div>
                     </div>
 
-                    <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.2)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>WARMUP PROGRESS (LEVEL {warmupLevel}/5)</span>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--brand-primary)' }}>{warmupLevel * 20}% OPTIMIZADO</span>
+                    <div className="p-6 bg-white/[0.02] rounded-2xl border border-white/[0.05] relative overflow-hidden">
+                        {/* Status bar */}
+                        <div className="flex justify-between items-end mb-3">
+                            <span className="text-[10px] font-black tracking-[0.2em] text-muted uppercase">Warmup Protocol (Level {warmupLevel}/5)</span>
+                            <span className="text-[10px] font-black tracking-[0.2em] text-brand-primary uppercase">{warmupLevel * 20}% Optimal</span>
                         </div>
-                        <div style={{ display: 'flex', gap: '4px', height: '12px', marginBottom: '1.5rem' }}>
+                        <div className="flex gap-1.5 h-2 mb-8">
                             {[1, 2, 3, 4, 5].map((level) => (
-                                <div key={level} style={{
-                                    flex: 1,
-                                    background: level <= warmupLevel ? 'var(--brand-primary)' : 'rgba(255,255,255,0.05)',
-                                    borderRadius: '2px',
-                                    boxShadow: level <= warmupLevel ? '0 0 10px rgba(80, 205, 149, 0.3)' : 'none'
-                                }} />
+                                <div key={level} className={`flex-1 rounded-sm transition-all duration-1000 ${level <= warmupLevel
+                                        ? 'bg-brand-primary shadow-[0_0_10px_rgba(var(--brand-primary-rgb),0.4)]'
+                                        : 'bg-white/5'
+                                    }`} />
                             ))}
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>VELOCIDAD</div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>120 msg/hr</div>
+
+                        <div className="grid grid-cols-3 gap-8 pt-6 border-t border-white/[0.05]">
+                            <div className="text-center md:text-left">
+                                <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5 opacity-40">Velocity</div>
+                                <div className="text-xl font-black text-header">120 <span className="text-[10px] text-muted opacity-60">MSG/HR</span></div>
                             </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>ROTACIÓN</div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>Activa</div>
+                            <div className="text-center md:text-left">
+                                <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5 opacity-40">Rotation</div>
+                                <div className="text-xl font-black text-brand-primary">ACTIVE</div>
                             </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>PROTECCIÓN</div>
-                                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                                    <Icons.Shield /> High
+                            <div className="text-center md:text-left">
+                                <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1.5 opacity-40">Protection</div>
+                                <div className="flex items-center justify-center md:justify-start gap-2 text-xl font-black text-header">
+                                    <Icons.Security size={20} className="text-brand-primary" />
+                                    HIGH
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Instance Stats */}
-                <div className="glass-card" style={{ padding: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1.25rem' }}>
-                        INSTANCIAS PARA ENVÍO
-                    </h3>
-                    <div className="stat-value" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{activeInstances}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-                        <Icons.Smartphone /> {activeInstances} WhatsApp Ready
+                {/* Infrastructure Stats */}
+                <div className="glass-panel p-8 flex flex-col justify-between">
+                    <div>
+                        <h3 className="text-[10px] font-black tracking-[0.2em] text-muted uppercase mb-8 opacity-40 italic">Deployment Readiness</h3>
+                        <div className="flex items-baseline gap-2 mb-2">
+                            <span className="text-5xl font-black font-display text-gradient">{activeInstances}</span>
+                            <span className="text-xs font-bold text-muted uppercase tracking-widest opacity-40">Nodes</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] font-bold text-brand-primary mb-8 px-3 py-1.5 rounded-full bg-brand-primary/5 border border-brand-primary/10 w-fit">
+                            <Icons.WhatsApp size={14} />
+                            {activeInstances} WhatsApp Ready
+                        </div>
                     </div>
 
-                    <Link href="/dashboard/whatsapp" className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        Gestionar Instancias
+                    <Link href="/dashboard/whatsapp" className="btn-premium btn-premium-outline w-full justify-center text-[11px] !py-3">
+                        Optimize Nodes <Icons.External size={14} className="ml-1 opacity-40" />
                     </Link>
                 </div>
             </div>
 
             {/* Campaigns Table */}
-            <div className="glass-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        HISTORIAL DE CAMPAÑAS
-                    </h3>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        {['Todas', 'Activas', 'En Pausa', 'Completadas'].map(filter => (
-                            <button key={filter} style={{
-                                padding: '0.25rem 0.75rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600,
-                                background: filter === 'Todas' ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                color: filter === 'Todas' ? 'white' : 'var(--text-muted)',
-                                border: '1px solid transparent',
-                                cursor: 'pointer'
-                            }}>{filter}</button>
+            <section className="glass-panel p-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                    <div>
+                        <h3 className="text-[10px] font-black tracking-[0.2em] text-muted uppercase mb-1">Operational History</h3>
+                        <p className="text-[10px] font-medium text-muted opacity-60 uppercase tracking-tighter">Real-time Campaign Execution Logs</p>
+                    </div>
+                    <div className="flex p-1 bg-white/[0.03] rounded-xl border border-white/[0.05]">
+                        {['All', 'Active', 'Paused', 'Complete'].map(filter => (
+                            <button key={filter} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === 'All' ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
+                                }`}>
+                                {filter}
+                            </button>
                         ))}
                     </div>
                 </div>
 
-                <table className="data-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre Campaña</th>
-                            <th>Canal</th>
-                            <th>Estado</th>
-                            <th>Enviados / Total</th>
-                            <th>Éxito</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                No hay campañas activas. Haz clic en "Nueva Campaña" para empezar.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="text-left border-b border-white/[0.03]">
+                                <th className="pb-5 text-[10px] font-black text-muted uppercase tracking-[0.2em] px-4">Campaign Strategy</th>
+                                <th className="pb-5 text-[10px] font-black text-muted uppercase tracking-[0.2em]">Protocol</th>
+                                <th className="pb-5 text-[10px] font-black text-muted uppercase tracking-[0.2em]">Status</th>
+                                <th className="pb-5 text-[10px] font-black text-muted uppercase tracking-[0.2em] text-right">Throughput</th>
+                                <th className="pb-5 text-[10px] font-black text-muted uppercase tracking-[0.2em] text-right px-4">Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/[0.02]">
+                            <tr>
+                                <td colSpan={5} className="py-24 text-center">
+                                    <div className="flex flex-col items-center gap-4 opacity-20">
+                                        <Icons.Rocket size={48} />
+                                        <p className="text-[11px] font-black tracking-[0.3em] uppercase">No Tactical Deployments Initiated</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-            {/* Modal Placeholder */}
+            {/* Modal Hardware */}
             {showModal && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-                    <div className="glass-card" style={{ maxWidth: '500px', width: '100%', padding: '2rem', border: '1px solid var(--brand-primary)' }}>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>Crear Nueva Campaña</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in transition-all">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+                    <div className="relative glass-panel w-full max-w-lg overflow-hidden p-10 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="text-xl font-bold font-display text-header tracking-tight">Deploy New Protocol</h2>
+                            <button className="text-muted hover:text-header transition-colors" onClick={() => setShowModal(false)}>
+                                <Icons.Logout size={18} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6 mb-10">
                             <div>
-                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>NOMBRE DE CAMPAÑA</label>
-                                <input type="text" placeholder="Ej: Lanzamiento Marzo 2024" style={{ width: '100%', padding: '0.75rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
+                                <label className="block text-[10px] font-black tracking-[0.2em] text-muted uppercase mb-2 ml-1">Strategy Identifier</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Q1_GROWTH_PULSE_2026"
+                                    className="w-full bg-white/[0.03] border border-white/[0.07] rounded-xl px-5 py-3.5 text-sm text-header focus:border-brand-primary placeholder:text-muted/20 outline-none transition-all"
+                                />
+                            </div>
+                            <div className="p-4 bg-brand-primary/5 rounded-xl border border-brand-primary/10">
+                                <p className="text-[10px] font-medium text-brand-primary leading-relaxed">
+                                    <span className="font-black">[NOTICE]</span> Dynamic anti-ban rotation will automatically distribute traffic across all authorized WhatsApp nodes to ensure cryptographic safety and infrastructure continuity.
+                                </p>
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <button onClick={() => setShowModal(false)} className="btn btn-ghost" style={{ flex: 1 }}>Cancelar</button>
-                            <button onClick={() => setShowModal(false)} className="btn btn-primary" style={{ flex: 1 }}>Continuar</button>
+
+                        <div className="flex gap-4">
+                            <button onClick={() => setShowModal(false)} className="btn-premium btn-premium-outline flex-1 justify-center">Abort</button>
+                            <button onClick={() => setShowModal(false)} className="btn-premium btn-premium-primary flex-1 justify-center">Execute Deployment</button>
                         </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }
-
-import Link from 'next/link';

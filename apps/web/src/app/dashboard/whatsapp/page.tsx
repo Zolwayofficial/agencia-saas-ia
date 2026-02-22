@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '@/lib/api';
+import { Icons } from '@/components/icons';
 
 interface WhatsappInstance {
     id: string;
@@ -14,10 +15,10 @@ interface WhatsappInstance {
     createdAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; badgeClass: string; icon: string }> = {
-    CONNECTED: { label: 'Conectado', badgeClass: 'badge success', icon: '🟢' },
-    QR_PENDING: { label: 'Esperando QR', badgeClass: 'badge warning', icon: '🟡' },
-    DISCONNECTED: { label: 'Desconectado', badgeClass: 'badge danger', icon: '🔴' },
+const STATUS_CONFIG: Record<string, { label: string; class: string; icon: any }> = {
+    CONNECTED: { label: 'AUTHORIZED', class: 'success', icon: Icons.Check },
+    QR_PENDING: { label: 'HANDSHAKE PENDING', class: 'warning', icon: Icons.Pending },
+    DISCONNECTED: { label: 'OFFLINE', class: 'danger', icon: Icons.Alert },
 };
 
 export default function WhatsAppPage() {
@@ -28,6 +29,7 @@ export default function WhatsAppPage() {
     const [qrModal, setQrModal] = useState<{ instanceId: string; qrCode: string | null; name: string } | null>(null);
     const [error, setError] = useState('');
     const pollRef = useRef<NodeJS.Timeout | null>(null);
+    const [connectionType, setConnectionType] = useState<'QR' | 'API'>('QR');
 
     const fetchInstances = useCallback(async () => {
         try {
@@ -47,13 +49,11 @@ export default function WhatsAppPage() {
         return () => clearInterval(interval);
     }, [fetchInstances]);
 
-    // QR polling
     useEffect(() => {
         if (!qrModal) {
             if (pollRef.current) clearInterval(pollRef.current);
             return;
         }
-
         const poll = async () => {
             try {
                 const data = await api.get(`/whatsapp/instances/${qrModal.instanceId}/qr`);
@@ -63,9 +63,8 @@ export default function WhatsAppPage() {
                 } else if (data.qrCode) {
                     setQrModal((prev) => prev ? { ...prev, qrCode: data.qrCode } : null);
                 }
-            } catch { /* retry on next poll */ }
+            } catch { /* retry */ }
         };
-
         pollRef.current = setInterval(poll, 4000);
         return () => { if (pollRef.current) clearInterval(pollRef.current); };
     }, [qrModal?.instanceId, fetchInstances]);
@@ -75,7 +74,7 @@ export default function WhatsAppPage() {
         setError('');
         try {
             const data = await api.post('/whatsapp/instances', {
-                displayName: `WhatsApp ${instances.length + 1}`,
+                displayName: `Node Delta ${instances.length + 1}`,
             });
             if (data.qrCode) {
                 setQrModal({
@@ -106,7 +105,7 @@ export default function WhatsAppPage() {
     };
 
     const logout = async (id: string) => {
-        if (!confirm('¿Desconectar esta instancia de WhatsApp?')) return;
+        if (!confirm('Confirm node disconnection protocol?')) return;
         try {
             await api.post(`/whatsapp/instances/${id}/logout`, {});
             fetchInstances();
@@ -116,7 +115,7 @@ export default function WhatsAppPage() {
     };
 
     const deleteInstance = async (id: string) => {
-        if (!confirm('¿Eliminar esta instancia permanentemente?')) return;
+        if (!confirm('Permanently purge instance from matrix?')) return;
         try {
             await api.delete(`/whatsapp/instances/${id}`);
             fetchInstances();
@@ -125,126 +124,208 @@ export default function WhatsAppPage() {
         }
     };
 
-    if (loading) return <div className="page-loading">Cargando instancias...</div>;
+    if (loading) {
+        return (
+            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
+                <div className="h-10 w-80 bg-white/5 rounded-lg" />
+                <div className="grid grid-cols-2 gap-6">
+                    {[1, 2].map((i) => (
+                        <div key={i} className="h-48 bg-white/5 rounded-2xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <>
-            {/* Header */}
-            <div className="page-header">
+        <div className="animate-in max-w-7xl mx-auto">
+            {/* Header Section */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
                 <div>
-                    <h1 className="page-title">📱 WhatsApp</h1>
-                    <p className="page-subtitle">
-                        {instances.length}/{limit} instancias usadas
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                            Operations Layer
+                        </span>
+                    </div>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">WhatsApp Nodes</h1>
+                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                        Deploy and manage independent communication gateways.
                     </p>
                 </div>
-                <button
-                    className="btn btn-primary"
-                    onClick={createInstance}
-                    disabled={creating || instances.length >= limit}
-                >
-                    {creating ? '⏳ Creando...' : '➕ Conectar WhatsApp'}
-                </button>
-            </div>
-
-            {error && <div className="error-banner">{error}</div>}
-
-            {/* Empty State */}
-            {instances.length === 0 && (
-                <div className="glass-card empty-state">
-                    <div className="empty-icon">📱</div>
-                    <h3>No hay WhatsApp conectado</h3>
-                    <p>Conecta tu primer número para empezar a recibir mensajes</p>
-                    <button className="btn btn-primary" onClick={createInstance} disabled={creating}>
-                        {creating ? '⏳ Creando...' : '🔗 Conectar mi WhatsApp'}
+                <div className="flex bg-white/[0.02] border border-white/[0.05] p-1 rounded-xl">
+                    <button
+                        onClick={() => setConnectionType('QR')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all
+                        ${connectionType === 'QR' ? 'bg-brand-primary text-black' : 'text-muted hover:text-header'}`}
+                    >
+                        <Icons.QrCode size={12} /> QR Protocol
                     </button>
+                    <button
+                        onClick={() => setConnectionType('API')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all
+                        ${connectionType === 'API' ? 'bg-brand-primary text-black' : 'text-muted hover:text-header'}`}
+                    >
+                        <Icons.Enterprise size={12} /> Meta API
+                    </button>
+                </div>
+            </header>
+
+            {error && (
+                <div className="mb-8 p-4 rounded-xl bg-danger/5 border border-danger/20 flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
+                    <Icons.Alert className="text-danger" size={16} />
+                    <span className="text-xs font-bold text-danger uppercase tracking-tight">{error}</span>
                 </div>
             )}
 
-            {/* Instance Cards */}
-            <div className="grid-stats">
-                {instances.map((inst) => {
-                    const statusCfg = STATUS_CONFIG[inst.connectionStatus] || STATUS_CONFIG.DISCONNECTED;
-                    return (
-                        <div key={inst.id} className="glass-card wa-card">
-                            <div className="wa-card-header">
-                                <div className="wa-card-info">
-                                    <h3 className="wa-card-name">{inst.displayName}</h3>
-                                    <span className={statusCfg.badgeClass}>
-                                        <span className="pulse-dot"></span>
-                                        {statusCfg.label}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="wa-card-details">
-                                <div className="wa-detail">
-                                    <span className="wa-detail-label">Número</span>
-                                    <span className="wa-detail-value">
-                                        {inst.phoneNumber || 'Sin conectar'}
-                                    </span>
-                                </div>
-                                <div className="wa-detail">
-                                    <span className="wa-detail-label">Mensajes 24h</span>
-                                    <span className="wa-detail-value">{inst.messagesLast24h}</span>
-                                </div>
-                                <div className="wa-detail">
-                                    <span className="wa-detail-label">Estado</span>
-                                    <span className="wa-detail-value">{statusCfg.icon} {statusCfg.label}</span>
-                                </div>
-                            </div>
-
-                            <div className="wa-card-actions">
-                                {inst.connectionStatus === 'CONNECTED' ? (
-                                    <button className="btn btn-ghost btn-sm" onClick={() => logout(inst.id)}>
-                                        🔌 Desconectar
-                                    </button>
-                                ) : (
-                                    <button className="btn btn-primary btn-sm" onClick={() => reconnect(inst)}>
-                                        📲 Conectar
-                                    </button>
-                                )}
-                                <button className="btn btn-danger btn-sm" onClick={() => deleteInstance(inst.id)}>
-                                    🗑️ Eliminar
-                                </button>
-                            </div>
+            {connectionType === 'QR' ? (
+                <div className="space-y-8">
+                    <div className="flex justify-between items-center px-4">
+                        <div>
+                            <h2 className="text-xs font-black tracking-[0.2em] text-muted uppercase">Active Deployment Matrix</h2>
+                            <p className="text-[10px] text-muted opacity-40 font-medium uppercase mt-1">Capacity: {instances.length} / {limit}</p>
                         </div>
-                    );
-                })}
-            </div>
+                        <button
+                            className="btn-premium btn-premium-primary !py-2.5 !px-6"
+                            onClick={createInstance}
+                            disabled={creating || instances.length >= limit}
+                        >
+                            {creating ? 'Initializing...' : 'Deploy New Node'}
+                        </button>
+                    </div>
 
-            {/* QR Modal */}
-            {qrModal && (
-                <div className="modal-overlay" onClick={() => setQrModal(null)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>📲 Escanea el QR Code</h2>
-                            <button className="modal-close" onClick={() => setQrModal(null)}>✕</button>
+                    {instances.length === 0 && (
+                        <div className="glass-panel py-24 text-center border-dashed border-white/5">
+                            <div className="w-20 h-20 bg-white/[0.02] border border-white/[0.05] rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Icons.WhatsApp size={32} className="text-muted opacity-20" />
+                            </div>
+                            <h3 className="text-header font-bold mb-2">No Active Gateways</h3>
+                            <p className="text-xs text-muted max-w-xs mx-auto opacity-50 italic mb-8">Establish your first WhatsApp secure-tunnel via QR handshake.</p>
+                            <button className="btn-premium btn-premium-outline" onClick={createInstance} disabled={creating}>
+                                Launch Protocol
+                            </button>
                         </div>
-                        <div className="modal-body">
-                            <p className="qr-instructions">
-                                Abre WhatsApp en tu teléfono → Ajustes → Dispositivos vinculados → Vincular dispositivo
-                            </p>
-                            <div className="qr-container">
-                                {qrModal.qrCode ? (
-                                    <img
-                                        src={`data:image/png;base64,${qrModal.qrCode}`}
-                                        alt="QR Code WhatsApp"
-                                        className="qr-image"
-                                    />
-                                ) : (
-                                    <div className="qr-loading">
-                                        <div className="spinner"></div>
-                                        <p>Generando QR Code...</p>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {instances.map((inst) => {
+                            const statusCfg = STATUS_CONFIG[inst.connectionStatus] || STATUS_CONFIG.DISCONNECTED;
+                            return (
+                                <div key={inst.id} className="glass-panel p-6 group hover:border-brand-primary/20 transition-all duration-500">
+                                    <div className="flex justify-between items-start mb-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <Icons.WhatsApp className="text-brand-primary" size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-black text-header uppercase tracking-tight">{inst.displayName}</h3>
+                                                <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest border mt-1
+                                                    ${inst.connectionStatus === 'CONNECTED' ? 'bg-success/5 text-success border-success/20' :
+                                                        inst.connectionStatus === 'QR_PENDING' ? 'bg-warning/5 text-warning border-warning/20 animate-pulse' :
+                                                            'bg-danger/5 text-danger border-danger/20'}`}>
+                                                    {statusCfg.label}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => deleteInstance(inst.id)} className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.05] text-muted hover:text-danger hover:bg-danger/5 hover:border-danger/20 transition-all">
+                                                <Icons.Trash size={14} />
+                                            </button>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
-                            <p className="qr-note">
-                                El QR se actualiza automáticamente cada 4 segundos
-                            </p>
+
+                                    <div className="grid grid-cols-2 gap-4 mb-8">
+                                        <div className="p-3 bg-white/[0.02] border border-white/[0.03] rounded-lg">
+                                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Registered ID</div>
+                                            <div className="text-xs font-mono font-bold text-header">{inst.phoneNumber || 'PENDING'}</div>
+                                        </div>
+                                        <div className="p-3 bg-white/[0.02] border border-white/[0.03] rounded-lg">
+                                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Throughput (24h)</div>
+                                            <div className="text-xs font-bold text-header">{inst.messagesLast24h} msgs</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-6 border-t border-white/[0.03]">
+                                        {inst.connectionStatus === 'CONNECTED' ? (
+                                            <button className="btn-premium btn-premium-outline w-full !py-2.5" onClick={() => logout(inst.id)}>
+                                                Execute Logout
+                                            </button>
+                                        ) : (
+                                            <button className="btn-premium btn-premium-primary w-full !py-2.5" onClick={() => reconnect(inst)}>
+                                                Authorize Handshake
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            ) : (
+                <div className="glass-panel py-32 text-center overflow-hidden relative">
+                    {/* Background Glow */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-primary/10 rounded-full blur-[100px] pointer-events-none" />
+
+                    <div className="relative">
+                        <div className="flex justify-center items-center gap-6 mb-10">
+                            <Icons.LogoMeta className="text-[#0668E1]" size={48} />
+                            <div className="w-px h-12 bg-white/10" />
+                            <Icons.LogoWhatsApp className="text-[#25D366]" size={48} />
+                        </div>
+                        <h2 className="text-2xl font-bold font-display text-header tracking-tight mb-4">Meta Business Ecosystem</h2>
+                        <p className="text-xs text-muted max-w-lg mx-auto opacity-60 leading-relaxed italic mb-12">
+                            Integrate via official Meta Cloud API protocols for maximum infrastructure stability,
+                            verified business identity, and industrial-scale message velocity without bottlenecking.
+                        </p>
+                        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.05] grayscale opacity-50 cursor-not-allowed">
+                            <Icons.Lock size={12} className="text-muted" />
+                            <span className="text-[10px] font-black tracking-[0.2em] text-muted uppercase">Protocol: Pending Beta</span>
                         </div>
                     </div>
                 </div>
             )}
-        </>
+
+            {/* QR Modal Hardware */}
+            {qrModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in transition-all">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setQrModal(null)} />
+                    <div className="relative glass-panel w-full max-w-sm overflow-hidden p-8 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h2 className="text-xs font-black tracking-[0.2em] text-brand-primary uppercase">Handshake ID</h2>
+                                <p className="text-[10px] text-muted opacity-40 uppercase font-medium mt-1">Instance: {qrModal.name}</p>
+                            </div>
+                            <button className="text-muted hover:text-header transition-colors" onClick={() => setQrModal(null)}>
+                                <Icons.Logout size={18} />
+                            </button>
+                        </div>
+
+                        <div className="aspect-square bg-white rounded-2xl p-4 flex items-center justify-center relative group overflow-hidden">
+                            {/* Scanning Line Animation */}
+                            <div className="absolute inset-0 z-10 opacity-40 pointer-events-none">
+                                <div className="w-full h-1 bg-brand-primary/50 shadow-[0_0_15px_var(--brand-primary)] absolute top-0 animate-scanner" />
+                            </div>
+
+                            {qrModal.qrCode ? (
+                                <img src={`data:image/png;base64,${qrModal.qrCode}`} alt="Security Token" className="w-full h-full relative z-0" />
+                            ) : (
+                                <div className="flex flex-col items-center gap-4 text-black">
+                                    <div className="w-10 h-10 border-4 border-black/10 border-t-brand-primary rounded-full animate-spin" />
+                                    <span className="text-[10px] font-black tracking-widest uppercase">Generating Link...</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mt-8 flex flex-col items-center gap-4 italic opacity-60">
+                            <p className="text-[10px] text-muted text-center font-medium">
+                                Protocol refreshing every 4.0s for cryptographic integrity.
+                            </p>
+                            <div className="flex gap-1">
+                                {[1, 2, 3].map(i => <div key={i} className="w-1 h-1 rounded-full bg-brand-primary animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

@@ -1,34 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { api } from '../../../lib/api';
-
-// Professional SVG Icons
-const Icons = {
-    Link: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-    ),
-    ChevronRight: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-    ),
-    Info: () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-    ),
-};
+import { api } from '@/lib/api';
+import { Icons } from '@/components/icons';
 
 const INTEGRATIONS = [
-    { id: 'chatwoot', name: 'Chatwoot', cat: 'Plataforma Core', status: 'connected', desc: 'Omnicanalidad y soporte técnico avanzado' },
-    { id: 'evolution', name: 'WhatsApp Evolution', cat: 'Plataforma Core', status: 'connected', desc: 'Motor de mensajería API para WhatsApp' },
-    { id: 'n8n', name: 'n8n Workflow', cat: 'Plataforma Core', status: 'connected', desc: 'Automatización de flujos B2B complejos' },
-    { id: 'openai', name: 'OpenAI (GPT-4)', cat: 'Inteligencia Artificial', status: 'connected', desc: 'Modelos de lenguaje para agentes inteligentes' },
-    { id: 'livekit', name: 'LiveKit Voice', cat: 'Inteligencia Artificial', status: 'setup', desc: 'Agentes de voz en tiempo real con baja latencia' },
-    { id: 'litellm', name: 'LiteLLM Proxy', cat: 'Inteligencia Artificial', status: 'connected', desc: 'Orquestación y balanceo de múltiples LLMs' },
-    { id: 'stripe', name: 'Stripe Payments', cat: 'Pagos & CRM', status: 'setup', desc: 'Pasarela de pagos y gestión de suscripciones' },
-    { id: 'shopify', name: 'Shopify Store', cat: 'Pagos & CRM', status: 'setup', desc: 'Integración de catálogo y pedidos e-commerce' },
-    { id: 'hubspot', name: 'HubSpot CRM', cat: 'Pagos & CRM', status: 'setup', desc: 'Sincronización de leads y contactos de ventas' },
-    { id: 'ga4', name: 'Google Analytics', cat: 'Analytics & Scheduling', status: 'connected', desc: 'Seguimiento de eventos y métricas de uso' },
-    { id: 'calendly', name: 'Calendly', cat: 'Analytics & Scheduling', status: 'setup', desc: 'Agendamiento automático de citas y demos' },
-    { id: 'opentable', name: 'OpenTable', cat: 'Analytics & Scheduling', status: 'setup', desc: 'Reservas automáticas para sector turismo/restaurante' },
+    { id: 'chatwoot', name: 'Chatwoot', cat: 'Core Infrastructure', status: 'connected', desc: 'Omnichannel engagement & advanced support terminal.' },
+    { id: 'evolution', name: 'WhatsApp Evolution', cat: 'Core Infrastructure', status: 'connected', desc: 'Enterprise-scale messaging API for full WhatsApp nodes.' },
+    { id: 'n8n', name: 'n8n Workflow', cat: 'Core Infrastructure', status: 'connected', desc: 'Complex B2B automation & multi-step logic orchestration.' },
+    { id: 'openai', name: 'OpenAI (GPT-4)', cat: 'Neural Models', status: 'connected', desc: 'Advanced LLM core for autonomous agent intelligence.' },
+    { id: 'livekit', name: 'LiveKit Voice', cat: 'Neural Models', status: 'setup', desc: 'Real-time low-latency voice agents for verbal interaction.' },
+    { id: 'litellm', name: 'LiteLLM Proxy', cat: 'Neural Models', status: 'connected', desc: 'Orchestration & load-balancing across diverse model providers.' },
+    { id: 'stripe', name: 'Stripe Payments', cat: 'Fiscal & CRM', status: 'setup', desc: 'Subscription lifecycle & secure fiscal transaction gateway.' },
+    { id: 'shopify', name: 'Shopify Store', cat: 'Fiscal & CRM', status: 'setup', desc: 'Native e-commerce catalog & fulfillment integration.' },
+    { id: 'hubspot', name: 'HubSpot CRM', cat: 'Fiscal & CRM', status: 'setup', desc: 'High-fidelity sales lead synchronization and tracking.' },
+    { id: 'ga4', name: 'Google Analytics', cat: 'Intelligence Hub', status: 'connected', desc: 'Deep event telemetry & behavioral usage metrics.' },
+    { id: 'calendly', name: 'Calendly', cat: 'Intelligence Hub', status: 'setup', desc: 'Autonomous demo scheduling & appointment handshake.' },
+    { id: 'opentable', name: 'OpenTable', cat: 'Intelligence Hub', status: 'setup', desc: 'Industrial logistics for hospitality & reservation nodes.' },
 ];
 
 export default function IntegrationsPage() {
@@ -51,88 +39,102 @@ export default function IntegrationsPage() {
         return i.status === filter.toLowerCase();
     });
 
+    if (loading) {
+        return (
+            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
+                <div className="h-10 w-64 bg-white/5 rounded-lg" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="h-44 bg-white/5 rounded-2xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <>
-            <div style={{ marginBottom: '2.5rem' }}>
-                <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <Icons.Link />
-                    Integraciones & Conectores
-                </h1>
-                <p className="page-subtitle">Conecta tu ecosistema de herramientas para potenciar la automatización de tu agencia.</p>
-            </div>
+        <div className="animate-in max-w-7xl mx-auto">
+            {/* Header section */}
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                            Connector Layer
+                        </span>
+                    </div>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">App Connect</h1>
+                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                        Synchronize your agency infrastructure with official third-party protocols.
+                    </p>
+                </div>
+                <div className="flex p-1 bg-white/[0.03] rounded-xl border border-white/[0.05]">
+                    {['All', 'Connected', 'Setup'].map(f => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`px-5 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === f ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
+                                }`}
+                        >
+                            {f === 'All' ? 'Complete' : f === 'Connected' ? 'Active' : 'Pending'}
+                        </button>
+                    ))}
+                </div>
+            </header>
 
-            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
-                {['All', 'Connected', 'Setup', 'Error'].map(f => (
-                    <button
-                        key={f}
-                        onClick={() => setFilter(f)}
-                        style={{
-                            padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 600,
-                            background: filter === f ? 'var(--brand-primary)' : 'rgba(255,255,255,0.03)',
-                            color: filter === f ? 'black' : 'rgba(255,255,255,0.6)',
-                            border: '1px solid',
-                            borderColor: filter === f ? 'var(--brand-primary)' : 'rgba(255,255,255,0.05)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        {f === 'All' ? 'Todas' : f === 'Connected' ? 'Conectadas' : f === 'Setup' ? 'Por Configurar' : 'Errores'}
-                    </button>
-                ))}
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {filtered.map(integration => (
-                    <div key={integration.id} className="glass-card" style={{
-                        padding: '1.5rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '1.25rem',
-                        transition: 'all 0.2s ease',
-                        cursor: 'default',
-                        border: integration.status === 'connected' ? '1px solid rgba(80, 205, 149, 0.15)' : '1px solid rgba(255,255,255,0.05)'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div style={{
-                                width: 44, height: 44, borderRadius: '12px', background: 'rgba(255,255,255,0.03)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', color: integration.status === 'connected' ? 'var(--brand-primary)' : 'rgba(255,255,255,0.4)',
-                                border: '1px solid rgba(255,255,255,0.05)'
-                            }}>
-                                <Icons.Link />
+                    <div key={integration.id} className={`group glass-panel p-6 flex flex-col transition-all duration-500 ${integration.status === 'connected' ? 'border-brand-primary/10 shadow-[0_10px_30px_-15px_rgba(var(--brand-primary-rgb),0.1)]' : ''
+                        }`}>
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="w-12 h-12 rounded-xl bg-white/[0.03] flex items-center justify-center text-muted group-hover:text-brand-primary border border-white/[0.05] transition-colors">
+                                <Icons.Link size={22} />
                             </div>
-                            <span style={{
-                                fontSize: '0.65rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: '100px',
-                                background: integration.status === 'connected' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)',
-                                color: integration.status === 'connected' ? '#10b981' : 'var(--text-muted)',
-                                border: `1px solid ${integration.status === 'connected' ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.1)'}`
-                            }}>
-                                {integration.status === 'connected' ? 'ACTIVE' : 'READY TO SETUP'}
-                            </span>
+                            <div className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest border transition-all ${integration.status === 'connected'
+                                    ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/20'
+                                    : 'bg-white/5 text-muted border-white/10 opacity-40'
+                                }`}>
+                                {integration.status === 'connected' ? 'AUTHORIZED' : 'PENDING'}
+                            </div>
                         </div>
 
-                        <div>
-                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'white' }}>{integration.name}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', fontWeight: 600, marginTop: '0.2rem', opacity: 0.8 }}>{integration.cat}</div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem', lineHeight: 1.5 }}>{integration.desc}</p>
+                        <div className="mb-8">
+                            <h3 className="text-base font-bold font-display text-header mb-1 group-hover:text-brand-primary transition-colors">{integration.name}</h3>
+                            <div className="text-[10px] font-bold text-brand-primary opacity-60 uppercase tracking-widest">{integration.cat}</div>
+                            <p className="text-xs text-muted font-medium leading-relaxed mt-4 opacity-50">
+                                {integration.desc}
+                            </p>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto' }}>
-                            <button className="btn btn-ghost btn-sm" style={{ flex: 1, gap: '0.4rem', fontSize: '0.75rem' }}>
-                                <Icons.Info /> Docs
+                        <div className="mt-auto grid grid-cols-2 gap-3 pt-6 border-t border-white/[0.03]">
+                            <button className="btn-premium btn-premium-outline !py-2 !text-[10px] justify-center opacity-40 hover:opacity-100">
+                                <Icons.Alert size={12} /> Tech Spec
                             </button>
-                            <button className="btn btn-primary btn-sm" style={{
-                                flex: 2,
-                                background: integration.status === 'connected' ? 'rgba(255,255,255,0.05)' : 'var(--brand-primary)',
-                                color: integration.status === 'connected' ? 'white' : 'black',
-                                border: integration.status === 'connected' ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                                cursor: 'pointer'
-                            }}>
-                                {integration.status === 'connected' ? 'Configurado' : 'Configurar'}
+                            <button className={`btn-premium !py-2 !text-[10px] justify-center ${integration.status === 'connected'
+                                    ? 'btn-premium-outline !border-white/[0.05] !bg-white/[0.02]'
+                                    : 'btn-premium-primary'
+                                }`}>
+                                {integration.status === 'connected' ? 'Configure' : 'Authorize'}
                             </button>
                         </div>
                     </div>
                 ))}
             </div>
-        </>
+
+            {/* Scale Alert */}
+            <div className="glass-panel p-6 border-dashed border-white/10 flex items-center justify-between gap-6 opacity-60 hover:opacity-100 transition-all">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-muted">
+                        <Icons.Plus size={18} />
+                    </div>
+                    <div>
+                        <h4 className="text-xs font-bold text-header uppercase tracking-widest">Protocol Expansion</h4>
+                        <p className="text-[10px] text-muted font-medium">Request custom API orchestration for enterprise workloads.</p>
+                    </div>
+                </div>
+                <button className="btn-premium btn-premium-outline !py-2 !px-4 !text-[10px]">
+                    Initiate Request
+                </button>
+            </div>
+        </div>
     );
 }

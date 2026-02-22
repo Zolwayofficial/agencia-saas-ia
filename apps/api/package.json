@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "@repo/database": "workspace:*",
+        "@repo/email": "workspace:*",
         "@repo/logger": "workspace:*",
         "@repo/types": "workspace:*",
         "bullmq": "^5.7.0",

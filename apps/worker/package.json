@@ -10,6 +10,7 @@
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.26.0",
         "@repo/database": "workspace:*",
+        "@repo/email": "workspace:*",
         "@repo/logger": "workspace:*",
         "@repo/types": "workspace:*",
         "bullmq": "^5.7.0",

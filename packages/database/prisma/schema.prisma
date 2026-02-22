@@ -191,7 +191,6 @@ model ReferralCode {
   organizationId String       @unique
   organization   Organization @relation(fields: [organizationId], references: [id])
   level1Percent  Float        @default(20)
-  level2Percent  Float        @default(5)
   createdAt      DateTime     @default(now())
 
   @@map("referral_codes")
