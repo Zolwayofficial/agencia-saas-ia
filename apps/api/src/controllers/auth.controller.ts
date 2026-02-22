@@ -147,6 +147,15 @@ export const authController = {
 
             logger.info({ userId: user.id }, 'User logged in');
 
+            if (!user.organization) {
+                logger.error({ userId: user.id }, 'User found but organization is null');
+                return res.status(500).json({
+                    error: 'DATA_INTEGRITY_ERROR',
+                    message: 'Tu usuario no tiene una organización vinculada.',
+                    debug: 'user.organization is null'
+                });
+            }
+
             res.json({
                 token,
                 user: {

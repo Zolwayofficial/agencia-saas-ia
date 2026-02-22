@@ -18,9 +18,15 @@ export const referralController = {
             // Auto-crear código si no existe
             if (!referral) {
                 const org = await prisma.organization.findUnique({ where: { id: orgId } });
+
+                if (!org) {
+                    logger.error({ orgId }, 'Organization not found while creating referral code');
+                    return res.status(404).json({ error: 'Organización no encontrada' });
+                }
+
                 referral = await prisma.referralCode.create({
                     data: {
-                        code: `REF-${org?.slug?.toUpperCase() || orgId.slice(0, 6)}`,
+                        code: `REF-${org.slug?.toUpperCase() || orgId.slice(0, 6)}`,
                         organizationId: orgId,
                     },
                 });
