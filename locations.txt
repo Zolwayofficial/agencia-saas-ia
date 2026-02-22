@@ -1,0 +1,13 @@
+=== DOCKER COMPOSE LOCATIONS ===
+/root/docker-compose.yml
+/opt/fulllogin/infrastructure/production/docker-compose.yml
+/opt/fulllogin/infrastructure/local/docker-compose.yml
+/opt/fulllogin/infrastructure/docker-compose.yml
+/opt/fulllogin/docker/docker-compose.yml
+/opt/agencia-saas-ia/infrastructure/production/docker-compose.yml
+/opt/agencia-saas-ia/infrastructure/local/docker-compose.yml
+/opt/agencia-saas-ia/infrastructure/docker-compose.yml
+/opt/agencia-saas-ia/docker/docker-compose.yml
+/opt/openclaw/docker-compose.yml
+=== DEPLOYMENT CHECK ===
+/root

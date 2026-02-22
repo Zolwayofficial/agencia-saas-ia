@@ -34,7 +34,7 @@ export class TwentyClient {
                 throw new Error(`Twenty API error (${response.status}): ${errorText}`);
             }
 
-            const result = await response.json();
+            const result = await response.json() as any;
 
             if (result.errors) {
                 throw new Error(`Twenty GraphQL Errors: ${JSON.stringify(result.errors)}`);

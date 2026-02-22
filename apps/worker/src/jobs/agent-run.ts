@@ -68,7 +68,7 @@ export function createAgentWorker(connection: IORedis) {
                     data: {
                         organizationId,
                         amount: -totalCost,
-                        type: 'USAGE',
+                        type: 'CHARGE',
                         description: `Agente IA: ${stepsUsed} pasos (${model})`,
                     },
                 }),

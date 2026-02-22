@@ -1,0 +1,5 @@
+=== FINDING DEPLOYMENT PATH ===
+                "Source": "/opt/agencia-saas-ia/landing",
+                "Source": "/opt/agencia-saas-ia/infrastructure/production/Caddyfile",
+                "Source": "/var/lib/docker/volumes/production_caddy_data/_data",
+                "Source": "/var/lib/docker/volumes/production_caddy_config/_data",
