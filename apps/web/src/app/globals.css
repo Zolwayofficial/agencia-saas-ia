@@ -310,3 +310,109 @@ h6,
     color: var(--text-muted);
     font-size: 1rem;
 }
+
+/* --- Authentication Pages --- */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1.5rem;
+    background: radial-gradient(circle at center, hsl(var(--bg-surface)) 0%, hsl(var(--bg-base)) 100%);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background: rgba(12, 18, 18, 0.6);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.auth-card h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    padding-left: 0.25rem;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-header);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 2px rgba(80, 205, 149, 0.1);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--brand-primary);
+    color: #060909;
+}
+
+.btn-primary:hover {
+    background: var(--brand-primary-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.3);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.error-msg {
+    background: hsla(var(--danger), 0.1);
+    color: hsl(var(--danger));
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid hsla(var(--danger), 0.2);
+}
