@@ -162,9 +162,9 @@ export const authController = {
                     balance: user.organization.creditBalance,
                 },
             });
-        } catch (error) {
+        } catch (error: any) {
             logger.error(error, 'Error en login');
-            res.status(500).json({ error: 'Error al iniciar sesión' });
+            res.status(500).json({ error: 'Error al iniciar sesión', debug: error?.message || String(error) });
         }
     },
 
