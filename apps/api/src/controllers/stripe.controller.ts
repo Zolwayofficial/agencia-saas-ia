@@ -8,7 +8,7 @@ import Stripe from 'stripe';
 import { logger } from '@repo/logger';
 import { prisma } from '@repo/database';
 import { env } from '../config/env';
-import { emailService } from '../services/email.service';
+import { emailService } from '@repo/email';
 
 const stripe = env.STRIPE_SECRET_KEY
     ? new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' as any })

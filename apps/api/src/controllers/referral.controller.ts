@@ -29,7 +29,6 @@ export const referralController = {
             res.json({
                 code: referral.code,
                 level1Percent: referral.level1Percent,
-                level2Percent: referral.level2Percent,
             });
         } catch (error) {
             logger.error(error, 'Error obteniendo código de referido');
