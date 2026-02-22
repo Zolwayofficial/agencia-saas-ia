@@ -180,6 +180,13 @@ importers:
       '@repo/logger':
         specifier: workspace:*
         version: link:../logger
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.33
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.3
 
   packages/logger:
     dependencies:
