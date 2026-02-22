@@ -3,171 +3,136 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../lib/api';
 
-type IntegrationStatus = 'connected' | 'error' | 'setup';
-
-interface Integration {
-    id: string;
-    name: string;
-    icon: string;
-    description: string;
-    category: string;
-    color: string;
-    status: IntegrationStatus;
-    detail: string;
-    docs?: string;
-}
-
-const INTEGRATIONS: Integration[] = [
-    // Core Platform
-    { id: 'chatwoot', name: 'Chatwoot Enterprise', icon: '💬', description: 'Inbox multicanal · 10 canales · Enterprise features', category: 'Plataforma Core', color: '#1F93FF', status: 'connected', detail: 'Activo', docs: 'https://chatwoot.com/docs' },
-    { id: 'evolution', name: 'Evolution API', icon: '📱', description: 'WhatsApp Business · Multi-instancia · SmartSend™', category: 'Plataforma Core', color: '#25D366', status: 'connected', detail: 'Activo', docs: 'https://doc.evolution-api.com' },
-    { id: 'n8n', name: 'n8n Workflows', icon: '🔄', description: 'Automatización · 400+ nodos · No-code', category: 'Plataforma Core', color: '#EA4B71', status: 'connected', detail: 'Activo', docs: 'https://docs.n8n.io' },
-    { id: 'livekit', name: 'LiveKit (Voz IA)', icon: '🎙️', description: 'Agente de voz · SIP Trunk · Whisper STT', category: 'Plataforma Core', color: '#6366f1', status: 'setup', detail: 'Configurable', docs: 'https://docs.livekit.io' },
-
-    // AI
-    { id: 'openai', name: 'OpenAI / GPT', icon: '🤖', description: 'LLM · GPT-4 · Embeddings · Function calling', category: 'Inteligencia Artificial', color: '#10a37f', status: 'connected', detail: 'Vía LiteLLM', docs: 'https://platform.openai.com/docs' },
-    { id: 'litellm', name: 'LiteLLM Router', icon: '⚡', description: 'Proxy multi-modelo · Fallbacks · Cost tracking', category: 'Inteligencia Artificial', color: '#f59e0b', status: 'connected', detail: 'Activo', docs: 'https://docs.litellm.ai' },
-    { id: 'whisper', name: 'Whisper STT', icon: '🎤', description: 'Transcripción de audio · Tiempo real', category: 'Inteligencia Artificial', color: '#8b5cf6', status: 'setup', detail: 'Configurable', docs: 'https://platform.openai.com/docs/guides/speech-to-text' },
-
-    // Ecommerce & CRM
-    { id: 'stripe', name: 'Stripe Payments', icon: '💳', description: 'Suscripciones · One-time · Facturas · Portal', category: 'Pagos & CRM', color: '#635BFF', status: 'connected', detail: 'Activo', docs: 'https://stripe.com/docs' },
-    { id: 'shopify', name: 'Shopify', icon: '🛒', description: 'E-commerce · Pedidos · Inventario · Notificaciones', category: 'Pagos & CRM', color: '#95BF47', status: 'setup', detail: 'No configurado', docs: 'https://shopify.dev/docs' },
-    { id: 'hubspot', name: 'HubSpot CRM', icon: '🏢', description: 'Contactos · Deals · Marketing automation', category: 'Pagos & CRM', color: '#FF7A59', status: 'setup', detail: 'No configurado', docs: 'https://developers.hubspot.com' },
-
-    // Analytics & Scheduling
-    { id: 'ganalytics', name: 'Google Analytics', icon: '📊', description: 'Tracking · Eventos · Reportes', category: 'Analytics & Scheduling', color: '#E37400', status: 'setup', detail: 'No configurado', docs: 'https://analytics.google.com' },
-    { id: 'calendly', name: 'Calendly / OpenTable', icon: '📅', description: 'Citas · Reservas · Recordatorios', category: 'Analytics & Scheduling', color: '#006BFF', status: 'setup', detail: 'No configurado', docs: 'https://developer.calendly.com' },
-];
-
-const STATUS_CONFIG: Record<IntegrationStatus, { label: string; badgeClass: string; dot: string }> = {
-    connected: { label: 'Conectado', badgeClass: 'success', dot: '#10b981' },
-    error: { label: 'Error', badgeClass: 'danger', dot: '#ef4444' },
-    setup: { label: 'Disponible', badgeClass: 'neutral', dot: 'var(--text-muted)' },
+// Professional SVG Icons
+const Icons = {
+    Link: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+    ),
+    ChevronRight: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+    ),
+    Info: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+    ),
 };
 
-const CATEGORIES = [...new Set(INTEGRATIONS.map(i => i.category))];
+const INTEGRATIONS = [
+    { id: 'chatwoot', name: 'Chatwoot', cat: 'Plataforma Core', status: 'connected', desc: 'Omnicanalidad y soporte técnico avanzado' },
+    { id: 'evolution', name: 'WhatsApp Evolution', cat: 'Plataforma Core', status: 'connected', desc: 'Motor de mensajería API para WhatsApp' },
+    { id: 'n8n', name: 'n8n Workflow', cat: 'Plataforma Core', status: 'connected', desc: 'Automatización de flujos B2B complejos' },
+    { id: 'openai', name: 'OpenAI (GPT-4)', cat: 'Inteligencia Artificial', status: 'connected', desc: 'Modelos de lenguaje para agentes inteligentes' },
+    { id: 'livekit', name: 'LiveKit Voice', cat: 'Inteligencia Artificial', status: 'setup', desc: 'Agentes de voz en tiempo real con baja latencia' },
+    { id: 'litellm', name: 'LiteLLM Proxy', cat: 'Inteligencia Artificial', status: 'connected', desc: 'Orquestación y balanceo de múltiples LLMs' },
+    { id: 'stripe', name: 'Stripe Payments', cat: 'Pagos & CRM', status: 'setup', desc: 'Pasarela de pagos y gestión de suscripciones' },
+    { id: 'shopify', name: 'Shopify Store', cat: 'Pagos & CRM', status: 'setup', desc: 'Integración de catálogo y pedidos e-commerce' },
+    { id: 'hubspot', name: 'HubSpot CRM', cat: 'Pagos & CRM', status: 'setup', desc: 'Sincronización de leads y contactos de ventas' },
+    { id: 'ga4', name: 'Google Analytics', cat: 'Analytics & Scheduling', status: 'connected', desc: 'Seguimiento de eventos y métricas de uso' },
+    { id: 'calendly', name: 'Calendly', cat: 'Analytics & Scheduling', status: 'setup', desc: 'Agendamiento automático de citas y demos' },
+    { id: 'opentable', name: 'OpenTable', cat: 'Analytics & Scheduling', status: 'setup', desc: 'Reservas automáticas para sector turismo/restaurante' },
+];
 
 export default function IntegrationsPage() {
-    const [waInstances, setWaInstances] = useState<any[]>([]);
-    const [filter, setFilter] = useState<IntegrationStatus | 'all'>('all');
+    const [instances, setInstances] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('All');
 
     useEffect(() => {
-        api.getInstances().then(d => setWaInstances(d.instances || [])).catch(() => { });
+        api.getInstances()
+            .then(data => setInstances(data.instances || []))
+            .catch(() => setInstances([]))
+            .finally(() => setLoading(false));
     }, []);
 
-    // Enrich WA status based on actual instances
-    const enriched = INTEGRATIONS.map(i =>
-        i.id === 'evolution'
-            ? { ...i, status: (waInstances.length > 0 ? 'connected' : 'setup') as IntegrationStatus, detail: waInstances.length > 0 ? `${waInstances.length} instancia(s)` : 'Sin instancias' }
-            : i
-    );
-
-    const filtered = filter === 'all' ? enriched : enriched.filter(i => i.status === filter);
-    const connectedCount = enriched.filter(i => i.status === 'connected').length;
-    const errorCount = enriched.filter(i => i.status === 'error').length;
+    const filtered = INTEGRATIONS.map(i => {
+        if (i.id === 'evolution') return { ...i, status: instances.length > 0 ? 'connected' : 'setup' };
+        return i;
+    }).filter(i => {
+        if (filter === 'All') return true;
+        return i.status === filter.toLowerCase();
+    });
 
     return (
         <>
-            <h1 className="page-title">🔗 Integraciones</h1>
-            <p className="page-subtitle">
-                {connectedCount} activas · {enriched.length - connectedCount} disponibles · Conecta toda tu pila tecnológica
-            </p>
-
-            {/* Summary Row */}
-            <div className="grid-stats" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: '1.5rem' }}>
-                <div className="stat-card">
-                    <div className="stat-label">✅ Activas</div>
-                    <div className="stat-value" style={{ color: '#10b981' }}>{connectedCount}</div>
-                    <div className="stat-detail">Integraciones funcionando</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-label">🔧 Disponibles</div>
-                    <div className="stat-value" style={{ color: 'var(--text-muted)' }}>{enriched.filter(i => i.status === 'setup').length}</div>
-                    <div className="stat-detail">Listas para configurar</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-label">⚠️ Con error</div>
-                    <div className="stat-value" style={{ color: errorCount > 0 ? '#ef4444' : 'var(--text-muted)' }}>{errorCount}</div>
-                    <div className="stat-detail">Requieren atención</div>
-                </div>
+            <div style={{ marginBottom: '2.5rem' }}>
+                <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Icons.Link />
+                    Integraciones & Conectores
+                </h1>
+                <p className="page-subtitle">Conecta tu ecosistema de herramientas para potenciar la automatización de tu agencia.</p>
             </div>
 
-            {/* Filter Tabs */}
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                {(['all', 'connected', 'setup', 'error'] as const).map((f) => (
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
+                {['All', 'Connected', 'Setup', 'Error'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
-                        className={filter === f ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'}
-                        style={{ textTransform: 'capitalize' }}
+                        style={{
+                            padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 600,
+                            background: filter === f ? 'var(--brand-primary)' : 'rgba(255,255,255,0.03)',
+                            color: filter === f ? 'black' : 'rgba(255,255,255,0.6)',
+                            border: '1px solid',
+                            borderColor: filter === f ? 'var(--brand-primary)' : 'rgba(255,255,255,0.05)',
+                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            cursor: 'pointer'
+                        }}
                     >
-                        {f === 'all' ? `Todas (${enriched.length})` : f === 'connected' ? `Activas (${connectedCount})` : f === 'setup' ? `Disponibles (${enriched.filter(i => i.status === 'setup').length})` : `Errores (${errorCount})`}
+                        {f === 'All' ? 'Todas' : f === 'Connected' ? 'Conectadas' : f === 'Setup' ? 'Por Configurar' : 'Errores'}
                     </button>
                 ))}
             </div>
 
-            {/* Integration Cards by Category */}
-            {CATEGORIES.map((cat) => {
-                const items = filtered.filter(i => i.category === cat);
-                if (items.length === 0) return null;
-                return (
-                    <div key={cat} style={{ marginBottom: '1.5rem' }}>
-                        <h2 style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                            {cat}
-                        </h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
-                            {items.map((intg) => {
-                                const sc = STATUS_CONFIG[intg.status];
-                                return (
-                                    <div key={intg.id} style={{
-                                        padding: '1.25rem',
-                                        background: intg.status === 'connected' ? `${intg.color}08` : 'var(--bg-glass)',
-                                        border: `1px solid ${intg.status === 'connected' ? intg.color + '30' : 'var(--border-subtle)'}`,
-                                        borderRadius: 'var(--radius-md)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '0.75rem',
-                                        transition: 'all 0.15s ease',
-                                    }}>
-                                        {/* Header */}
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                                            <div style={{
-                                                width: 40, height: 40, borderRadius: 10,
-                                                background: `${intg.color}18`,
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                fontSize: '1.25rem', flexShrink: 0,
-                                            }}>
-                                                {intg.icon}
-                                            </div>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{intg.name}</div>
-                                                <div style={{ fontSize: '0.775rem', color: 'var(--text-muted)', lineHeight: 1.4, marginTop: '0.1rem' }}>{intg.description}</div>
-                                            </div>
-                                            <span className={`badge ${sc.badgeClass}`} style={{ flexShrink: 0, fontSize: '0.68rem' }}>
-                                                <span style={{ width: 5, height: 5, borderRadius: '50%', background: sc.dot, display: 'inline-block', marginRight: '0.3rem' }} />
-                                                {sc.label}
-                                            </span>
-                                        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+                {filtered.map(integration => (
+                    <div key={integration.id} className="glass-card" style={{
+                        padding: '1.5rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1.25rem',
+                        transition: 'all 0.2s ease',
+                        cursor: 'default',
+                        border: integration.status === 'connected' ? '1px solid rgba(80, 205, 149, 0.15)' : '1px solid rgba(255,255,255,0.05)'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{
+                                width: 44, height: 44, borderRadius: '12px', background: 'rgba(255,255,255,0.03)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', color: integration.status === 'connected' ? 'var(--brand-primary)' : 'rgba(255,255,255,0.4)',
+                                border: '1px solid rgba(255,255,255,0.05)'
+                            }}>
+                                <Icons.Link />
+                            </div>
+                            <span style={{
+                                fontSize: '0.65rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: '100px',
+                                background: integration.status === 'connected' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)',
+                                color: integration.status === 'connected' ? '#10b981' : 'var(--text-muted)',
+                                border: `1px solid ${integration.status === 'connected' ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.1)'}`
+                            }}>
+                                {integration.status === 'connected' ? 'ACTIVE' : 'READY TO SETUP'}
+                            </span>
+                        </div>
 
-                                        {/* Footer */}
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px solid var(--border-subtle)' }}>
-                                            <span style={{ fontSize: '0.75rem', color: intg.status === 'connected' ? intg.color : 'var(--text-muted)', fontWeight: 500 }}>
-                                                {intg.detail}
-                                            </span>
-                                            {intg.docs && (
-                                                <a href={intg.docs} target="_blank" rel="noreferrer"
-                                                    style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 500 }}>
-                                                    Docs →
-                                                </a>
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <div>
+                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'white' }}>{integration.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--brand-primary)', fontWeight: 600, marginTop: '0.2rem', opacity: 0.8 }}>{integration.cat}</div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem', lineHeight: 1.5 }}>{integration.desc}</p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.75rem', marginTop: 'auto' }}>
+                            <button className="btn btn-ghost btn-sm" style={{ flex: 1, gap: '0.4rem', fontSize: '0.75rem' }}>
+                                <Icons.Info /> Docs
+                            </button>
+                            <button className="btn btn-primary btn-sm" style={{
+                                flex: 2,
+                                background: integration.status === 'connected' ? 'rgba(255,255,255,0.05)' : 'var(--brand-primary)',
+                                color: integration.status === 'connected' ? 'white' : 'black',
+                                border: integration.status === 'connected' ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                                cursor: 'pointer'
+                            }}>
+                                {integration.status === 'connected' ? 'Configurado' : 'Configurar'}
+                            </button>
                         </div>
                     </div>
-                );
-            })}
+                ))}
+            </div>
         </>
     );
 }

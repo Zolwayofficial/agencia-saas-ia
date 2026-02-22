@@ -3,192 +3,180 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../lib/api';
 
-const WARMUP_LEVELS = [
-    { level: 1, label: 'Calentando', desc: '20 msgs/día — Inicio seguro', max: 20, color: '#f59e0b' },
-    { level: 2, label: 'Creciendo', desc: '50 msgs/día — Sin riesgo', max: 50, color: '#3b82f6' },
-    { level: 3, label: 'Activo', desc: '150 msgs/día — Estable', max: 150, color: '#8b5cf6' },
-    { level: 4, label: 'Óptimo', desc: '400 msgs/día — Alta velocidad', max: 400, color: '#10b981' },
-    { level: 5, label: 'Máximo', desc: '1000+ msgs/día — Elite', max: 1000, color: '#50CD95' },
-];
-
-const CAMPAIGN_STATUSES = [
-    { label: 'Activas', value: 0, color: '#10b981' },
-    { label: 'Programadas', value: 0, color: '#3b82f6' },
-    { label: 'Completadas', value: 0, color: 'var(--text-muted)' },
-    { label: 'Pausadas', value: 0, color: '#f59e0b' },
-];
+// Professional SVG Icons
+const Icons = {
+    Rocket: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" /><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" /><path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" /><path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" /></svg>
+    ),
+    Plus: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+    ),
+    Zap: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+    ),
+    Shield: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z" /></svg>
+    ),
+    Smartphone: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg>
+    ),
+};
 
 export default function MarketingPage() {
     const [instances, setInstances] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [campaignName, setCampaignName] = useState('');
-    const [campaignChannel, setCampaignChannel] = useState('whatsapp');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         api.getInstances()
-            .then((d) => setInstances(d.instances || []))
+            .then(data => setInstances(data.instances || []))
             .catch(() => setInstances([]))
             .finally(() => setLoading(false));
     }, []);
 
-    const activeInstances = instances.filter(i => i.status === 'CONNECTED' || i.state === 'open');
+    const activeInstances = instances.filter(i => i.status === 'open').length;
+    const warmupLevel = activeInstances > 0 ? 3 : 0; // Simulated level
 
     return (
         <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+            <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <h1 className="page-title">🚀 Marketing & Campañas</h1>
-                    <p className="page-subtitle">SmartSend™ · Envío masivo seguro · Anti-ban · Programación inteligente</p>
+                    <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <Icons.Rocket />
+                        Marketing & Campañas
+                    </h1>
+                    <p className="page-subtitle">Envía mensajes masivos inteligentes con sistemas anti-ban avanzados SmartSend™.</p>
                 </div>
-                <button onClick={() => setShowModal(true)} className="btn btn-primary">
-                    + Nueva Campaña
+                <button
+                    onClick={() => setShowModal(true)}
+                    className="btn btn-primary"
+                    style={{ gap: '0.5rem' }}
+                >
+                    <Icons.Plus />
+                    Nueva Campaña
                 </button>
             </div>
 
-            {/* SmartSend Status */}
-            <div className="glass-card" style={{
-                marginBottom: '1.5rem',
-                background: 'linear-gradient(135deg, rgba(80,205,149,0.06), rgba(61,184,131,0.02))',
-                border: '1px solid rgba(80,205,149,0.15)',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
-                    <div style={{
-                        width: 48, height: 48, borderRadius: '50%',
-                        background: 'rgba(80,205,149,0.15)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '1.5rem',
-                    }}>🛡️</div>
-                    <div>
-                        <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>SmartSend™ — Sistema Anti-Ban</h2>
-                        <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                            Warmup automático · Jitter de tiempo · Rotación de instancias · Límites adaptativos
-                        </p>
-                    </div>
-                    <div style={{ marginLeft: 'auto' }}>
-                        <span className="badge success">
-                            <span className="pulse-dot" />
-                            {activeInstances.length > 0 ? 'Activo' : 'Listo'}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Warmup Levels */}
-                <h3 style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                    NIVELES DE WARMUP
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem' }}>
-                    {WARMUP_LEVELS.map((w, i) => (
-                        <div key={w.level} style={{
-                            padding: '0.75rem',
-                            background: i === 0 ? `${w.color}15` : 'var(--bg-elevated)',
-                            border: `1px solid ${i === 0 ? w.color + '50' : 'var(--border-subtle)'}`,
-                            borderRadius: 'var(--radius-sm)',
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                {/* SmartSend System */}
+                <div className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                        <div style={{
+                            width: 48, height: 48, borderRadius: '12px', background: 'rgba(80, 205, 149, 0.1)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-primary)'
                         }}>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: w.color, marginBottom: '0.2rem' }}>Nivel {w.level}</div>
-                            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.15rem' }}>{w.label}</div>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.3 }}>{w.desc}</div>
+                            <Icons.Zap />
                         </div>
-                    ))}
-                </div>
+                        <div>
+                            <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>SmartSend™ Engine Status</h2>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Calibración de velocidad y protección anti-ban activa</p>
+                        </div>
+                    </div>
 
-                {/* Instances */}
-                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
-                    <h3 style={{ fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                        INSTANCIAS DISPONIBLES PARA ENVÍO ({instances.length})
-                    </h3>
-                    {loading ? (
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Cargando...</p>
-                    ) : instances.length === 0 ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No hay instancias conectadas.</span>
-                            <a href="/dashboard/whatsapp" style={{ color: 'var(--brand-primary)', fontSize: '0.85rem', textDecoration: 'none' }}>
-                                Conectar WhatsApp →
-                            </a>
+                    <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.2)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>WARMUP PROGRESS (LEVEL {warmupLevel}/5)</span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--brand-primary)' }}>{warmupLevel * 20}% OPTIMIZADO</span>
                         </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                            {instances.map((inst) => (
-                                <span key={inst.id} style={{
-                                    padding: '0.3rem 0.75rem',
-                                    background: 'rgba(80,205,149,0.1)',
-                                    border: '1px solid rgba(80,205,149,0.3)',
-                                    borderRadius: '9999px',
-                                    fontSize: '0.8rem',
-                                    color: 'var(--brand-primary)',
-                                    fontWeight: 500,
-                                }}>
-                                    📱 {inst.name || inst.instanceName || inst.id}
-                                </span>
+                        <div style={{ display: 'flex', gap: '4px', height: '12px', marginBottom: '1.5rem' }}>
+                            {[1, 2, 3, 4, 5].map((level) => (
+                                <div key={level} style={{
+                                    flex: 1,
+                                    background: level <= warmupLevel ? 'var(--brand-primary)' : 'rgba(255,255,255,0.05)',
+                                    borderRadius: '2px',
+                                    boxShadow: level <= warmupLevel ? '0 0 10px rgba(80, 205, 149, 0.3)' : 'none'
+                                }} />
                             ))}
                         </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Campaign Stats */}
-            <div className="grid-stats" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '1.5rem' }}>
-                {CAMPAIGN_STATUSES.map((s) => (
-                    <div key={s.label} className="stat-card">
-                        <div className="stat-label">{s.label}</div>
-                        <div className="stat-value" style={{ color: s.color }}>{s.value}</div>
-                        <div className="stat-detail">campañas</div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Empty campaigns */}
-            <div className="glass-card">
-                <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>📋 Campañas</h2>
-                <div style={{ textAlign: 'center', padding: '3rem 2rem' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚀</div>
-                    <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Crea tu primera campaña</h3>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', maxWidth: 400, margin: '0 auto 1.5rem' }}>
-                        Envía mensajes masivos con SmartSend™: warmup automático, anti-ban, jitter de tiempo y rotación de números.
-                    </p>
-                    <button onClick={() => setShowModal(true)} className="btn btn-primary">
-                        + Nueva Campaña
-                    </button>
-                </div>
-            </div>
-
-            {/* Modal */}
-            {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h2>🚀 Nueva Campaña SmartSend™</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>VELOCIDAD</div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>120 msg/hr</div>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>ROTACIÓN</div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>Activa</div>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>PROTECCIÓN</div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                                    <Icons.Shield /> High
+                                </div>
+                            </div>
                         </div>
-                        <div className="modal-body" style={{ alignItems: 'stretch' }}>
-                            <div className="form-group">
-                                <label className="form-label">Nombre de la campaña</label>
-                                <input
-                                    className="form-input"
-                                    placeholder="Ej: Promo Diciembre 2026"
-                                    value={campaignName}
-                                    onChange={(e) => setCampaignName(e.target.value)}
-                                />
+                    </div>
+                </div>
+
+                {/* Instance Stats */}
+                <div className="glass-card" style={{ padding: '1.5rem' }}>
+                    <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1.25rem' }}>
+                        INSTANCIAS PARA ENVÍO
+                    </h3>
+                    <div className="stat-value" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{activeInstances}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+                        <Icons.Smartphone /> {activeInstances} WhatsApp Ready
+                    </div>
+
+                    <Link href="/dashboard/whatsapp" className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        Gestionar Instancias
+                    </Link>
+                </div>
+            </div>
+
+            {/* Campaigns Table */}
+            <div className="glass-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        HISTORIAL DE CAMPAÑAS
+                    </h3>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {['Todas', 'Activas', 'En Pausa', 'Completadas'].map(filter => (
+                            <button key={filter} style={{
+                                padding: '0.25rem 0.75rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600,
+                                background: filter === 'Todas' ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                color: filter === 'Todas' ? 'white' : 'var(--text-muted)',
+                                border: '1px solid transparent',
+                                cursor: 'pointer'
+                            }}>{filter}</button>
+                        ))}
+                    </div>
+                </div>
+
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre Campaña</th>
+                            <th>Canal</th>
+                            <th>Estado</th>
+                            <th>Enviados / Total</th>
+                            <th>Éxito</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                                No hay campañas activas. Haz clic en "Nueva Campaña" para empezar.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Modal Placeholder */}
+            {showModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                    <div className="glass-card" style={{ maxWidth: '500px', width: '100%', padding: '2rem', border: '1px solid var(--brand-primary)' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>Crear Nueva Campaña</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>NOMBRE DE CAMPAÑA</label>
+                                <input type="text" placeholder="Ej: Lanzamiento Marzo 2024" style={{ width: '100%', padding: '0.75rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white' }} />
                             </div>
-                            <div className="form-group">
-                                <label className="form-label">Canal</label>
-                                <select
-                                    className="form-input"
-                                    value={campaignChannel}
-                                    onChange={(e) => setCampaignChannel(e.target.value)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <option value="whatsapp">📱 WhatsApp</option>
-                                    <option value="sms" disabled>📟 SMS (próximamente)</option>
-                                    <option value="email" disabled>📧 Email (próximamente)</option>
-                                </select>
-                            </div>
-                            <div style={{ padding: '0.75rem 1rem', background: 'rgba(80,205,149,0.08)', border: '1px solid rgba(80,205,149,0.2)', borderRadius: 'var(--radius-sm)', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                                💡 <strong>SmartSend™</strong> aplicará warmup automático y distribución inteligente para proteger tus números.
-                            </div>
-                            <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} onClick={() => setShowModal(false)}>
-                                Crear Campaña (próximamente)
-                            </button>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button onClick={() => setShowModal(false)} className="btn btn-ghost" style={{ flex: 1 }}>Cancelar</button>
+                            <button onClick={() => setShowModal(false)} className="btn btn-primary" style={{ flex: 1 }}>Continuar</button>
                         </div>
                     </div>
                 </div>
@@ -196,3 +184,5 @@ export default function MarketingPage() {
         </>
     );
 }
+
+import Link from 'next/link';

@@ -1,0 +1,40 @@
+﻿commit b3b76574582f5bdbc134b068f0b3f24bca66f5e6
+Author: Billy <billy@example.com>
+Date:   Sat Feb 21 10:08:13 2026 -0500
+
+    feat(ai-skills): add Postgres MCP server and Data Interpreter tools for Dashboards
+
+diff --git a/apps/worker/package.json b/apps/worker/package.json
+index 803b12d..3cff722 100644
+--- a/apps/worker/package.json
++++ b/apps/worker/package.json
+@@ -8,6 +8,7 @@
+         "start": "node dist/index.js"
+     },
+     "dependencies": {
++        "@modelcontextprotocol/sdk": "^1.26.0",
+         "@repo/database": "workspace:*",
+         "@repo/logger": "workspace:*",
+         "@repo/types": "workspace:*",
+diff --git a/infrastructure/production/docker-compose.yml b/infrastructure/production/docker-compose.yml
+index b356bb2..877f2d9 100644
+--- a/infrastructure/production/docker-compose.yml
++++ b/infrastructure/production/docker-compose.yml
+@@ -257,6 +257,17 @@ services:
+     networks:
+       - internal
+ 
++  postgres-mcp:
++    build:
++      context: .
++      dockerfile: Dockerfile.mcp
++    restart: always
++    environment:
++      DATABASE_URL: postgresql://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db # Need to verify correct DB
++    depends_on: [ postgres ]
++    networks:
++      - internal
++
+   saas-web:
+     build:
+       context: ../..
