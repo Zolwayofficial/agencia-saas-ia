@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { env } from './config/env';
 import { logger } from '@repo/logger';
 import v1Routes from './routes/v1';
 import { stripeController } from './controllers/stripe.controller';
@@ -9,7 +10,7 @@ import { apiRateLimiter } from './middlewares/rate-limit';
 const app: express.Application = express();
 
 // Global Middleware
-app.use(cors());
+app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 
 // Rate limiting (V6.1)
 app.use(apiRateLimiter);

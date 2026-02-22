@@ -3,7 +3,7 @@ import IORedis from 'ioredis';
 import { env } from '../config/env';
 import type { SendMessagePayload, OpenClawConfig } from '@repo/types';
 
-const connection = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null });
+export const connection = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null });
 
 const whatsappQueue = new Queue('whatsapp-send', { connection });
 const agentQueue = new Queue('agent-run', { connection });

@@ -13,7 +13,7 @@ import { TwentyClient } from '../lib/twenty';
 
 export function createAgentWorker(connection: IORedis) {
     const worker = new Worker<OpenClawConfig>('agent-run', async (job: Job<OpenClawConfig>) => {
-        const { taskId, model, maxSteps, timeout, organizationId } = job.data;
+        const { taskId, model, maxSteps, timeout, organizationId, reservationId } = job.data as any;
         logger.info({ jobId: job.id, taskId, model }, 'Agent: starting execution');
 
         // ── 1. Marcar tarea como RUNNING ────────────────────────
@@ -72,9 +72,12 @@ export function createAgentWorker(connection: IORedis) {
                         description: `Agente IA: ${stepsUsed} pasos (${model})`,
                     },
                 }),
-                prisma.creditReservation.deleteMany({
-                    where: { organizationId, status: 'PENDING' }
-                })
+                ...(reservationId ? [
+                    prisma.creditReservation.update({
+                        where: { id: reservationId },
+                        data: { status: 'CONFIRMED' }
+                    })
+                ] : [])
             ]);
 
             logger.info({ taskId, totalCost, stepsUsed }, 'AgentRun: complete');
@@ -85,14 +88,22 @@ export function createAgentWorker(connection: IORedis) {
             const errorMessage = err instanceof Error ? err.message : 'Unknown error';
             logger.error({ taskId, err: errorMessage }, 'AgentRun: critical failure');
 
-            await prisma.agentTask.update({
-                where: { id: taskId },
-                data: {
-                    status: 'ERROR',
-                    output: `Internal Error: ${errorMessage}`,
-                    completedAt: new Date(),
-                },
-            });
+            await prisma.$transaction([
+                prisma.agentTask.update({
+                    where: { id: taskId },
+                    data: {
+                        status: 'ERROR',
+                        output: `Internal Error: ${errorMessage}`,
+                        completedAt: new Date(),
+                    },
+                }),
+                ...(reservationId ? [
+                    prisma.creditReservation.update({
+                        where: { id: reservationId },
+                        data: { status: 'FAILED' }
+                    })
+                ] : [])
+            ]);
 
             throw err;
         }

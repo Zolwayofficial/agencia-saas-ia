@@ -9,6 +9,7 @@ import { referralController } from '../controllers/referral.controller';
 import { stripeController } from '../controllers/stripe.controller';
 import { authMiddleware } from '../middlewares/auth';
 import { creditGuard } from '../middlewares/credit-guard';
+import { requireWebhookAuth } from '../middlewares/webhook-auth';
 
 const router: Router = Router();
 
@@ -20,8 +21,8 @@ router.post('/auth/register', authController.register);
 router.post('/auth/login', authController.login);
 
 // ─── Webhooks (no auth, validados por API key del servicio) ──
-router.post('/webhooks/evolution', webhookController.evolution);
-router.post('/webhooks/chatwoot', webhookController.chatwoot);
+router.post('/webhooks/evolution', requireWebhookAuth, webhookController.evolution);
+router.post('/webhooks/chatwoot', requireWebhookAuth, webhookController.chatwoot);
 
 // ─── Protected (requiere auth) ───────────────────────
 router.use(authMiddleware);

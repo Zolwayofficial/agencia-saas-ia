@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { logger } from '@repo/logger';
 import { prisma } from '@repo/database';
 import { evolutionApi } from '../lib/evolution';
@@ -16,192 +16,226 @@ export const whatsappController = {
      * POST /api/v1/whatsapp/instances
      * Create a new WhatsApp instance.
      */
-    createInstance: async (req: Request, res: Response) => {
-        const organizationId = (req as any).organizationId;
-        const parsed = CreateInstanceSchema.parse(req.body);
-        const { displayName } = parsed;
-
-        // Check plan limit
-        const org = await prisma.organization.findUnique({
-            where: { id: organizationId },
-            include: { plan: true, instances: true },
-        });
-
-        if (!org) throw new AppError(404, 'ORG_NOT_FOUND', 'Organización no encontrada');
-
-        const maxInstances = org.plan?.maxInstances ?? 1;
-        if (org.instances.length >= maxInstances) {
-            throw new AppError(403, 'PLAN_LIMIT_REACHED', `Tu plan permite máximo ${maxInstances} instancia(s).`);
-        }
-
-        // Generate unique instance name
-        const instanceName = `${org.slug}-wa-${Date.now()}`;
-        const webhookUrl = `${env.API_BASE_URL || 'http://localhost:3001'}/api/v1/webhooks/evolution`;
-
-        // Create in Evolution API
-        const evoResult = await evolutionApi.createInstance(instanceName, webhookUrl);
-        logger.info({ instanceName, evoResult }, 'Instance created in Evolution API');
-
-        // Save to database
-        const instance = await prisma.whatsappInstance.create({
-            data: {
-                instanceName,
-                displayName: displayName || `WhatsApp ${org.instances.length + 1}`,
-                organizationId,
-                connectionStatus: 'QR_PENDING',
-            },
-        });
-
-        // Get QR code immediately
-        let qr = null;
+    createInstance: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const connectResult = await evolutionApi.connectInstance(instanceName);
-            qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
-        } catch (e) {
-            logger.warn({ instanceName }, 'Could not get QR immediately, client will poll');
-        }
+            const organizationId = (req as any).organizationId;
+            const parsed = CreateInstanceSchema.safeParse(req.body);
 
-        res.status(201).json({
-            instance,
-            qrCode: qr,
-            message: 'Instancia creada. Escanea el QR con tu WhatsApp.',
-        });
+            if (!parsed.success) {
+                return res.status(400).json({ error: parsed.error.flatten() });
+            }
+
+            const { displayName } = parsed.data;
+
+            // Check plan limit
+            const org = await prisma.organization.findUnique({
+                where: { id: organizationId },
+                include: { plan: true, instances: true },
+            });
+
+            if (!org) throw new AppError(404, 'ORG_NOT_FOUND', 'Organización no encontrada');
+
+            const maxInstances = org.plan?.maxInstances ?? 1;
+            if (org.instances.length >= maxInstances) {
+                throw new AppError(403, 'PLAN_LIMIT_REACHED', `Tu plan permite máximo ${maxInstances} instancia(s).`);
+            }
+
+            // Generate unique instance name
+            const instanceName = `${org.slug}-wa-${Date.now()}`;
+            const webhookUrl = `${env.API_BASE_URL || 'http://localhost:3001'}/api/v1/webhooks/evolution`;
+
+            // Create in Evolution API
+            const evoResult = await evolutionApi.createInstance(instanceName, webhookUrl);
+            logger.info({ instanceName, evoResult }, 'Instance created in Evolution API');
+
+            // Save to database
+            const instance = await prisma.whatsappInstance.create({
+                data: {
+                    instanceName,
+                    displayName: displayName || `WhatsApp ${org.instances.length + 1}`,
+                    organizationId,
+                    connectionStatus: 'QR_PENDING',
+                },
+            });
+
+            // Get QR code immediately
+            let qr = null;
+            try {
+                const connectResult = await evolutionApi.connectInstance(instanceName);
+                qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+            } catch (e) {
+                logger.warn({ instanceName }, 'Could not get QR immediately, client will poll');
+            }
+
+            res.status(201).json({
+                instance,
+                qrCode: qr,
+                message: 'Instancia creada. Escanea el QR con tu WhatsApp.',
+            });
+        } catch (err) {
+            next(err);
+        }
     },
 
     /**
      * GET /api/v1/whatsapp/instances
      */
-    listInstances: async (req: Request, res: Response) => {
-        const organizationId = (req as any).organizationId;
+    listInstances: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const organizationId = (req as any).organizationId;
 
-        const org = await prisma.organization.findUnique({
-            where: { id: organizationId },
-            include: { plan: true },
-        });
+            const org = await prisma.organization.findUnique({
+                where: { id: organizationId },
+                include: { plan: true },
+            });
 
-        const instances = await prisma.whatsappInstance.findMany({
-            where: { organizationId },
-            orderBy: { createdAt: 'desc' },
-        });
+            const instances = await prisma.whatsappInstance.findMany({
+                where: { organizationId },
+                orderBy: { createdAt: 'desc' },
+            });
 
-        // Sync status with Evolution API (Optimized: skip parallel DB updates if not needed)
-        const enriched = await Promise.all(
-            instances.map(async (inst: any) => {
-                try {
-                    const status = await evolutionApi.getInstanceStatus(inst.instanceName);
-                    const state = status?.instance?.state || status?.state || 'close';
-                    const connStatus = state === 'open' ? 'CONNECTED' : state === 'connecting' ? 'QR_PENDING' : 'DISCONNECTED';
+            // Sync status with Evolution API (Optimized: skip parallel DB updates if not needed)
+            const enriched = await Promise.all(
+                instances.map(async (inst: any) => {
+                    try {
+                        const status = await evolutionApi.getInstanceStatus(inst.instanceName);
+                        const state = status?.instance?.state || status?.state || 'close';
+                        const connStatus = state === 'open' ? 'CONNECTED' : state === 'connecting' ? 'QR_PENDING' : 'DISCONNECTED';
 
-                    if (connStatus !== inst.connectionStatus) {
-                        await prisma.whatsappInstance.update({
-                            where: { id: inst.id },
-                            data: {
-                                connectionStatus: connStatus as any,
-                                health: connStatus === 'CONNECTED' ? 'ACTIVE' : 'WARMUP',
-                            },
-                        });
+                        if (connStatus !== inst.connectionStatus) {
+                            await prisma.whatsappInstance.update({
+                                where: { id: inst.id },
+                                data: {
+                                    connectionStatus: connStatus as any,
+                                    health: connStatus === 'CONNECTED' ? 'ACTIVE' : 'WARMUP',
+                                },
+                            });
+                        }
+                        return { ...inst, connectionStatus: connStatus };
+                    } catch {
+                        return inst;
                     }
-                    return { ...inst, connectionStatus: connStatus };
-                } catch {
-                    return inst;
-                }
-            })
-        );
+                })
+            );
 
-        res.json({
-            instances: enriched,
-            limit: org?.plan?.maxInstances ?? 1,
-            used: instances.length,
-        });
+            res.json({
+                instances: enriched,
+                limit: org?.plan?.maxInstances ?? 1,
+                used: instances.length,
+            });
+        } catch (err) {
+            next(err);
+        }
     },
 
     /**
      * GET /api/v1/whatsapp/instances/:id/qr
      */
-    getQrCode: async (req: Request, res: Response) => {
-        const organizationId = (req as any).organizationId;
-        const { id } = req.params;
-
-        const instance = await prisma.whatsappInstance.findFirst({
-            where: { id, organizationId },
-        });
-
-        if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
-
-        // Check if already connected
+    getQrCode: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const status = await evolutionApi.getInstanceStatus(instance.instanceName);
-            if ((status?.instance?.state || status?.state) === 'open') {
-                await prisma.whatsappInstance.update({
-                    where: { id },
-                    data: { connectionStatus: 'CONNECTED', health: 'ACTIVE' },
-                });
-                return res.json({ status: 'CONNECTED', qrCode: null });
-            }
-        } catch { /* continue */ }
+            const organizationId = (req as any).organizationId;
+            const { id } = req.params;
 
-        const connectResult = await evolutionApi.connectInstance(instance.instanceName);
-        const qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+            const instance = await prisma.whatsappInstance.findFirst({
+                where: { id, organizationId },
+            });
 
-        res.json({ status: 'QR_PENDING', qrCode: qr });
+            if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
+
+            // Check if already connected
+            try {
+                const status = await evolutionApi.getInstanceStatus(instance.instanceName);
+                if ((status?.instance?.state || status?.state) === 'open') {
+                    await prisma.whatsappInstance.update({
+                        where: { id },
+                        data: { connectionStatus: 'CONNECTED', health: 'ACTIVE' },
+                    });
+                    return res.json({ status: 'CONNECTED', qrCode: null });
+                }
+            } catch { /* continue */ }
+
+            const connectResult = await evolutionApi.connectInstance(instance.instanceName);
+            const qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+
+            res.json({ status: 'QR_PENDING', qrCode: qr });
+        } catch (err) {
+            next(err);
+        }
     },
 
     /**
      * POST /api/v1/whatsapp/instances/:id/logout
      */
-    logoutInstance: async (req: Request, res: Response) => {
-        const organizationId = (req as any).organizationId;
-        const { id } = req.params;
+    logoutInstance: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const organizationId = (req as any).organizationId;
+            const { id } = req.params;
 
-        const instance = await prisma.whatsappInstance.findFirst({
-            where: { id, organizationId },
-        });
+            const instance = await prisma.whatsappInstance.findFirst({
+                where: { id, organizationId },
+            });
 
-        if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
+            if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
 
-        await evolutionApi.logoutInstance(instance.instanceName);
-        await prisma.whatsappInstance.update({
-            where: { id },
-            data: { connectionStatus: 'DISCONNECTED', health: 'WARMUP' },
-        });
+            await evolutionApi.logoutInstance(instance.instanceName);
+            await prisma.whatsappInstance.update({
+                where: { id },
+                data: { connectionStatus: 'DISCONNECTED', health: 'WARMUP' },
+            });
 
-        res.json({ message: 'WhatsApp desconectado' });
+            res.json({ message: 'WhatsApp desconectado' });
+        } catch (err) {
+            next(err);
+        }
     },
 
     /**
      * DELETE /api/v1/whatsapp/instances/:id
      */
-    deleteInstance: async (req: Request, res: Response) => {
-        const organizationId = (req as any).organizationId;
-        const { id } = req.params;
-
-        const instance = await prisma.whatsappInstance.findFirst({
-            where: { id, organizationId },
-        });
-
-        if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
-
+    deleteInstance: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await evolutionApi.deleteInstance(instance.instanceName);
-        } catch (e) {
-            logger.warn({ instanceName: instance.instanceName }, 'Evo API delete failed');
-        }
+            const organizationId = (req as any).organizationId;
+            const { id } = req.params;
 
-        await prisma.whatsappInstance.delete({ where: { id } });
-        res.json({ message: 'Instancia eliminada' });
+            const instance = await prisma.whatsappInstance.findFirst({
+                where: { id, organizationId },
+            });
+
+            if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
+
+            try {
+                await evolutionApi.deleteInstance(instance.instanceName);
+            } catch (e) {
+                logger.warn({ instanceName: instance.instanceName }, 'Evo API delete failed');
+            }
+
+            await prisma.whatsappInstance.delete({ where: { id } });
+            res.json({ message: 'Instancia eliminada' });
+        } catch (err) {
+            next(err);
+        }
     },
 
     /**
      * POST /api/v1/whatsapp/send
      */
-    send: async (req: Request, res: Response) => {
-        const parsed = SendMessageSchema.parse(req.body);
-        const payload: SendMessagePayload = {
-            ...parsed,
-            organizationId: (req as any).organizationId,
-        };
+    send: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const parsed = SendMessageSchema.safeParse(req.body);
 
-        const job = await queueService.sendWhatsApp(payload);
-        res.status(202).json({ message: 'Mensaje encolado', jobId: job.id });
+            if (!parsed.success) {
+                return res.status(400).json({ error: parsed.error.flatten() });
+            }
+
+            const payload: SendMessagePayload = {
+                ...parsed.data,
+                organizationId: (req as any).organizationId,
+            };
+
+            const job = await queueService.sendWhatsApp(payload);
+            res.status(202).json({ message: 'Mensaje encolado', jobId: job.id });
+        } catch (err) {
+            next(err);
+        }
     },
 };

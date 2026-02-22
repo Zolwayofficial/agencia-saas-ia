@@ -68,12 +68,12 @@ export function createSmartSendWorker(connection: IORedis) {
         // ── 5. Registrar y Limpiar ──────────────────────────────
         try { await evolutionApi.setPresence(instanceId, 'paused'); } catch { }
 
-        await prisma.$transaction([
-            prisma.organization.update({
+        await prisma.$transaction(async (tx) => {
+            await tx.organization.update({
                 where: { id: organizationId },
                 data: { messagesUsedThisMonth: { increment: 1 } },
-            }),
-            prisma.sentMessage.create({
+            });
+            await tx.sentMessage.create({
                 data: {
                     idempotencyKey: job.data.idempotencyKey || null,
                     organizationId,
@@ -82,12 +82,12 @@ export function createSmartSendWorker(connection: IORedis) {
                     jobId: job.id,
                     status: 'sent',
                 },
-            }),
-            prisma.whatsappInstance.update({
+            });
+            await tx.whatsappInstance.update({
                 where: { id: instanceId },
                 data: { messagesLast24h: { increment: 1 } },
-            }),
-        ]);
+            });
+        });
 
         logger.info({ jobId: job.id, to }, 'SmartSend: complete');
     }, {

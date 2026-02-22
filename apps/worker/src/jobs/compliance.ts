@@ -101,8 +101,26 @@ export function createComplianceWorker(connection: IORedis) {
         }
     }, { connection });
 
-    worker.on('failed', (job, err) => {
+    worker.on('failed', async (job, err) => {
         logger.error({ jobId: job?.id, err: err.message }, 'Compliance: job failed');
+
+        // [V6.1] DLQ: persist permanently failed jobs
+        if (job && job.attemptsMade >= 3) {
+            try {
+                await prisma.failedMessage.create({
+                    data: {
+                        organizationId: job.data.organizationId,
+                        jobId: job.id,
+                        payload: job.data as any,
+                        error: err.message,
+                        attempts: job.attemptsMade,
+                    },
+                });
+                logger.warn({ jobId: job.id }, 'Compliance: moved to DLQ after max retries');
+            } catch (dlqErr) {
+                logger.error({ jobId: job.id, dlqErr }, 'Compliance: failed to save to DLQ');
+            }
+        }
     });
 
     return worker;

@@ -46,6 +46,16 @@ export const agentController = {
                 }),
             ]);
 
+            // [V6.1] Reservar crédito ANTES de encolar
+            const reservation = await prisma.creditReservation.create({
+                data: {
+                    organizationId,
+                    amount: COST_PER_AGENT_RUN,
+                    status: 'PENDING',
+                    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min
+                },
+            });
+
             // Encolar para ejecución en Worker
             const job = await queueService.runAgent({
                 taskId: task.id,
@@ -53,17 +63,13 @@ export const agentController = {
                 maxSteps,
                 timeout,
                 organizationId,
-            });
+                reservationId: reservation.id,
+            } as any); // using inline cast in case type is not updated yet
 
-            // [V6.1] Reservar crédito ANTES de ejecutar
-            await prisma.creditReservation.create({
-                data: {
-                    organizationId,
-                    amount: COST_PER_AGENT_RUN,
-                    status: 'PENDING',
-                    jobId: job.id,
-                    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min
-                },
+            // Vinculamos el job a la reserva
+            await prisma.creditReservation.update({
+                where: { id: reservation.id },
+                data: { jobId: job.id }
             });
 
             logger.info({ taskId: task.id, jobId: job.id, model }, 'Agent task enqueued with credit reservation');

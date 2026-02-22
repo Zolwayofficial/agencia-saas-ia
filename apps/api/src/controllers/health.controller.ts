@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
+import { connection } from '../services/queue.service';
 
 export const healthController = {
     /**
@@ -10,6 +11,7 @@ export const healthController = {
     check: async (_req: Request, res: Response) => {
         const checks: Record<string, string> = {
             database: 'unknown',
+            redis: 'unknown',
             api: 'healthy',
         };
 
@@ -19,6 +21,14 @@ export const healthController = {
         } catch (e) {
             checks.database = 'unhealthy';
             logger.error(e, 'Health check: database unreachable');
+        }
+
+        try {
+            const pong = await connection.ping();
+            checks.redis = pong === 'PONG' ? 'healthy' : 'unhealthy';
+        } catch (e) {
+            checks.redis = 'unhealthy';
+            logger.error(e, 'Health check: redis unreachable');
         }
 
         const allHealthy = Object.values(checks).every(s => s === 'healthy');
