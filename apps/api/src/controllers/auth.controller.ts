@@ -173,7 +173,7 @@ export const authController = {
             });
         } catch (error: any) {
             logger.error(error, 'Error en login');
-            res.status(500).json({ error: 'Error al iniciar sesión', debug: error?.message || String(error) });
+            res.status(500).json({ error: 'Error al iniciar sesión' });
         }
     },
 
