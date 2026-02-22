@@ -6,7 +6,7 @@ export class IntegrationsService {
      */
     static async validateEmail(email: string): Promise<boolean> {
         try {
-            const response = await axios.get(`https://disify.com/api/email/${email}`);
+            const response = await (axios as any).get(`https://disify.com/api/email/${email}`);
             return response.data.format && !response.data.disposable && !response.data.dns === false;
         } catch (error) {
             console.error('Disify API error:', error);

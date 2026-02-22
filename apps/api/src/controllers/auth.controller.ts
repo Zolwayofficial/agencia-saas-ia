@@ -3,9 +3,8 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
 import { generateToken } from '../middlewares/auth';
-import { RegisterSchema, LoginSchema } from '@repo/types';
+import { RegisterSchema, LoginSchema, TwentyClient } from '@repo/types';
 import { IntegrationsService } from '../services/integrations.service';
-import { TwentyClient } from '../../worker/src/lib/twenty';
 
 const SALT_ROUNDS = 12;
 

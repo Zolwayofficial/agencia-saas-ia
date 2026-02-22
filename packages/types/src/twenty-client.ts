@@ -14,12 +14,10 @@ export class TwentyClient {
         this.apiKey = config.apiKey;
     }
 
-    /**
-     * Ejecuta una petición GraphQL contra la API de Twenty
-     */
     private async requestGraphQL<T>(query: string, variables?: Record<string, any>): Promise<T> {
         const url = `${this.serverUrl}/graphql`;
         try {
+            // @ts-ignore
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -42,7 +40,7 @@ export class TwentyClient {
 
             return result.data as T;
         } catch (error) {
-            logger.error({ err: error instanceof Error ? error.message : 'Unknown error', query }, 'TwentyClient: requestGraphQL failed');
+            console.error('TwentyClient: requestGraphQL failed', { error, query });
             throw error;
         }
     }
@@ -60,7 +58,6 @@ export class TwentyClient {
       }
     `;
 
-        // Adaptar variables al esquema de Twenty (esto depende de los campos custom/estándar configurados)
         const variables = {
             input: {
                 firstName: data.firstName,

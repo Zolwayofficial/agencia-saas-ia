@@ -7,9 +7,8 @@ import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
 import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
-import { OpenClawConfig } from '@repo/types';
+import { OpenClawConfig, TwentyClient } from '@repo/types';
 import { dockerClient } from '../lib/docker';
-import { TwentyClient } from '../lib/twenty';
 
 export function createAgentWorker(connection: IORedis) {
     const worker = new Worker<OpenClawConfig>('agent-run', async (job: Job<OpenClawConfig>) => {
