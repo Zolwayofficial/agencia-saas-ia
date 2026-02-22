@@ -60,3 +60,7 @@ app.fulllogin.com {
 api.fulllogin.com {
     reverse_proxy saas-api:3001
 }
+
+crm.fulllogin.com {
+    reverse_proxy twenty-server:3000
+}

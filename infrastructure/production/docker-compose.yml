@@ -282,6 +282,38 @@ services:
       - internal
       - web
 
+  # ============================================
+  # PHASE 4: TWENTY CRM MULTI-TENANT
+  # ============================================
+
+  twenty-server:
+    image: twentycrm/twenty:latest
+    restart: always
+    environment:
+      - SERVER_URL=https://crm.fulllogin.com
+      - FRONT_AUTH_CALLBACK_URL=https://crm.fulllogin.com/auth/callback
+      - FRONT_AUTH_ERROR_URL=https://crm.fulllogin.com/auth/error
+      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
+      - REDIS_URL=redis://redis:6379/1
+      - APP_SECRET=${TWENTY_APP_SECRET:-veinty_super_secret_for_fulllogin}
+    depends_on: [ postgres, redis ]
+    networks:
+      - internal
+      - web
+
+  twenty-worker:
+    image: twentycrm/twenty:latest
+    restart: always
+    command: ["yarn", "worker:prod"]
+    environment:
+      - SERVER_URL=https://crm.fulllogin.com
+      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
+      - REDIS_URL=redis://redis:6379/1
+      - APP_SECRET=${TWENTY_APP_SECRET:-veinty_super_secret_for_fulllogin}
+    depends_on: [ postgres, redis ]
+    networks:
+      - internal
+
 volumes:
   pg_data:
   n8n_data:
