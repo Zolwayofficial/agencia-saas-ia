@@ -21,6 +21,7 @@ export interface AgentContainerResult {
 
 export interface AgentRunContext {
     mcpServerUrl?: string;
+    envVars?: Record<string, string>;
 }
 
 export const dockerClient = {
@@ -39,7 +40,8 @@ export const dockerClient = {
             Image: AGENT_IMAGE,
             Cmd: ['python', 'main.py', '--task', taskId, '--model', model, '--max-steps', String(maxSteps)],
             Env: [
-                ...(context?.mcpServerUrl ? [`MCP_SERVER_URL=${context.mcpServerUrl}`] : [])
+                ...(context?.mcpServerUrl ? [`MCP_SERVER_URL=${context.mcpServerUrl}`] : []),
+                ...(context?.envVars ? Object.entries(context.envVars).map(([k, v]) => `${k}=${v}`) : [])
             ],
             HostConfig: {
                 Memory: AGENT_MEMORY_MB * 1024 * 1024,

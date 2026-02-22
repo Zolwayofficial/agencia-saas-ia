@@ -233,3 +233,37 @@ services:
       - qdrant_data:/qdrant/storage
     networks:
       - agencia-net
+
+  # =========================================
+  # ?? 10. CRM & VENTAS MULTI-TENANT
+  # =========================================
+  twenty-server:
+    image: twentycrm/twenty:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - SERVER_URL=https://crm.tudominio.com
+      - FRONT_AUTH_CALLBACK_URL=https://crm.tudominio.com/auth/callback
+      - FRONT_AUTH_ERROR_URL=https://crm.tudominio.com/auth/error
+      - PG_DATABASE_URL=postgres://user:pass@postgres:5432/agencia
+      - REDIS_URL=redis://redis:6379/1
+      - APP_SECRET=${TWENTY_APP_SECRET:-super_secret_for_twenty_crm_12345}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - agencia-net
+
+  twenty-worker:
+    image: twentycrm/twenty:latest
+    command: ["yarn", "worker:prod"]
+    environment:
+      - SERVER_URL=https://crm.tudominio.com
+      - PG_DATABASE_URL=postgres://user:pass@postgres:5432/agencia
+      - REDIS_URL=redis://redis:6379/1
+      - APP_SECRET=${TWENTY_APP_SECRET:-super_secret_for_twenty_crm_12345}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - agencia-net

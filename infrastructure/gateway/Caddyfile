@@ -22,3 +22,7 @@ n8n.tudominio.com {
 minio.tudominio.com {
     reverse_proxy minio:9001
 }
+
+crm.tudominio.com {
+    reverse_proxy twenty-server:3000
+}

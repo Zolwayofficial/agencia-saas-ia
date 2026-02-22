@@ -5,6 +5,7 @@ import { logger } from '@repo/logger';
 import { generateToken } from '../middlewares/auth';
 import { RegisterSchema, LoginSchema } from '@repo/types';
 import { IntegrationsService } from '../services/integrations.service';
+import { TwentyClient } from '../../worker/src/lib/twenty';
 
 const SALT_ROUNDS = 12;
 
@@ -81,6 +82,22 @@ export const authController = {
             });
 
             logger.info({ userId: result.user.id, orgId: result.org.id }, 'New user registered');
+
+            // Provisionar Workspace en Twenty CRM
+            try {
+                const twenty = new TwentyClient({
+                    serverUrl: process.env.TWENTY_SERVER_URL || "http://twenty-server:3000",
+                    apiKey: process.env.TWENTY_API_KEY || ""
+                });
+
+                // TODO: Dependiente de si usamos internal API o system admin token 
+                // para inyectar workspaces programáticamente en Twenty. 
+                // Por ahora logueamos la intención.
+                logger.info({ orgId: result.org.id }, 'Twenty CRM: Provisioning workspace skipped (needs root config)');
+
+            } catch (err) {
+                logger.error({ err }, 'Failed to provision Twenty CRM workspace');
+            }
 
             // Send welcome email
             import('@repo/email').then(({ emailService }) => {

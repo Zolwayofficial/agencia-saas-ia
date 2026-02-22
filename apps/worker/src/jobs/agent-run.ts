@@ -9,6 +9,7 @@ import { prisma } from '@repo/database';
 import { logger } from '@repo/logger';
 import { OpenClawConfig } from '@repo/types';
 import { dockerClient } from '../lib/docker';
+import { TwentyClient } from '../lib/twenty';
 
 export function createAgentWorker(connection: IORedis) {
     const worker = new Worker<OpenClawConfig>('agent-run', async (job: Job<OpenClawConfig>) => {
@@ -24,9 +25,15 @@ export function createAgentWorker(connection: IORedis) {
         try {
             // ── 2. Ejecutar agente en jaula Docker ──────────────────
             const mcpUrl = process.env.MCP_SERVER_URL || "http://postgres-mcp:3000/sse";
+            const twentyUrl = process.env.TWENTY_SERVER_URL || "http://twenty-server:3000";
+            const twentyKey = process.env.TWENTY_API_KEY || "";
 
             const containerResult = await dockerClient.runAgent(taskId, model, maxSteps, timeout, {
-                mcpServerUrl: mcpUrl
+                mcpServerUrl: mcpUrl,
+                envVars: {
+                    TWENTY_SERVER_URL: twentyUrl,
+                    TWENTY_API_KEY: twentyKey
+                }
             });
 
             // ── 3. Parsear pasos desde los logs ─────────────────────
