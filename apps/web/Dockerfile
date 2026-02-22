@@ -13,7 +13,7 @@ FROM base AS installer
 WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 COPY --from=builder /app/out/full/ .
 ENV NODE_OPTIONS="--max_old_space_size=2048"

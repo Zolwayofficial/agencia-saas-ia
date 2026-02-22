@@ -13,7 +13,7 @@ FROM base AS installer
 WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 COPY --from=builder /app/out/full/ .
 RUN cd packages/database && npx prisma generate
 RUN pnpm turbo run build --filter=worker...
