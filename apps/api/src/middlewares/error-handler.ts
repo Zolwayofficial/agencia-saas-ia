@@ -50,5 +50,5 @@ export function errorHandler(
 
     // Errores inesperados — loguear y devolver genérico
     logger.error({ err, path: req.path, method: req.method }, 'Unhandled error');
-    res.status(500).json({ error: 'INTERNAL_ERROR' });
+    res.status(500).json({ error: 'INTERNAL_ERROR', debug: err?.message || String(err), stack: err?.stack?.split('\n').slice(0, 5) });
 }
