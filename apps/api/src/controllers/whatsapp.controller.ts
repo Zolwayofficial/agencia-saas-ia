@@ -58,13 +58,19 @@ export const whatsappController = {
                 },
             });
 
-            // Get QR code immediately
-            let qr = null;
-            try {
-                const connectResult = await evolutionApi.connectInstance(instanceName);
-                qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
-            } catch (e) {
-                logger.warn({ instanceName }, 'Could not get QR immediately, client will poll');
+            // Get QR code immediately (try from create result first, then connect)
+            let qr = evoResult?.qrcode?.base64 || null;
+            if (!qr) {
+                try {
+                    const connectResult = await evolutionApi.connectInstance(instanceName);
+                    qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+                } catch (e) {
+                    logger.warn({ instanceName }, 'Could not get QR immediately, client will poll');
+                }
+            }
+            // Strip data URI prefix if present (Evolution v2.3+ includes it)
+            if (qr && qr.startsWith('data:')) {
+                qr = qr.replace(/^data:image\/[^;]+;base64,/, '');
             }
 
             res.status(201).json({
@@ -155,7 +161,11 @@ export const whatsappController = {
             } catch { /* continue */ }
 
             const connectResult = await evolutionApi.connectInstance(instance.instanceName);
-            const qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+            let qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+            // Strip data URI prefix if present (Evolution v2.3+ includes it)
+            if (qr && qr.startsWith('data:')) {
+                qr = qr.replace(/^data:image\/[^;]+;base64,/, '');
+            }
 
             res.json({ status: 'QR_PENDING', qrCode: qr });
         } catch (err) {
