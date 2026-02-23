@@ -14,12 +14,16 @@ const FORBIDDEN_KEYWORDS = [
     'CREATE', 'GRANT', 'REVOKE', 'EXECUTE', 'COPY', 'VACUUM',
 ];
 
+const querySchema = { query: z.string() };
+const emptySchema = {};
+const tableNameSchema = { table_name: z.string() };
+
 export function registerPostgresTools(server: McpServer, orgId: string) {
-    server.tool(
+    (server as any).tool(
         'query_database',
         'Execute a read-only SQL SELECT query on the database. Only SELECT statements are allowed.',
-        { query: z.string().describe('SQL SELECT query to execute') },
-        async ({ query }) => {
+        querySchema,
+        async ({ query }: any) => {
             const normalized = query.trim().toUpperCase();
 
             if (!normalized.startsWith('SELECT') && !normalized.startsWith('WITH')) {
@@ -61,10 +65,10 @@ export function registerPostgresTools(server: McpServer, orgId: string) {
         }
     );
 
-    server.tool(
+    (server as any).tool(
         'list_tables',
         'List all available database tables in the public schema',
-        {},
+        emptySchema,
         async () => {
             try {
                 const result = await readPool.query(
@@ -85,11 +89,11 @@ export function registerPostgresTools(server: McpServer, orgId: string) {
         }
     );
 
-    server.tool(
+    (server as any).tool(
         'describe_table',
         'Get the schema (columns, types, constraints) of a specific database table',
-        { table_name: z.string().describe('Name of the table to describe') },
-        async ({ table_name }) => {
+        tableNameSchema,
+        async ({ table_name }: any) => {
             const safeName = table_name.replace(/[^a-zA-Z0-9_]/g, '');
             try {
                 const result = await readPool.query(

@@ -26,22 +26,37 @@ async function graphql(query: string, variables?: Record<string, any>): Promise<
     return data.data;
 }
 
+// Pre-defined schemas to avoid TS2589 deep instantiation
+const createPersonSchema = {
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().optional(),
+    phone: z.string().optional(),
+};
+
+const createOpportunitySchema = {
+    name: z.string(),
+    amount: z.number().optional(),
+    stage: z.string().optional(),
+    personId: z.string().optional(),
+};
+
+const searchPeopleSchema = {
+    query: z.string(),
+    limit: z.number().optional(),
+};
+
 export function registerTwentyTools(server: McpServer, orgId: string) {
     if (!TWENTY_API_KEY) {
         logger.warn({ orgId }, 'MCP Gateway: TWENTY_API_KEY not set, CRM tools disabled');
         return;
     }
 
-    server.tool(
+    (server as any).tool(
         'crm_create_person',
         'Create a new contact/person in the CRM system',
-        {
-            firstName: z.string().describe('First name of the person'),
-            lastName: z.string().describe('Last name of the person'),
-            email: z.string().optional().describe('Email address'),
-            phone: z.string().optional().describe('Phone number'),
-        },
-        async (args) => {
+        createPersonSchema,
+        async (args: any) => {
             try {
                 const result = await graphql(
                     `mutation CreatePerson($input: PersonCreateInput!) {
@@ -66,16 +81,11 @@ export function registerTwentyTools(server: McpServer, orgId: string) {
         }
     );
 
-    server.tool(
+    (server as any).tool(
         'crm_create_opportunity',
         'Create a business opportunity/deal in the CRM',
-        {
-            name: z.string().describe('Opportunity name'),
-            amount: z.number().optional().describe('Deal amount in dollars'),
-            stage: z.string().optional().describe('Pipeline stage (e.g., NEW, MEETING, PROPOSAL, CLOSED_WON)'),
-            personId: z.string().optional().describe('ID of the associated person/contact'),
-        },
-        async (args) => {
+        createOpportunitySchema,
+        async (args: any) => {
             try {
                 const result = await graphql(
                     `mutation CreateOpportunity($input: OpportunityCreateInput!) {
@@ -102,14 +112,11 @@ export function registerTwentyTools(server: McpServer, orgId: string) {
         }
     );
 
-    server.tool(
+    (server as any).tool(
         'crm_search_people',
         'Search for people/contacts in the CRM by name or email',
-        {
-            query: z.string().describe('Search term (name, email, phone)'),
-            limit: z.number().optional().describe('Max results to return (default 10)'),
-        },
-        async (args) => {
+        searchPeopleSchema,
+        async (args: any) => {
             try {
                 const result = await graphql(
                     `query FindPeople($filter: PersonFilterInput, $limit: Int) {
