@@ -1,3 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+    --color-brand-primary: #50CD95;
+    --color-brand-primary-light: #7EE0B5;
+    --color-brand-primary-dark: #3DB883;
+    --color-header: #FCF0DA;
+    --color-main: #D1DEDC;
+    --color-muted: #7A8F8D;
+    --color-ghost: #40504E;
+    --color-success: hsl(158, 64%, 52%);
+    --color-warning: hsl(38, 92%, 50%);
+    --color-danger: hsl(0, 84%, 60%);
+    --color-info: hsl(217, 91%, 60%);
+    --color-primary-light: #7EE0B5;
+    --font-family-display: 'Outfit', sans-serif;
+    --font-family-sans: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
 /* ============================================================
    DESIGN SYSTEM — SAACS Command Center
    Aesthetic: Industrial Luxury (Modern Dark, Mint Brand, Glass)
@@ -128,30 +147,6 @@ h6,
     background: linear-gradient(135deg, var(--text-header) 0%, var(--brand-primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-
-.text-xs {
-    font-size: 0.75rem;
-}
-
-.text-sm {
-    font-size: 0.875rem;
-}
-
-.text-base {
-    font-size: 1rem;
-}
-
-.text-lg {
-    font-size: 1.125rem;
-}
-
-.text-xl {
-    font-size: 1.25rem;
-}
-
-.text-2xl {
-    font-size: 1.5rem;
 }
 
 /* --- Interaction elements --- */
