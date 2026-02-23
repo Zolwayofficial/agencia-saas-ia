@@ -131,9 +131,9 @@ export default function MarketingPage() {
                         <h3 className="text-[10px] font-black tracking-[0.2em] text-muted uppercase mb-1">Operational History</h3>
                         <p className="text-[10px] font-medium text-muted opacity-60 uppercase tracking-tighter">Real-time Campaign Execution Logs</p>
                     </div>
-                    <div className="flex p-1 bg-white/[0.03] rounded-xl border border-white/[0.05]">
+                    <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl border border-white/[0.05] shrink-0">
                         {['All', 'Active', 'Paused', 'Complete'].map(filter => (
-                            <button key={filter} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === 'All' ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
+                            <button key={filter} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all whitespace-nowrap ${filter === 'All' ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
                                 }`}>
                                 {filter}
                             </button>
