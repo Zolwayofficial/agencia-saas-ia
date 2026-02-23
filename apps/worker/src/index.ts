@@ -19,6 +19,7 @@ import { createAgentWorker } from './jobs/agent-run';
 import { createBillingWorker } from './jobs/billing';
 import { createComplianceWorker } from './jobs/compliance';
 import { processAiResponse } from './jobs/ai-response';
+import { mcpClient } from './lib/mcp';
 
 // ─── Redis Connection ─────────────────────────────────────────
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
@@ -60,6 +61,7 @@ async function shutdown() {
         complianceWorker.close(),
         aiResponseWorker.close(),
     ]);
+    await mcpClient.disconnectAll();
     await prisma.$disconnect();
     await connection.quit();
     logger.info('All workers stopped. Goodbye.');

@@ -251,22 +251,31 @@ services:
       dockerfile: apps/worker/Dockerfile
     restart: always
     env_file: .env.prod
-    depends_on: [ postgres, redis ]
+    environment:
+      MCP_GATEWAY_URL: http://mcp-gateway:3100/mcp
+    depends_on: [ postgres, redis, mcp-gateway ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Para ejecutar agentes en Docker
     networks:
       - internal
 
-  postgres-mcp:
+  mcp-gateway:
     build:
-      context: .
-      dockerfile: Dockerfile.mcp
+      context: ../..
+      dockerfile: apps/mcp-gateway/Dockerfile
     restart: always
     environment:
-      DATABASE_URL: postgresql://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db # Need to verify correct DB
-    depends_on: [ postgres ]
+      DATABASE_READONLY_URL: postgresql://readonly_agent:${READONLY_DB_PASSWORD:-r0_ag3nt_s3cur3_2024}@postgres:5432/agencia_saas
+      TWENTY_SERVER_URL: http://twenty-server:3000
+      TWENTY_API_KEY: ${TWENTY_API_KEY:-}
+      MCP_GATEWAY_PORT: "3100"
+    depends_on: [ postgres, twenty-server ]
     networks:
       - internal
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   saas-web:
     build:
@@ -293,7 +302,7 @@ services:
       - SERVER_URL=https://crm.fulllogin.com
       - FRONT_AUTH_CALLBACK_URL=https://crm.fulllogin.com/auth/callback
       - FRONT_AUTH_ERROR_URL=https://crm.fulllogin.com/auth/error
-      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
+      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/twenty_db
       - REDIS_URL=redis://redis:6379/1
       - APP_SECRET=${TWENTY_APP_SECRET:-veinty_super_secret_for_fulllogin}
     depends_on: [ postgres, redis ]
@@ -307,7 +316,7 @@ services:
     command: ["yarn", "worker:prod"]
     environment:
       - SERVER_URL=https://crm.fulllogin.com
-      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
+      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/twenty_db
       - REDIS_URL=redis://redis:6379/1
       - APP_SECRET=${TWENTY_APP_SECRET:-veinty_super_secret_for_fulllogin}
     depends_on: [ postgres, redis ]
