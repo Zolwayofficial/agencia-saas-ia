@@ -1,9 +1,0 @@
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Ensure we have the latest MCP server globally installed
-RUN npm install -g @modelcontextprotocol/server-postgres
-
-# Use shell form with proper env var expansion
-CMD npx -y @modelcontextprotocol/server-postgres "$DATABASE_URL"

@@ -19,7 +19,7 @@ async function main() {
             messagesIncluded: 1000,
             agentRunsIncluded: 500,
             maxInstances: 1,
-            stripePriceId: 'price_H5ggYJDq9g7', // ⚠️ CAMBIAR POR ID REAL DE STRIPE
+            stripePriceId: 'price_1T3sqEPRaA4otXlgFoVctvim',
         },
         {
             name: 'Pro',
@@ -28,7 +28,7 @@ async function main() {
             messagesIncluded: 10000,
             agentRunsIncluded: 5000,
             maxInstances: 3,
-            stripePriceId: 'price_H5ggYJDq9g8', // ⚠️ CAMBIAR POR ID REAL DE STRIPE
+            stripePriceId: 'price_1T3sqPPRaA4otXlgQuys3X4u',
         },
         {
             name: 'Agency',
@@ -37,7 +37,7 @@ async function main() {
             messagesIncluded: -1, // Ilimitado
             agentRunsIncluded: -1, // Ilimitado
             maxInstances: 10,
-            stripePriceId: 'price_H5ggYJDq9g9', // ⚠️ CAMBIAR POR ID REAL DE STRIPE
+            stripePriceId: 'price_1T3sqcPRaA4otXlgNxAeJ8jp',
         },
     ];
 

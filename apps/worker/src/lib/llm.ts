@@ -8,13 +8,27 @@ const LLM_URL = process.env.LLM_API_URL || 'http://localhost:11434';
 const LLM_API_KEY = process.env.LLM_API_KEY || '';
 const LLM_MODEL = process.env.LLM_MODEL || 'llama3.1';
 
-interface ChatMessage {
-    role: 'system' | 'user' | 'assistant';
+export interface ChatMessage {
+    role: 'system' | 'user' | 'assistant' | 'tool';
     content: string;
+    tool_call_id?: string;
 }
 
 interface ChatCompletionResponse {
     content: string;
+    model: string;
+    tokensUsed: number;
+}
+
+export interface ToolCall {
+    id: string;
+    name: string;
+    arguments: Record<string, any>;
+}
+
+export interface ToolCallResponse {
+    content: string;
+    toolCalls?: ToolCall[];
     model: string;
     tokensUsed: number;
 }
@@ -171,5 +185,103 @@ export const llmClient = {
         ]);
 
         return result.content.trim();
+    },
+
+    /**
+     * Chat completion with tool/function calling support.
+     * Compatible with Ollama (/api/chat) and OpenAI format (/v1/chat/completions).
+     * MCP tools are passed as OpenAI-style function definitions.
+     */
+    async chatWithTools(messages: ChatMessage[], tools: any[], options?: {
+        model?: string;
+        temperature?: number;
+        maxTokens?: number;
+    }): Promise<ToolCallResponse> {
+        const model = options?.model || LLM_MODEL;
+        const isOllama = LLM_URL.includes('11434');
+
+        if (isOllama) {
+            return this.chatOllamaWithTools(messages, tools, model, options);
+        } else {
+            return this.chatOpenAIWithTools(messages, tools, model, options);
+        }
+    },
+
+    /**
+     * Ollama with tool calling (/api/chat with tools parameter)
+     */
+    async chatOllamaWithTools(messages: ChatMessage[], tools: any[], model: string, options?: any): Promise<ToolCallResponse> {
+        const res = await fetch(`${LLM_URL}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model,
+                messages,
+                tools,
+                stream: false,
+                options: {
+                    temperature: options?.temperature ?? 0.3,
+                    num_predict: options?.maxTokens ?? 2000,
+                },
+            }),
+        });
+
+        if (!res.ok) throw new Error(`Ollama error: ${res.status}`);
+        const data = await res.json() as any;
+
+        const message = data.message || {};
+        const toolCalls: ToolCall[] = (message.tool_calls || []).map((tc: any, i: number) => ({
+            id: `call_${i}_${Date.now()}`,
+            name: tc.function?.name || tc.name,
+            arguments: tc.function?.arguments || tc.arguments || {},
+        }));
+
+        return {
+            content: message.content || '',
+            toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
+            model: data.model || model,
+            tokensUsed: (data.eval_count || 0) + (data.prompt_eval_count || 0),
+        };
+    },
+
+    /**
+     * OpenAI-compatible with tool calling (/v1/chat/completions with tools)
+     */
+    async chatOpenAIWithTools(messages: ChatMessage[], tools: any[], model: string, options?: any): Promise<ToolCallResponse> {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (LLM_API_KEY) headers['Authorization'] = `Bearer ${LLM_API_KEY}`;
+
+        const res = await fetch(`${LLM_URL}/v1/chat/completions`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                model,
+                messages,
+                tools,
+                tool_choice: 'auto',
+                temperature: options?.temperature ?? 0.3,
+                max_tokens: options?.maxTokens ?? 2000,
+            }),
+        });
+
+        if (!res.ok) throw new Error(`LLM API error: ${res.status}`);
+        const data = await res.json() as any;
+
+        const choice = data.choices?.[0];
+        const message = choice?.message || {};
+        const toolCalls: ToolCall[] = (message.tool_calls || []).map((tc: any) => ({
+            id: tc.id || `call_${Date.now()}`,
+            name: tc.function?.name,
+            arguments: typeof tc.function?.arguments === 'string'
+                ? JSON.parse(tc.function.arguments)
+                : tc.function?.arguments || {},
+        }));
+
+        return {
+            content: message.content || '',
+            toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
+            model: data.model || model,
+            tokensUsed: data.usage?.total_tokens || 0,
+        };
     },
 };

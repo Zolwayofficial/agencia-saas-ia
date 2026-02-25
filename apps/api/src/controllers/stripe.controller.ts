@@ -40,7 +40,15 @@ export const stripeController = {
             });
             if (!org) return res.status(404).json({ error: 'Organización no encontrada' });
 
-            const plan = await prisma.plan.findUnique({ where: { id: planId } });
+            // Support lookup by id, name, or slug (plan_starter → Starter)
+            let plan = await prisma.plan.findUnique({ where: { id: planId } });
+            if (!plan) {
+                const slugMap: Record<string, string> = {
+                    plan_starter: 'Starter', plan_pro: 'Pro', plan_agency: 'Agency',
+                };
+                const name = slugMap[planId] || planId;
+                plan = await prisma.plan.findFirst({ where: { name } });
+            }
             if (!plan) return res.status(404).json({ error: 'Plan no encontrado' });
             if (!plan.stripePriceId) return res.status(400).json({ error: 'Plan sin precio en Stripe' });
 
@@ -106,6 +114,23 @@ export const stripeController = {
         } catch (error) {
             logger.error(error, 'Error creating billing portal');
             res.status(500).json({ error: 'Error abriendo portal de facturación' });
+        }
+    },
+
+    /**
+     * GET /api/v1/billing/plans
+     * Listar planes disponibles.
+     */
+    getPlans: async (_req: Request, res: Response) => {
+        try {
+            const plans = await prisma.plan.findMany({
+                orderBy: { priceMonthly: 'asc' },
+                select: { id: true, name: true, priceMonthly: true, messagesIncluded: true, agentRunsIncluded: true, maxInstances: true },
+            });
+            res.json(plans);
+        } catch (error) {
+            logger.error(error, 'Error listing plans');
+            res.status(500).json({ error: 'Error listando planes' });
         }
     },
 

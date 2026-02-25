@@ -43,6 +43,7 @@ router.get('/auth/me', authController.me);
 router.get('/billing/balance', billingController.getBalance);
 router.get('/billing/plans', billingController.getPlans);
 router.get('/billing/history', billingController.getHistory);
+router.get('/billing/plans', stripeController.getPlans);
 router.get('/billing/subscription', stripeController.getSubscription);
 router.post('/billing/checkout', stripeController.createCheckout);
 router.post('/billing/portal', stripeController.createPortal);

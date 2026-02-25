@@ -67,15 +67,15 @@ export default function IntegrationsPage() {
                         Synchronize your agency infrastructure with official third-party protocols.
                     </p>
                 </div>
-                <div className="flex p-1 bg-white/[0.03] rounded-xl border border-white/[0.05]">
+                <div className="flex gap-2 p-1.5 bg-white/[0.03] rounded-xl border border-white/[0.05] shrink-0">
                     {['All', 'Connected', 'Setup'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-5 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === f ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
+                            className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
                                 }`}
                         >
-                            {f === 'All' ? 'Complete' : f === 'Connected' ? 'Active' : 'Pending'}
+                            {f === 'All' ? 'All' : f === 'Connected' ? 'Active' : 'Pending'}
                         </button>
                     ))}
                 </div>

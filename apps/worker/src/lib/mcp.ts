@@ -1,71 +1,123 @@
+/**
+ * MCP Client Service — Connects to the MCP Gateway for tool execution
+ *
+ * Uses Streamable HTTP transport (MCP standard, replaces SSE).
+ * Multi-tenant: each organization gets a separate client with scoped permissions.
+ * The worker mediates all MCP tool access — agent containers never connect directly.
+ */
+
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { logger } from "@repo/logger";
 
-class MCPClientService {
-    private client: Client;
-    private transport: SSEClientTransport | null = null;
-    private isConnected = false;
+const MCP_GATEWAY_URL = process.env.MCP_GATEWAY_URL || "http://mcp-gateway:3100/mcp";
 
-    constructor() {
-        this.client = new Client(
+export interface McpTool {
+    name: string;
+    description?: string;
+    inputSchema: Record<string, any>;
+}
+
+export interface McpToolResult {
+    content: Array<{ type: string; text: string }>;
+    isError?: boolean;
+}
+
+class MCPClientService {
+    private clients: Map<string, Client> = new Map();
+
+    /**
+     * Get or create an MCP client for a specific organization.
+     * Each org gets its own session with scoped permissions via x-organization-id header.
+     */
+    async getClient(organizationId: string): Promise<Client> {
+        const existing = this.clients.get(organizationId);
+        if (existing) return existing;
+
+        const client = new Client({
+            name: `agencia-worker-${organizationId}`,
+            version: "1.0.0",
+        });
+
+        const transport = new StreamableHTTPClientTransport(
+            new URL(MCP_GATEWAY_URL),
             {
-                name: "agencia-saas-ia-worker",
-                version: "1.0.0",
-            },
-            {
-                capabilities: {
-                    experimental: {},
+                requestInit: {
+                    headers: {
+                        'x-organization-id': organizationId,
+                    },
                 },
             }
         );
+
+        await client.connect(transport);
+        this.clients.set(organizationId, client);
+        logger.info({ service: 'mcp-client', organizationId }, "MCP client connected to gateway");
+        return client;
     }
 
-    async connect() {
-        if (this.isConnected) return;
-
+    /**
+     * List all available MCP tools for an organization.
+     * Returns tool schemas compatible with LLM function calling.
+     */
+    async getAvailableTools(organizationId: string): Promise<McpTool[]> {
         try {
-            // In docker-compose, postgres-mcp is accessible via the service name
-            // MCP servers usually expose HTTP/SSE or stdio. For stdio in docker we would need to 
-            // launch the process, but as a separate service we need it to expose SSE.
-            // NOTE: The default @modelcontextprotocol/server-postgres uses STDIO.
-            // For this architecture, since it's a separate container, we should ideally use SSE,
-            // but if the official server only supports stdio natively, running it as a separate container
-            // requires an SSE bridge.
-
-            logger.info({ service: 'mcp-client' }, "Initializing MCP connection...");
-
-            // We will need to adapt this depending on how the MCP server is exposed.
-            // For now, this is a placeholder structure for the connection logic.
-
-            const serverUrl = new URL(process.env.MCP_SERVER_URL || "http://postgres-mcp:3000/sse");
-            this.transport = new SSEClientTransport(serverUrl);
-
-            await this.client.connect(this.transport);
-            this.isConnected = true;
-            logger.info({ service: 'mcp-client' }, "Successfully connected to MCP Server");
-
-        } catch (error) {
-            logger.error({ service: 'mcp-client', error }, "Failed to connect to MCP Server");
-            throw error;
+            const client = await this.getClient(organizationId);
+            const result = await client.listTools();
+            return (result.tools || []).map((t: any) => ({
+                name: t.name,
+                description: t.description,
+                inputSchema: t.inputSchema,
+            }));
+        } catch (err: any) {
+            logger.error({ service: 'mcp-client', organizationId, err: err.message }, "Failed to list MCP tools");
+            return [];
         }
     }
 
-    async getAvailableTools(): Promise<any> {
-        if (!this.isConnected) await this.connect();
-        return await this.client.listTools();
+    /**
+     * Execute a specific MCP tool by name with given arguments.
+     */
+    async executeTool(organizationId: string, toolName: string, args: Record<string, any>): Promise<McpToolResult> {
+        try {
+            const client = await this.getClient(organizationId);
+            logger.info({ service: 'mcp-client', tool: toolName, organizationId }, "Executing MCP tool");
+
+            const result = await client.callTool({
+                name: toolName,
+                arguments: args,
+            });
+
+            return result as McpToolResult;
+        } catch (err: any) {
+            logger.error({ service: 'mcp-client', tool: toolName, organizationId, err: err.message }, "MCP tool execution failed");
+            return {
+                content: [{ type: 'text', text: `Tool execution error: ${err.message}` }],
+                isError: true,
+            };
+        }
     }
 
-    async executeTool(toolName: string, args: any): Promise<any> {
-        if (!this.isConnected) await this.connect();
+    /**
+     * Disconnect and clean up a client for a specific organization.
+     */
+    async disconnect(organizationId: string) {
+        const client = this.clients.get(organizationId);
+        if (client) {
+            try {
+                await client.close();
+            } catch { /* ignore close errors */ }
+            this.clients.delete(organizationId);
+        }
+    }
 
-        logger.info({ service: 'mcp-client', tool: toolName }, "Executing MCP tool");
-        const result = await this.client.callTool({
-            name: toolName,
-            arguments: args
-        });
-
-        return result;
+    /**
+     * Disconnect all clients. Used during graceful shutdown.
+     */
+    async disconnectAll() {
+        for (const [orgId] of this.clients) {
+            await this.disconnect(orgId);
+        }
     }
 }
 
