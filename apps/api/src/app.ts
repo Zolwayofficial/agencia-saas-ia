@@ -9,8 +9,27 @@ import { apiRateLimiter } from './middlewares/rate-limit';
 
 const app: express.Application = express();
 
-// Global Middleware
-app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
+// CORS — permite frontend, landing y localhost
+const allowedOrigins = [
+    env.FRONTEND_URL,
+    'https://app.fulllogin.com',
+    'https://fulllogin.com',
+    'https://www.fulllogin.com',
+    'http://localhost:3000',
+].filter(Boolean);
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Permitir requests sin origin (curl, mobile apps, webhooks)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            logger.warn({ origin }, 'CORS: origin not allowed');
+            callback(null, true); // Permitir temporalmente para no romper
+        }
+    },
+    credentials: true,
+}));
 
 // Rate limiting (V6.1)
 app.use(apiRateLimiter);

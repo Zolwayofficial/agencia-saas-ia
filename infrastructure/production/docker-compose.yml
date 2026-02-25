@@ -53,6 +53,7 @@ services:
       - POSTGRES_USERNAME=fulllogin
       - POSTGRES_PASSWORD=QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i
       - POSTGRES_DATABASE=chatwoot_db
+      - DATABASE_URL=postgresql://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY_BASE=d1f2a3b4c5e6f7890123456789abcdef0123456789abcdef0123456789abcdef
       - RAILS_ENV=production
@@ -109,6 +110,7 @@ services:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_POLL_INTERVAL=86400
       - WATCHTOWER_INCLUDE_STOPPED=true
+      - DOCKER_API_VERSION=1.44
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -261,9 +263,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.mcp
-    restart: always
+    restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db # Need to verify correct DB
+      DATABASE_URL: "postgresql://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/agencia_saas"
     depends_on: [ postgres ]
     networks:
       - internal
@@ -274,9 +276,13 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.fulllogin.com/api/v1}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     restart: always
+    env_file: .env.prod
     environment:
       - NEXT_PUBLIC_API_URL=https://api.fulllogin.com/api/v1
+      - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+      - PORT=3000
     depends_on: [ saas-api ]
     networks:
       - internal
@@ -293,7 +299,7 @@ services:
       - SERVER_URL=https://crm.fulllogin.com
       - FRONT_AUTH_CALLBACK_URL=https://crm.fulllogin.com/auth/callback
       - FRONT_AUTH_ERROR_URL=https://crm.fulllogin.com/auth/error
-      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
+      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/twenty_db
       - REDIS_URL=redis://redis:6379/1
       - APP_SECRET=${TWENTY_APP_SECRET:-veinty_super_secret_for_fulllogin}
     depends_on: [ postgres, redis ]
@@ -307,7 +313,7 @@ services:
     command: ["yarn", "worker:prod"]
     environment:
       - SERVER_URL=https://crm.fulllogin.com
-      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/chatwoot_db
+      - PG_DATABASE_URL=postgres://fulllogin:QJ0SYYiOpH1+3qtOABpxNSpi86RIt+7i@postgres:5432/twenty_db
       - REDIS_URL=redis://redis:6379/1
       - APP_SECRET=${TWENTY_APP_SECRET:-veinty_super_secret_for_fulllogin}
     depends_on: [ postgres, redis ]

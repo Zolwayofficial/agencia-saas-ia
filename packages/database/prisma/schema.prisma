@@ -29,6 +29,9 @@ model Organization {
   agentRunsUsedThisMonth Int      @default(0)
   billingCycleStart      DateTime @default(now())
   creditBalance          Float    @default(0)   // Comisiones de referidos acumuladas
+  trialEndsAt            DateTime?                // Fecha fin del trial Pro (null = sin trial)
+  trialPlanId            String?                  // Plan del trial (normalmente Pro)
+  onboardingCompleted    Boolean  @default(false) // Onboarding completado
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
@@ -44,8 +47,10 @@ model Organization {
 model User {
   id             String   @id @default(cuid())
   email          String   @unique
-  passwordHash   String
+  passwordHash   String?
+  googleId       String?  @unique  // Google OAuth ID
   name           String?
+  chatwootUserId String?
   role           Role     @default(MEMBER)
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
@@ -219,4 +224,53 @@ enum TaskStatus {
   SUCCESS
   ERROR
   TIMEOUT
+}
+
+// ─── CONVERSATION MEMORY (Aprender y No Olvidar) ───────────
+
+model ConversationMessage {
+  id             String   @id @default(cuid())
+  organizationId String
+  instanceName   String
+  contactPhone   String
+  role           String   // 'user' | 'assistant'
+  content        String
+  createdAt      DateTime @default(now())
+
+  @@index([organizationId, contactPhone, createdAt(sort: Desc)])
+  @@map("conversation_messages")
+}
+
+// ─── KNOWLEDGE BASE (Info del negocio por org) ──────────────
+
+model KnowledgeEntry {
+  id             String   @id @default(cuid())
+  organizationId String
+  category       String   @default("general")
+  title          String
+  content        String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId, category, isActive])
+  @@map("knowledge_entries")
+}
+
+// ─── AGENT CONFIG (Personalización del agente por org) ──────
+
+model AgentConfig {
+  id                 String   @id @default(cuid())
+  organizationId     String   @unique
+  agentName          String   @default("Asistente")
+  systemPrompt       String?
+  welcomeMessage     String   @default("Hola! En que puedo ayudarte?")
+  tone               String   @default("profesional")
+  language           String   @default("es")
+  maxHistoryMessages Int      @default(10)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("agent_configs")
 }

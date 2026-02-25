@@ -31,3 +31,11 @@ packages/database/prisma/*.db
 
 # Docker
 *.log
+
+# Secret env files (NEVER commit these)
+.env.prod
+.env.chatwoot
+.env.chatwoot.local
+infrastructure/production/.env.prod
+infrastructure/production/.env.chatwoot
+infrastructure/production/.env.prod.backup*
