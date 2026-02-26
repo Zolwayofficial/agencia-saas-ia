@@ -29,25 +29,25 @@ export default function AnalyticsPage() {
     if (loading) {
         return (
             <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-80 bg-white/5 rounded-lg" />
+                <div className="h-10 w-80 bg-gray-100 rounded-lg" />
                 <div className="grid grid-cols-4 gap-6">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-32 bg-white/5 rounded-2xl" />
+                        <div key={i} className="h-32 bg-gray-100 rounded-2xl" />
                     ))}
                 </div>
                 <div className="grid grid-cols-3 gap-6">
-                    <div className="col-span-2 h-[400px] bg-white/5 rounded-2xl" />
-                    <div className="h-[400px] bg-white/5 rounded-2xl" />
+                    <div className="col-span-2 h-[400px] bg-gray-100 rounded-2xl" />
+                    <div className="h-[400px] bg-gray-100 rounded-2xl" />
                 </div>
             </div>
         );
     }
 
     const stats = [
-        { label: 'Weekly Velocity', value: messageVolume.reduce((a: number, b: number) => a + b, 0).toLocaleString(), trend: '+24.8%', icon: Icons.TrendingUp, color: 'var(--brand-primary)' },
-        { label: 'AI Success Rate', value: `${(balance?.stats?.successRate || 84.2).toFixed(1)}%`, trend: 'OPTIMAL', icon: Icons.AI, color: '#3b82f6' },
-        { label: 'Cognitive Savings', value: `${(balance?.stats?.timeSavedHours || 32.4).toFixed(1)}h`, trend: 'ESTIMATED', icon: Icons.Cpu, color: '#f59e0b' },
-        { label: 'Compute Limit', value: `${Math.round(((balance?.usage?.messagesUsed || 1240) / (balance?.usage?.messagesLimit || 5000)) * 100)}%`, trend: 'ACTIVE', icon: Icons.Credits, color: 'var(--text-header)' },
+        { label: 'Volumen Semanal', value: messageVolume.reduce((a: number, b: number) => a + b, 0).toLocaleString(), trend: '+24.8%', icon: Icons.TrendingUp, color: 'var(--brand-primary)' },
+        { label: 'Tasa de Exito IA', value: `${(balance?.stats?.successRate || 84.2).toFixed(1)}%`, trend: 'OPTIMO', icon: Icons.AI, color: '#3b82f6' },
+        { label: 'Ahorro de Tiempo', value: `${(balance?.stats?.timeSavedHours || 32.4).toFixed(1)}h`, trend: 'ESTIMADO', icon: Icons.Cpu, color: '#f59e0b' },
+        { label: 'Uso de Capacidad', value: `${Math.round(((balance?.usage?.messagesUsed || 1240) / (balance?.usage?.messagesLimit || 5000)) * 100)}%`, trend: 'ACTIVO', icon: Icons.Credits, color: 'var(--text-header)' },
     ];
 
     return (
@@ -57,18 +57,18 @@ export default function AnalyticsPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Intelligence Core
+                            Nucleo de Inteligencia
                         </span>
                     </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Strategic Analytics</h1>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Analitica Estrategica</h1>
                     <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
-                        Operational insights and autonomous performance telemetry.
+                        Metricas de rendimiento y analisis operativo.
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button className="btn-premium btn-premium-outline !py-2.5">
                         <Icons.Download size={14} />
-                        Export Data
+                        Exportar Datos
                     </button>
                 </div>
             </header>
@@ -83,7 +83,7 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="flex items-baseline gap-2">
                             <span className="value">{stat.value}</span>
-                            <span className="text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.05]" style={{ color: stat.color }}>
+                            <span className="text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded bg-gray-50 border border-gray-200" style={{ color: stat.color }}>
                                 {stat.trend}
                             </span>
                         </div>
@@ -101,20 +101,20 @@ export default function AnalyticsPage() {
                 <div className="lg:col-span-2 glass-panel p-8">
                     <div className="flex items-center justify-between mb-10">
                         <div>
-                            <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">NETWORK VOLUME</h3>
-                            <p className="text-[10px] text-muted font-medium uppercase tracking-widest opacity-40">7-DAY ANALYTICAL WINDOW</p>
+                            <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">VOLUMEN DE MENSAJES</h3>
+                            <p className="text-[10px] text-muted font-medium uppercase tracking-widest opacity-40">VENTANA DE 7 DIAS</p>
                         </div>
                         <div className="flex items-center gap-6">
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full bg-brand-primary shadow-[0_0_8px_var(--brand-primary)]" />
-                                <span className="text-[10px] font-bold text-header uppercase tracking-widest">Inbound Traffic</span>
+                                <span className="text-[10px] font-bold text-header uppercase tracking-widest">Trafico Entrante</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="h-[280px] flex items-end gap-3 px-4 relative">
                         {/* Grid Lines */}
-                        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-[0.03]">
+                        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-[0.06]">
                             {[1, 2, 3, 4].map(idx => <div key={idx} className="w-full h-px bg-white" />)}
                         </div>
 
@@ -131,7 +131,7 @@ export default function AnalyticsPage() {
                                         </div>
                                     </div>
                                     <div className="text-[10px] font-bold text-muted uppercase tracking-widest opacity-40">
-                                        {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][i]}
+                                        {['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM'][i]}
                                     </div>
                                 </div>
                             );
@@ -141,20 +141,20 @@ export default function AnalyticsPage() {
 
                 {/* Conversion Funnel */}
                 <div className="glass-panel p-8">
-                    <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-10">TRANSFORM FLOW</h3>
+                    <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-10">EMBUDO DE CONVERSION</h3>
                     <div className="space-y-6">
                         {[
-                            { label: 'RAW INPUT', value: '1,248', p: 100, color: 'var(--text-muted)' },
-                            { label: 'COGNITIVE FILTER', value: '1,120', p: 90, color: '#3b82f6' },
-                            { label: 'AI RESOLUTION', value: '942', p: 75, color: '#a855f7' },
-                            { label: 'MISSION SUCCESS', value: '312', p: 25, color: 'var(--brand-primary)' },
+                            { label: 'MENSAJES RECIBIDOS', value: '1,248', p: 100, color: 'var(--text-muted)' },
+                            { label: 'FILTRO IA', value: '1,120', p: 90, color: '#3b82f6' },
+                            { label: 'RESOLUCION IA', value: '942', p: 75, color: '#a855f7' },
+                            { label: 'CONVERSIONES', value: '312', p: 25, color: 'var(--brand-primary)' },
                         ].map((step, i) => (
                             <div key={i} className="relative">
                                 <div className="flex justify-between items-end mb-2">
                                     <span className="text-[10px] font-bold tracking-widest text-header uppercase">{step.label}</span>
                                     <span className="text-[11px] font-black text-muted">{step.value}</span>
                                 </div>
-                                <div className="h-2 w-full bg-white/[0.03] rounded-full overflow-hidden">
+                                <div className="h-2 w-full bg-gray-50/50 rounded-full overflow-hidden">
                                     <div className="h-full rounded-full transition-all duration-1000 ease-out"
                                         style={{
                                             width: `${step.p}%`,
@@ -165,8 +165,8 @@ export default function AnalyticsPage() {
                             </div>
                         ))}
                     </div>
-                    <div className="mt-10 p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                        <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">CONVERSION EFFICIENCY</div>
+                    <div className="mt-10 p-4 rounded-xl bg-gray-50/30 border border-gray-200">
+                        <div className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">TASA DE CONVERSION</div>
                         <div className="text-xl font-black text-brand-primary font-display">24.9%</div>
                     </div>
                 </div>
@@ -176,34 +176,34 @@ export default function AnalyticsPage() {
             <section className="glass-panel p-8 mb-8">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">AUTONOMOUS AUDIT LOG</h3>
-                        <p className="text-[10px] text-muted font-medium uppercase tracking-widest opacity-40">REAL-TIME RUNTIME TELEMETRY</p>
+                        <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">REGISTRO DE ACTIVIDAD</h3>
+                        <p className="text-[10px] text-muted font-medium uppercase tracking-widest opacity-40">TELEMETRIA EN TIEMPO REAL</p>
                     </div>
                     <Link href="/dashboard/agents" className="btn-premium btn-premium-outline !py-2 !px-4 !text-[11px]">
-                        Personnel Overview
+                        Ver Agentes IA
                     </Link>
                 </div>
 
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="text-left border-b border-white/[0.03]">
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">NODE ID</th>
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">ENIGMA / STATUS</th>
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">LATENCY</th>
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">OUTCOME</th>
+                            <tr className="text-left border-b border-gray-200">
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">ID</th>
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">MODELO / ESTADO</th>
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">DURACION</th>
+                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">RESULTADO</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/[0.02]">
+                        <tbody className="divide-y divide-gray-100">
                             {tasks.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="py-12 text-center text-muted opacity-30 text-xs font-medium uppercase tracking-widest italic">
-                                        No active telemetry data detected
+                                        No hay datos de actividad
                                     </td>
                                 </tr>
                             ) : (
                                 tasks.map((task) => (
-                                    <tr key={task.id} className="group hover:bg-white/[0.01] transition-all">
+                                    <tr key={task.id} className="group hover:bg-gray-50/20 transition-all">
                                         <td className="py-5 px-4">
                                             <div className="text-[11px] font-mono text-muted opacity-60">#{task.id.slice(0, 8).toUpperCase()}</div>
                                         </td>
@@ -211,9 +211,9 @@ export default function AnalyticsPage() {
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-1.5 h-1.5 rounded-full ${task.status === 'COMPLETED' ? 'bg-success shadow-[0_0_8px_hsl(var(--success))]' : 'bg-warning animate-pulse'}`} />
                                                 <div>
-                                                    <div className="text-[13px] font-bold text-header group-hover:text-brand-primary transition-all">GPT-4o Mission Core</div>
+                                                    <div className="text-[13px] font-bold text-header group-hover:text-brand-primary transition-all">Agente IA</div>
                                                     <div className="text-[10px] text-muted font-medium opacity-40 uppercase tracking-tighter">
-                                                        {new Date(task.createdAt).toLocaleTimeString()} • PROCESSED
+                                                        {new Date(task.createdAt).toLocaleTimeString()} • PROCESADO
                                                     </div>
                                                 </div>
                                             </div>
@@ -225,7 +225,7 @@ export default function AnalyticsPage() {
                                             <span className={`text-[9px] font-black px-2 py-0.5 rounded border tracking-widest ${task.status === 'COMPLETED'
                                                 ? 'bg-success/5 text-brand-primary border-brand-primary/20'
                                                 : 'bg-warning/5 text-warning border-warning/20'}`}>
-                                                {task.status === 'COMPLETED' ? 'OPTIMAL' : 'RUNNING'}
+                                                {task.status === 'COMPLETED' ? 'OPTIMO' : 'EN PROCESO'}
                                             </span>
                                         </td>
                                     </tr>

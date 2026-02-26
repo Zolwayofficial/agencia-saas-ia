@@ -5,18 +5,18 @@ import { api } from '@/lib/api';
 import { Icons } from '@/components/icons';
 
 const INTEGRATIONS = [
-    { id: 'chatwoot', name: 'Chatwoot', cat: 'Core Infrastructure', status: 'connected', desc: 'Omnichannel engagement & advanced support terminal.' },
-    { id: 'evolution', name: 'WhatsApp Evolution', cat: 'Core Infrastructure', status: 'connected', desc: 'Enterprise-scale messaging API for full WhatsApp nodes.' },
-    { id: 'n8n', name: 'n8n Workflow', cat: 'Core Infrastructure', status: 'connected', desc: 'Complex B2B automation & multi-step logic orchestration.' },
-    { id: 'openai', name: 'OpenAI (GPT-4)', cat: 'Neural Models', status: 'connected', desc: 'Advanced LLM core for autonomous agent intelligence.' },
-    { id: 'livekit', name: 'LiveKit Voice', cat: 'Neural Models', status: 'setup', desc: 'Real-time low-latency voice agents for verbal interaction.' },
-    { id: 'litellm', name: 'LiteLLM Proxy', cat: 'Neural Models', status: 'connected', desc: 'Orchestration & load-balancing across diverse model providers.' },
-    { id: 'stripe', name: 'Stripe Payments', cat: 'Fiscal & CRM', status: 'setup', desc: 'Subscription lifecycle & secure fiscal transaction gateway.' },
-    { id: 'shopify', name: 'Shopify Store', cat: 'Fiscal & CRM', status: 'setup', desc: 'Native e-commerce catalog & fulfillment integration.' },
-    { id: 'hubspot', name: 'HubSpot CRM', cat: 'Fiscal & CRM', status: 'setup', desc: 'High-fidelity sales lead synchronization and tracking.' },
-    { id: 'ga4', name: 'Google Analytics', cat: 'Intelligence Hub', status: 'connected', desc: 'Deep event telemetry & behavioral usage metrics.' },
-    { id: 'calendly', name: 'Calendly', cat: 'Intelligence Hub', status: 'setup', desc: 'Autonomous demo scheduling & appointment handshake.' },
-    { id: 'opentable', name: 'OpenTable', cat: 'Intelligence Hub', status: 'setup', desc: 'Industrial logistics for hospitality & reservation nodes.' },
+    { id: 'chatwoot', name: 'Chatwoot', cat: 'Infraestructura Principal', status: 'connected', desc: 'Plataforma omnicanal de soporte y atencion al cliente.' },
+    { id: 'evolution', name: 'WhatsApp Evolution', cat: 'Infraestructura Principal', status: 'connected', desc: 'API de mensajeria para nodos WhatsApp.' },
+    { id: 'n8n', name: 'n8n Workflow', cat: 'Infraestructura Principal', status: 'connected', desc: 'Automatizacion de flujos de trabajo y logica multi-paso.' },
+    { id: 'openai', name: 'OpenAI (GPT-4)', cat: 'Modelos IA', status: 'connected', desc: 'Modelo de lenguaje avanzado para agentes IA autonomos.' },
+    { id: 'livekit', name: 'LiveKit Voice', cat: 'Modelos IA', status: 'setup', desc: 'Agentes de voz en tiempo real de baja latencia.' },
+    { id: 'litellm', name: 'LiteLLM Proxy', cat: 'Modelos IA', status: 'connected', desc: 'Orquestacion y balanceo de carga entre proveedores de modelos.' },
+    { id: 'stripe', name: 'Stripe Payments', cat: 'Pagos y CRM', status: 'setup', desc: 'Pasarela de pagos y gestion de suscripciones.' },
+    { id: 'shopify', name: 'Shopify Store', cat: 'Pagos y CRM', status: 'setup', desc: 'Integracion nativa con catalogo y logistica e-commerce.' },
+    { id: 'hubspot', name: 'HubSpot CRM', cat: 'Pagos y CRM', status: 'setup', desc: 'Sincronizacion y seguimiento de leads de ventas.' },
+    { id: 'ga4', name: 'Google Analytics', cat: 'Herramientas', status: 'connected', desc: 'Telemetria de eventos y metricas de uso.' },
+    { id: 'calendly', name: 'Calendly', cat: 'Herramientas', status: 'setup', desc: 'Programacion autonoma de demos y citas.' },
+    { id: 'opentable', name: 'OpenTable', cat: 'Herramientas', status: 'setup', desc: 'Integracion con sistema de reservas para restaurantes.' },
 ];
 
 export default function IntegrationsPage() {
@@ -42,10 +42,10 @@ export default function IntegrationsPage() {
     if (loading) {
         return (
             <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-64 bg-white/5 rounded-lg" />
+                <div className="h-10 w-64 bg-gray-100 rounded-lg" />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="h-44 bg-white/5 rounded-2xl" />
+                        <div key={i} className="h-44 bg-gray-100 rounded-2xl" />
                     ))}
                 </div>
             </div>
@@ -59,23 +59,23 @@ export default function IntegrationsPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Connector Layer
+                            Integraciones
                         </span>
                     </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">App Connect</h1>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Integraciones</h1>
                     <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
-                        Synchronize your agency infrastructure with official third-party protocols.
+                        Conecta tu plataforma con servicios de terceros.
                     </p>
                 </div>
-                <div className="flex gap-2 p-1.5 bg-white/[0.03] rounded-xl border border-white/[0.05] shrink-0">
+                <div className="flex p-1 bg-gray-50/50 rounded-xl border border-gray-200">
                     {['All', 'Connected', 'Setup'].map(f => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-wider uppercase transition-all whitespace-nowrap ${filter === f ? 'bg-brand-primary text-black shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
+                            className={`px-5 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === f ? 'bg-brand-primary text-white shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
                                 }`}
                         >
-                            {f === 'All' ? 'All' : f === 'Connected' ? 'Active' : 'Pending'}
+                            {f === 'All' ? 'Todas' : f === 'Connected' ? 'Activas' : 'Pendientes'}
                         </button>
                     ))}
                 </div>
@@ -86,14 +86,14 @@ export default function IntegrationsPage() {
                     <div key={integration.id} className={`group glass-panel p-6 flex flex-col transition-all duration-500 ${integration.status === 'connected' ? 'border-brand-primary/10 shadow-[0_10px_30px_-15px_rgba(var(--brand-primary-rgb),0.1)]' : ''
                         }`}>
                         <div className="flex justify-between items-start mb-6">
-                            <div className="w-12 h-12 rounded-xl bg-white/[0.03] flex items-center justify-center text-muted group-hover:text-brand-primary border border-white/[0.05] transition-colors">
+                            <div className="w-12 h-12 rounded-xl bg-gray-50/50 flex items-center justify-center text-muted group-hover:text-brand-primary border border-gray-200 transition-colors">
                                 <Icons.Link size={22} />
                             </div>
                             <div className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest border transition-all ${integration.status === 'connected'
                                     ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/20'
-                                    : 'bg-white/5 text-muted border-white/10 opacity-40'
+                                    : 'bg-gray-100 text-muted border-gray-200 opacity-40'
                                 }`}>
-                                {integration.status === 'connected' ? 'AUTHORIZED' : 'PENDING'}
+                                {integration.status === 'connected' ? 'ACTIVO' : 'PENDIENTE'}
                             </div>
                         </div>
 
@@ -105,15 +105,15 @@ export default function IntegrationsPage() {
                             </p>
                         </div>
 
-                        <div className="mt-auto grid grid-cols-2 gap-3 pt-6 border-t border-white/[0.03]">
+                        <div className="mt-auto grid grid-cols-2 gap-3 pt-6 border-t border-gray-200">
                             <button className="btn-premium btn-premium-outline !py-2 !text-[10px] justify-center opacity-40 hover:opacity-100">
-                                <Icons.Alert size={12} /> Tech Spec
+                                <Icons.Alert size={12} /> Detalles
                             </button>
                             <button className={`btn-premium !py-2 !text-[10px] justify-center ${integration.status === 'connected'
-                                    ? 'btn-premium-outline !border-white/[0.05] !bg-white/[0.02]'
+                                    ? 'btn-premium-outline !border-gray-200 !bg-gray-50/30'
                                     : 'btn-premium-primary'
                                 }`}>
-                                {integration.status === 'connected' ? 'Configure' : 'Authorize'}
+                                {integration.status === 'connected' ? 'Configurar' : 'Activar'}
                             </button>
                         </div>
                     </div>
@@ -121,18 +121,18 @@ export default function IntegrationsPage() {
             </div>
 
             {/* Scale Alert */}
-            <div className="glass-panel p-6 border-dashed border-white/10 flex items-center justify-between gap-6 opacity-60 hover:opacity-100 transition-all">
+            <div className="glass-panel p-6 border-dashed border-gray-200 flex items-center justify-between gap-6 opacity-60 hover:opacity-100 transition-all">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-muted">
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-muted">
                         <Icons.Plus size={18} />
                     </div>
                     <div>
-                        <h4 className="text-xs font-bold text-header uppercase tracking-widest">Protocol Expansion</h4>
-                        <p className="text-[10px] text-muted font-medium">Request custom API orchestration for enterprise workloads.</p>
+                        <h4 className="text-xs font-bold text-header uppercase tracking-widest">Solicitar Integracion</h4>
+                        <p className="text-[10px] text-muted font-medium">Solicita una integracion personalizada para tu negocio.</p>
                     </div>
                 </div>
                 <button className="btn-premium btn-premium-outline !py-2 !px-4 !text-[10px]">
-                    Initiate Request
+                    Solicitar
                 </button>
             </div>
         </div>

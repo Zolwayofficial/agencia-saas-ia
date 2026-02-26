@@ -16,19 +16,19 @@ const CHANNEL_ICONS: Record<string, ((props: any) => JSX.Element)> = {
 };
 
 const CHANNELS = [
-    { id: 'whatsapp', name: 'WhatsApp', icon: CHANNEL_ICONS.whatsapp, color: '#25D366', status: 'connected', label: 'Active instances' },
-    { id: 'instagram', name: 'Instagram', icon: CHANNEL_ICONS.instagram, color: '#E1306C', status: 'setup', label: 'Not configured' },
-    { id: 'telegram', name: 'Telegram', icon: CHANNEL_ICONS.telegram, color: '#0088cc', status: 'setup', label: 'Not configured' },
-    { id: 'facebook', name: 'Facebook', icon: CHANNEL_ICONS.facebook, color: '#1877F2', status: 'setup', label: 'Not configured' },
-    { id: 'email', name: 'Email', icon: CHANNEL_ICONS.email, color: '#EA4335', status: 'setup', label: 'Not configured' },
-    { id: 'discord', name: 'Discord', icon: CHANNEL_ICONS.discord, color: '#5865F2', status: 'setup', label: 'Not configured' },
+    { id: 'whatsapp', name: 'WhatsApp', icon: CHANNEL_ICONS.whatsapp, color: '#25D366', status: 'connected', label: 'Instancias activas' },
+    { id: 'instagram', name: 'Instagram', icon: CHANNEL_ICONS.instagram, color: '#E1306C', status: 'setup', label: 'No configurado' },
+    { id: 'telegram', name: 'Telegram', icon: CHANNEL_ICONS.telegram, color: '#0088cc', status: 'setup', label: 'No configurado' },
+    { id: 'facebook', name: 'Facebook', icon: CHANNEL_ICONS.facebook, color: '#1877F2', status: 'setup', label: 'No configurado' },
+    { id: 'email', name: 'Email', icon: CHANNEL_ICONS.email, color: '#EA4335', status: 'setup', label: 'No configurado' },
+    { id: 'discord', name: 'Discord', icon: CHANNEL_ICONS.discord, color: '#5865F2', status: 'setup', label: 'No configurado' },
 ];
 
 const QUICK_ACTIONS = [
-    { href: '/dashboard/inbox', Icon: Icons.Inbox, label: 'Omni-Channel Inbox', desc: 'Manage all interactions', color: '#50CD95' },
-    { href: '/dashboard/marketing', Icon: Icons.Rocket, label: 'Campaign Engine', desc: 'Deploy new automation', color: '#3b82f6' },
-    { href: '/dashboard/whatsapp', Icon: Icons.WhatsApp, label: 'WhatsApp Nodes', desc: 'Scan & Manage instances', color: '#25D366' },
-    { href: '/dashboard/integrations', Icon: Icons.Link, label: 'App Connect', desc: 'Infrastructure sync', color: '#f59e0b' },
+    { href: '/dashboard/inbox', Icon: Icons.Inbox, label: 'Bandeja Omnicanal', desc: 'Gestionar conversaciones', color: '#50CD95' },
+    { href: '/dashboard/marketing', Icon: Icons.Rocket, label: 'Motor de Campanas', desc: 'Crear nueva automatizacion', color: '#3b82f6' },
+    { href: '/dashboard/whatsapp', Icon: Icons.WhatsApp, label: 'Nodos WhatsApp', desc: 'Escanear y gestionar instancias', color: '#25D366' },
+    { href: '/dashboard/integrations', Icon: Icons.Link, label: 'Integraciones', desc: 'Sincronizar aplicaciones', color: '#f59e0b' },
 ];
 
 export default function DashboardPage() {
@@ -59,22 +59,22 @@ export default function DashboardPage() {
 
     const enrichedChannels = CHANNELS.map((c) =>
         c.id === 'whatsapp'
-            ? { ...c, label: `${instances.length} node(s) active`, status: instances.length > 0 ? 'connected' : 'setup' }
+            ? { ...c, label: `${instances.length} nodo(s) activo(s)`, status: instances.length > 0 ? 'connected' : 'setup' }
             : c
     );
 
     if (loading) {
         return (
             <div className="animate-pulse space-y-8 p-8 max-w-6xl mx-auto">
-                <div className="h-8 w-64 bg-white/5 rounded-lg" />
+                <div className="h-8 w-64 bg-gray-100 rounded-lg" />
                 <div className="grid grid-cols-4 gap-6">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-32 bg-white/5 rounded-2xl" />
+                        <div key={i} className="h-32 bg-gray-100 rounded-2xl" />
                     ))}
                 </div>
                 <div className="grid grid-cols-2 gap-6">
-                    <div className="h-64 bg-white/5 rounded-2xl" />
-                    <div className="h-64 bg-white/5 rounded-2xl" />
+                    <div className="h-64 bg-gray-100 rounded-2xl" />
+                    <div className="h-64 bg-gray-100 rounded-2xl" />
                 </div>
             </div>
         );
@@ -82,27 +82,27 @@ export default function DashboardPage() {
 
     return (
         <div className="animate-in max-w-7xl mx-auto">
-            {/* Command Center Header */}
+            {/* Centro de Control Header */}
             <header className="flex justify-between items-end mb-12">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/[0.05] text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Operational Hub
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-50 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                            Centro Operativo
                         </span>
                     </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Command Center</h1>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Centro de Control</h1>
                     <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
-                        {organization?.name || 'Enterprise'} — Terminal Strategy Active
+                        {organization?.name || 'Mi Empresa'} — Estrategia Activa
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
-                        <div className="text-xs font-bold text-muted uppercase tracking-widest mb-1">CURRENT PLAN</div>
-                        <div className="text-sm font-semibold text-header">{balance?.plan?.name || 'SaaS Professional'}</div>
+                        <div className="text-xs font-bold text-muted uppercase tracking-widest mb-1">PLAN ACTUAL</div>
+                        <div className="text-sm font-semibold text-header">{balance?.plan?.name || 'Profesional'}</div>
                     </div>
                     <Link href="/dashboard/billing" className="btn-premium btn-premium-primary">
                         <Icons.Billing size={16} />
-                        Scale Operation
+                        Mejorar Plan
                     </Link>
                 </div>
             </header>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
             {/* Strategic KPI Row */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <div className="glass-panel stat-card-premium">
-                    <div className="label">Monthly Revenue</div>
+                    <div className="label">Ingresos Mensuales</div>
                     <div className="flex items-baseline gap-2">
                         <span className="value">${(balance?.mrr || 0).toLocaleString()}</span>
                         <span className="trend trend-up">
@@ -120,27 +120,27 @@ export default function DashboardPage() {
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                         <Icons.MRR size={14} className="text-brand-primary opacity-50" />
-                        <span className="text-[10px] font-bold text-muted underline decoration-brand-primary/20 underline-offset-4">PROJECTION ACTIVE</span>
+                        <span className="text-[10px] font-bold text-muted underline decoration-brand-primary/20 underline-offset-4">PROYECCION ACTIVA</span>
                     </div>
                 </div>
 
                 <div className="glass-panel stat-card-premium">
-                    <div className="label">Message Velocity</div>
+                    <div className="label">Volumen de Mensajes</div>
                     <div className="flex items-baseline gap-2">
                         <span className="value">{(balance?.usage?.messagesUsed || 0).toLocaleString()}</span>
                         <span className="text-xs font-medium text-muted">/ {balance?.usage?.messagesLimit || '5k'}</span>
                     </div>
-                    <div className="mt-4 w-full h-1 bg-white/[0.05] rounded-full overflow-hidden">
+                    <div className="mt-4 w-full h-1 bg-gray-50 rounded-full overflow-hidden">
                         <div className="h-full bg-brand-primary shadow-[0_0_8px_var(--brand-primary)]" style={{ width: `${msgPercent}%` }} />
                     </div>
                     <div className="mt-4 flex justify-between items-center text-[10px] font-bold tracking-widest text-muted">
-                        <span>VOLUME: {Math.round(msgPercent)}%</span>
-                        <span className="opacity-40">AUTO-SCALE ENABLED</span>
+                        <span>VOLUMEN: {Math.round(msgPercent)}%</span>
+                        <span className="opacity-40">ESCALADO AUTOMATICO</span>
                     </div>
                 </div>
 
                 <div className="glass-panel stat-card-premium">
-                    <div className="label">AI Resolution</div>
+                    <div className="label">Resolucion IA</div>
                     <div className="flex items-baseline gap-2">
                         <span className="value">84.2%</span>
                         <span className="trend trend-up">
@@ -150,18 +150,18 @@ export default function DashboardPage() {
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                         <Icons.AI size={14} className="text-primary-light opacity-80" />
-                        <span className="text-[10px] font-bold text-muted">AUTONOMOUS EFFICIENCY</span>
+                        <span className="text-[10px] font-bold text-muted">EFICIENCIA AUTONOMA</span>
                     </div>
                 </div>
 
                 <div className="glass-panel stat-card-premium">
-                    <div className="label">Partner Commissions</div>
+                    <div className="label">Comisiones de Referidos</div>
                     <div className="flex items-baseline gap-2">
                         <span className="value">${(balance?.commissions || 0).toFixed(2)}</span>
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                         <Icons.Referrals size={14} className="text-warning opacity-50" />
-                        <span className="text-[10px] font-bold text-muted">SINGLE-LEVEL 20% ACTIVE</span>
+                        <span className="text-[10px] font-bold text-muted">NIVEL UNICO 20% ACTIVO</span>
                     </div>
                 </div>
             </section>
@@ -170,12 +170,12 @@ export default function DashboardPage() {
                 {/* Tactical Actions */}
                 <div className="lg:col-span-1 glass-panel p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase">TACTICAL ACTIONS</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase">ACCIONES RAPIDAS</h2>
                         <div className="w-8 h-1 bg-brand-primary/20 rounded-full" />
                     </div>
                     <div className="grid grid-cols-1 gap-3">
                         {QUICK_ACTIONS.map((action) => (
-                            <Link key={action.href} href={action.href} className="flex items-center gap-4 p-4 glass-panel hover:bg-white/[0.03] transition-all group !border-white/[0.02]">
+                            <Link key={action.href} href={action.href} className="flex items-center gap-4 p-4 glass-panel hover:bg-gray-50/50 transition-all group !border-gray-100">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300"
                                     style={{ background: `${action.color}15`, color: action.color }}>
                                     <action.Icon size={20} />
@@ -193,14 +193,14 @@ export default function DashboardPage() {
                 {/* Infrastructure Status */}
                 <div className="lg:col-span-2 glass-panel p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase">INFRASTRUCTURE NODES</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase">CANALES DE COMUNICACION</h2>
                         <Link href="/dashboard/whatsapp" className="text-[10px] flex items-center gap-1 font-bold text-brand-primary uppercase tracking-widest hover:opacity-80 transition-all">
-                            Manage All <Icons.External size={10} />
+                            Ver Todos <Icons.External size={10} />
                         </Link>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {enrichedChannels.map((ch) => (
-                            <div key={ch.id} className="flex items-center gap-4 p-4 glass-panel !border-white/[0.02]">
+                            <div key={ch.id} className="flex items-center gap-4 p-4 glass-panel !border-gray-100">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                                     style={{ background: `${ch.color}10`, color: ch.color }}>
                                     {(() => {
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                                 <div className="flex-1 min-w-0">
                                     <div className="text-[13px] font-bold text-header truncate">{ch.name}</div>
                                     <div className="flex items-center gap-2">
-                                        <div className={`w-1.5 h-1.5 rounded-full ${ch.status === 'connected' ? 'bg-success animate-pulse' : 'bg-white/10'}`}
+                                        <div className={`w-1.5 h-1.5 rounded-full ${ch.status === 'connected' ? 'bg-success animate-pulse' : 'bg-gray-100'}`}
                                             style={{ backgroundColor: ch.status === 'connected' ? 'hsl(var(--success))' : undefined }} />
                                         <span className={`text-[10px] font-bold tracking-tight uppercase ${ch.status === 'connected' ? 'text-brand-primary' : 'text-muted opacity-40'}`}>
                                             {ch.label}
@@ -228,31 +228,31 @@ export default function DashboardPage() {
             <section className="glass-panel p-6 mb-8">
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">OPERATIONAL ACTIVITY</h2>
-                        <p className="text-[10px] text-muted font-medium">REAL-TIME TRANSACTION LOG</p>
+                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">ACTIVIDAD RECIENTE</h2>
+                        <p className="text-[10px] text-muted font-medium">REGISTRO DE TRANSACCIONES</p>
                     </div>
                     <Link href="/dashboard/billing" className="btn-premium btn-premium-outline !py-2 !px-4 !text-[11px]">
-                        Full Forensic Audit
+                        Ver Historial Completo
                     </Link>
                 </div>
                 {history.length === 0 ? (
-                    <div className="py-20 text-center glass-panel !border-dashed !bg-transparent border-white/5 opacity-40">
+                    <div className="py-20 text-center glass-panel !border-dashed !bg-transparent border-gray-200 opacity-40">
                         <Icons.Inbox size={48} className="mx-auto mb-4 opacity-5" />
-                        <p className="text-sm font-medium">No tactical movements registered</p>
+                        <p className="text-sm font-medium">No hay movimientos registrados</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="text-left border-b border-white/[0.03]">
-                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">TYPE</th>
-                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">STRATEGY</th>
-                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">IMPACT</th>
+                                <tr className="text-left border-b border-gray-200">
+                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">TIPO</th>
+                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">DESCRIPCION</th>
+                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">MONTO</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/[0.02]">
+                            <tbody className="divide-y divide-gray-100">
                                 {history.map((tx) => (
-                                    <tr key={tx.id} className="group hover:bg-white/[0.01] transition-all">
+                                    <tr key={tx.id} className="group hover:bg-gray-50/20 transition-all">
                                         <td className="py-5 px-4">
                                             <span className={`text-[10px] font-black px-2 py-0.5 rounded border ${tx.type === 'COMMISSION'
                                                     ? 'bg-warning/5 text-warning border-warning/20'
@@ -263,7 +263,7 @@ export default function DashboardPage() {
                                         <td className="py-5">
                                             <div className="text-[13px] font-bold text-header group-hover:text-brand-primary transition-all line-clamp-1">{tx.description}</div>
                                             <div className="text-[10px] text-muted font-medium opacity-40">
-                                                {new Date(tx.createdAt).toLocaleString('en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                {new Date(tx.createdAt).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </td>
                                         <td className="py-5 text-right px-4">

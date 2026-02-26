@@ -5,11 +5,11 @@ import { api } from '@/lib/api';
 import { Icons } from '@/components/icons';
 
 const STATUS_MAP: Record<string, { label: string; class: string; icon: any }> = {
-    PENDING: { label: 'PENDING', class: 'neutral', icon: Icons.Credits },
-    RUNNING: { label: 'PROCESSING', class: 'info', icon: Icons.AI },
-    SUCCESS: { label: 'SUCCESSFUL', class: 'success', icon: Icons.Check },
-    ERROR: { label: 'CRITICAL', class: 'danger', icon: Icons.Logout },
-    TIMEOUT: { label: 'TIMEOUT', class: 'warning', icon: Icons.Clock },
+    PENDING: { label: 'PENDIENTE', class: 'neutral', icon: Icons.Credits },
+    RUNNING: { label: 'PROCESANDO', class: 'info', icon: Icons.AI },
+    SUCCESS: { label: 'EXITOSO', class: 'success', icon: Icons.Check },
+    ERROR: { label: 'ERROR', class: 'danger', icon: Icons.Logout },
+    TIMEOUT: { label: 'TIEMPO AGOTADO', class: 'warning', icon: Icons.Clock },
 };
 
 export default function AgentsPage() {
@@ -36,62 +36,62 @@ export default function AgentsPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Intelligence Core
+                            Nucleo de Inteligencia
                         </span>
                     </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">AI Personnel</h1>
+                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Agentes IA</h1>
                     <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
-                        Monitoring real-time cognitive executions and neural task cycles.
+                        Monitoreo en tiempo real de ejecuciones de agentes IA.
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="glass-panel px-4 py-2 flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
-                        <span className="text-[10px] font-black tracking-widest text-header uppercase">Synchronizing Telemetry</span>
+                        <span className="text-[10px] font-black tracking-widest text-header uppercase">Sincronizando</span>
                     </div>
                 </div>
             </header>
 
-            <div className="glass-panel overflow-hidden border-white/[0.03]">
+            <div className="glass-panel overflow-hidden border-gray-200">
                 {loading ? (
                     <div className="p-12 space-y-4 animate-pulse">
                         {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-10 bg-white/5 rounded-lg w-full" />
+                            <div key={i} className="h-10 bg-gray-100 rounded-lg w-full" />
                         ))}
                     </div>
                 ) : tasks.length === 0 ? (
                     <div className="text-center py-24 px-8">
-                        <div className="w-20 h-20 bg-white/[0.02] border border-white/[0.05] rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="w-20 h-20 bg-gray-50/30 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Icons.Agents size={32} className="text-muted opacity-20" />
                         </div>
-                        <h3 className="text-lg font-bold text-header mb-2">Null Task Matrix</h3>
+                        <h3 className="text-lg font-bold text-header mb-2">Sin Tareas</h3>
                         <p className="text-xs text-muted max-w-sm mx-auto opacity-60 italic leading-relaxed">
-                            No active AI cycles detected. Initialize your first agency protocol via API to populate this neural log.
+                            No se detectaron ejecuciones de agentes. Ejecuta tu primer agente IA via API para ver los resultados aqui.
                         </p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b border-white/[0.05]">
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Execution Status</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Neural Model</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Task Steps</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Cycle Dur.</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase text-right">Timestamp</th>
+                                <tr className="border-b border-gray-200">
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Estado</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Modelo</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Pasos</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Duracion</th>
+                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase text-right">Fecha</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/[0.02]">
+                            <tbody className="divide-y divide-gray-100">
                                 {tasks.map((task) => {
                                     const status = STATUS_MAP[task.status] || STATUS_MAP.PENDING;
                                     return (
-                                        <tr key={task.id} className="group hover:bg-white/[0.01] transition-all">
+                                        <tr key={task.id} className="group hover:bg-gray-50/20 transition-all">
                                             <td className="px-8 py-4">
                                                 <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-[9px] font-black tracking-widest border 
                                                     ${task.status === 'RUNNING' ? 'bg-info/10 text-info border-info/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]' :
                                                         task.status === 'SUCCESS' ? 'bg-success/10 text-success border-success/20' :
                                                             task.status === 'ERROR' ? 'bg-danger/10 text-danger border-danger/20' :
-                                                                'bg-white/5 text-muted border-white/10'}`}>
+                                                                'bg-gray-100 text-muted border-gray-200'}`}>
                                                     {task.status === 'RUNNING' && <div className="w-1 h-1 rounded-full bg-info animate-ping" />}
                                                     {status.label}
                                                 </div>
@@ -112,7 +112,7 @@ export default function AgentsPage() {
                                             </td>
                                             <td className="px-8 py-4 text-right">
                                                 <span className="text-[10px] font-bold text-muted uppercase opacity-40">
-                                                    {new Date(task.createdAt).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                                                    {new Date(task.createdAt).toLocaleString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                                                 </span>
                                             </td>
                                         </tr>

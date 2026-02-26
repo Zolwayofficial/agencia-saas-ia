@@ -1,53 +1,32 @@
-@import "tailwindcss";
-
-@theme {
-    --color-brand-primary: #50CD95;
-    --color-brand-primary-light: #7EE0B5;
-    --color-brand-primary-dark: #3DB883;
-    --color-header: #FCF0DA;
-    --color-main: #D1DEDC;
-    --color-muted: #7A8F8D;
-    --color-ghost: #40504E;
-    --color-success: hsl(158, 64%, 52%);
-    --color-warning: hsl(38, 92%, 50%);
-    --color-danger: hsl(0, 84%, 60%);
-    --color-info: hsl(217, 91%, 60%);
-    --color-primary-light: #7EE0B5;
-    --font-family-display: 'Outfit', sans-serif;
-    --font-family-sans: 'Inter', -apple-system, system-ui, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ============================================================
-   DESIGN SYSTEM — SAACS Command Center
-   Aesthetic: Industrial Luxury (Modern Dark, Mint Brand, Glass)
+   DESIGN SYSTEM — Full Login Dashboard
+   Aesthetic: Clean Light (Landing-aligned, Mint Brand)
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 :root {
     /* Brand Signals */
-    --brand-primary: #50CD95;
-    --brand-primary-rgb: 80, 205, 149;
+    --brand-primary: #5abf8a;
+    --brand-primary-rgb: 90, 191, 138;
     --brand-primary-light: #7EE0B5;
     --brand-primary-dark: #3DB883;
 
     /* Industrial Dark Palette (HSL for precision depth) */
-    --bg-base: 184, 35%, 4%;
-    /* #060909 */
-    --bg-surface: 184, 32%, 7%;
-    /* #0c1212 */
-    --bg-panel: 184, 28%, 10%;
-    /* #121a1a */
-    --bg-elevated: 184, 25%, 14%;
-    /* #1b2626 */
+    --bg-base: 0, 0%, 98%;
+    --bg-surface: 0, 0%, 100%;
+    --bg-panel: 40, 30%, 96%;
+    --bg-elevated: 0, 0%, 93%;
 
     /* Text Hierarchy */
-    --text-header: #FCF0DA;
-    /* Soft Cream */
-    --text-main: #D1DEDC;
-    /* Muted Cyan Gray */
-    --text-muted: #7A8F8D;
-    --text-ghost: #40504E;
+    --text-header: #192a29;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --text-ghost: #cccccc;
 
     /* Semantic Status */
     --success: 158, 64%, 52%;
@@ -56,10 +35,10 @@
     --info: 217, 91%, 60%;
 
     /* Glass System */
-    --glass-opacity: 0.4;
+    --glass-opacity: 0.85;
     --glass-blur: 12px;
-    --glass-border: rgba(255, 255, 255, 0.04);
-    --glass-border-hover: rgba(80, 205, 149, 0.2);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-border-hover: rgba(90, 191, 138, 0.4);
 
     /* Layout Constraints */
     --sidebar-width: 280px;
@@ -88,7 +67,7 @@ html {
 
 body {
     font-family: 'Inter', -apple-system, system-ui, sans-serif;
-    background-color: hsl(var(--bg-base));
+    background-color: #ffffff;
     color: var(--text-main);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -128,7 +107,7 @@ h6,
 
 /* --- Premium Glassmorphism --- */
 .glass-panel {
-    background: rgba(12, 18, 18, var(--glass-opacity));
+    background: rgba(255, 255, 255, var(--glass-opacity));
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-md);
@@ -136,15 +115,15 @@ h6,
 }
 
 .glass-panel:hover {
-    background: rgba(18, 26, 26, 0.6);
+    background: rgba(255, 255, 255, 0.95);
     border-color: var(--glass-border-hover);
     transform: translateY(-2px);
-    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.1);
 }
 
 /* --- Typography Helpers --- */
 .text-gradient {
-    background: linear-gradient(135deg, var(--text-header) 0%, var(--brand-primary) 100%);
+    background: linear-gradient(135deg, #192a29 0%, var(--brand-primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -168,7 +147,7 @@ h6,
 
 .btn-premium-primary {
     background: var(--brand-primary);
-    color: hsl(var(--bg-base));
+    color: #ffffff;
 }
 
 .btn-premium-primary:hover {
@@ -184,8 +163,46 @@ h6,
 }
 
 .btn-premium-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.03);
     border-color: var(--text-muted);
+}
+
+/* --- Input Field (Knowledge Base forms) --- */
+.input-field {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.9rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-header);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.input-field:focus {
+    border-color: var(--brand-primary);
+    background: rgba(0, 0, 0, 0.03);
+    box-shadow: 0 0 0 2px rgba(90, 191, 138, 0.2);
+}
+
+.input-field::placeholder {
+    color: var(--text-ghost);
+}
+
+select.input-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237A8F8D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+}
+
+select.input-field option {
+    background: #ffffff;
+    color: var(--text-header);
 }
 
 /* --- Dashboard Specifics --- */
@@ -268,16 +285,34 @@ h6,
 }
 
 ::-webkit-scrollbar-track {
-    background: hsl(var(--bg-base));
+    background: #f5f5f5;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--bg-elevated);
+    background: #ddd;
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-ghost);
+}
+
+/* --- Custom Scrollbar (for components) --- */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* --- Line clamp --- */
+.line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* --- Mobile Responsiveness --- */
@@ -313,18 +348,18 @@ h6,
     justify-content: center;
     min-height: 100vh;
     padding: 1.5rem;
-    background: radial-gradient(circle at center, hsl(var(--bg-surface)) 0%, hsl(var(--bg-base)) 100%);
+    background: radial-gradient(circle at center, hsl(var(--bg-surface)) 0%, hsl(var(--bg-panel)) 100%);
 }
 
 .auth-card {
     width: 100%;
     max-width: 420px;
     padding: 2.5rem;
-    background: rgba(12, 18, 18, 0.6);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -355,7 +390,7 @@ h6,
 
 .form-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.02);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     padding: 0.75rem 1rem;
@@ -368,8 +403,8 @@ h6,
 .form-input:focus {
     outline: none;
     border-color: var(--brand-primary);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 0 2px rgba(80, 205, 149, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+    box-shadow: 0 0 0 2px rgba(90, 191, 138, 0.2);
 }
 
 .btn {
@@ -388,7 +423,7 @@ h6,
 
 .btn-primary {
     background: var(--brand-primary);
-    color: #060909;
+    color: #ffffff;
 }
 
 .btn-primary:hover {
@@ -410,4 +445,52 @@ h6,
     font-size: 0.85rem;
     margin-bottom: 1.5rem;
     border: 1px solid hsla(var(--danger), 0.2);
+}
+
+/* ── Industry Grid (Register page) ── */
+.industry-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.industry-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--text-ghost, #40504E);
+    border-radius: 8px;
+    color: var(--text-muted, #7A8F8D);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.industry-option:hover {
+    border-color: var(--brand-primary-light, #5abf8a);
+    color: var(--text-main, #D1DEDC);
+}
+
+.industry-option.active {
+    border-color: var(--brand-primary-light, #5abf8a);
+    background: rgba(90, 191, 138, 0.1);
+    color: var(--text-main, #D1DEDC);
+}
+
+.industry-icon {
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 1.5rem;
+    text-align: center;
+    color: var(--brand-primary-light, #5abf8a);
+}
+
+.industry-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

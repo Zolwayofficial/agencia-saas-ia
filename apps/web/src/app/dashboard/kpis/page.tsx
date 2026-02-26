@@ -30,11 +30,11 @@ function generateValue(kpi: KpiWidget): string {
 }
 
 const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
-    engagement: { label: 'Engagement', icon: '💬' },
-    revenue: { label: 'Revenue', icon: '💰' },
+    engagement: { label: 'Engagement', icon: 'CHT' },
+    revenue: { label: 'Revenue', icon: 'MRR' },
     operations: { label: 'Operaciones', icon: '⚙️' },
-    ai: { label: 'Inteligencia Artificial', icon: '🤖' },
-    satisfaction: { label: 'Satisfacción', icon: '😊' },
+    ai: { label: 'Inteligencia Artificial', icon: 'BOT' },
+    satisfaction: { label: 'Satisfacción', icon: 'SAT' },
 };
 
 export default function KpiDashboardPage() {
@@ -83,7 +83,7 @@ export default function KpiDashboardPage() {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <h1 className="page-title">📊 Dashboard KPIs</h1>
+                <h1 className="page-title">Dashboard KPIs</h1>
                 <button
                     className={editMode ? 'btn btn-primary' : 'btn btn-ghost'}
                     onClick={() => setEditMode(!editMode)}
@@ -122,7 +122,7 @@ export default function KpiDashboardPage() {
 
                     {/* ─── KPI Selector by Category ──────── */}
                     {categories.map((cat) => {
-                        const catInfo = CATEGORY_LABELS[cat] || { label: cat, icon: '📋' };
+                        const catInfo = CATEGORY_LABELS[cat] || { label: cat, icon: 'LST' };
                         const kpis = ALL_KPIS.filter((k) => k.category === cat);
 
                         return (
@@ -176,7 +176,7 @@ export default function KpiDashboardPage() {
                 <>
                     {activeWidgets.length === 0 ? (
                         <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>---</div>
                             <p style={{ color: 'var(--text-secondary)' }}>No hay KPIs seleccionados</p>
                             <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={() => setEditMode(true)}>
                                 Configurar Dashboard

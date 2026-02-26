@@ -7,26 +7,27 @@ import { Icons } from './icons';
 
 const NAV_GROUPS = [
     {
-        label: 'Intelligence',
+        label: 'Inteligencia',
         items: [
-            { href: '/dashboard', Icon: Icons.Home, label: 'Command Center', exact: true },
-            { href: '/dashboard/analytics', Icon: Icons.Analytics, label: 'Strategic Overview' },
-            { href: '/dashboard/agents', Icon: Icons.Agents, label: 'AI Personnel' },
+            { href: '/dashboard', Icon: Icons.Home, label: 'Centro de Control', exact: true },
+            { href: '/dashboard/analytics', Icon: Icons.Analytics, label: 'Vista Estrategica' },
+            { href: '/dashboard/agents', Icon: Icons.Agents, label: 'Agentes IA' },
+            { href: '/dashboard/knowledge', Icon: Icons.AI, label: 'Base de Conocimiento' },
         ],
     },
     {
-        label: 'Operations',
+        label: 'Operaciones',
         items: [
-            { href: '/dashboard/inbox', Icon: Icons.Inbox, label: 'Omni-Channel Inbox' },
-            { href: '/dashboard/whatsapp', Icon: Icons.WhatsApp, label: 'WhatsApp Nodes' },
+            { href: '/dashboard/inbox', Icon: Icons.Inbox, label: 'Bandeja Omnicanal' },
+            { href: '/dashboard/whatsapp', Icon: Icons.WhatsApp, label: 'Nodos WhatsApp' },
         ],
     },
     {
-        label: 'Growth',
+        label: 'Crecimiento',
         items: [
-            { href: '/dashboard/marketing', Icon: Icons.Rocket, label: 'Campaign Engine' },
-            { href: '/dashboard/integrations', Icon: Icons.Link, label: 'App Connect' },
-            { href: '/dashboard/referrals', Icon: Icons.Referrals, label: 'Partner Program' },
+            { href: '/dashboard/marketing', Icon: Icons.Rocket, label: 'Motor de Campanas' },
+            { href: '/dashboard/integrations', Icon: Icons.Link, label: 'Integraciones' },
+            { href: '/dashboard/referrals', Icon: Icons.Referrals, label: 'Programa de Referidos' },
         ],
     },
 ];
@@ -42,17 +43,17 @@ export default function Sidebar() {
         <aside className="fixed top-0 left-0 h-screen overflow-hidden flex flex-col z-50 transition-all duration-300"
             style={{
                 width: 'var(--sidebar-width)',
-                background: 'hsl(var(--bg-surface))',
-                borderRight: '1px solid var(--glass-border)'
+                background: '#ffffff',
+                borderRight: '1px solid #e5e5e5'
             }}>
 
             {/* Brand Identity */}
             <div className="flex items-center gap-3 px-8 py-10" style={{ cursor: 'default' }}>
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg"
                     style={{ background: 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%)' }}>
-                    <Icons.Credits width={18} height={18} style={{ color: 'hsl(var(--bg-base))' }} />
+                    <Icons.Credits width={18} height={18} style={{ color: '#ffffff' }} />
                 </div>
-                <span className="font-display text-xl font-bold tracking-tight">SAACS</span>
+                <span className="font-display text-xl font-bold tracking-tight">Full Login</span>
             </div>
 
             {/* Navigation Flow */}
@@ -69,8 +70,8 @@ export default function Sidebar() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 
-                                            ${active ? 'bg-white/[0.03]' : 'hover:bg-white/[0.01]'}`}
+                                        className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                                            ${active ? 'bg-black/[0.04]' : 'hover:bg-black/[0.02]'}`}
                                         style={{
                                             textDecoration: 'none',
                                             color: active ? 'var(--text-header)' : 'var(--text-muted)'
@@ -85,7 +86,7 @@ export default function Sidebar() {
                                                 }} />
                                         )}
 
-                                        <div className={`transition-colors duration-200 
+                                        <div className={`transition-colors duration-200
                                             ${active ? 'text-brand-primary' : 'group-hover:text-header'}`}
                                             style={{ color: active ? 'var(--brand-primary)' : undefined }}>
                                             <item.Icon size={18} />
@@ -105,8 +106,8 @@ export default function Sidebar() {
 
             {/* Premium User Module */}
             <div className="p-4 mt-auto">
-                <div className="glass-panel p-4 rounded-2xl flex items-center gap-3" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border border-white/10">
+                <div className="glass-panel p-4 rounded-2xl flex items-center gap-3" style={{ border: '1px solid rgba(0,0,0,0.08)' }}>
+                    <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center border border-black/10">
                         <img
                             src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email || 'default'}`}
                             alt="User Avatar"
@@ -116,13 +117,13 @@ export default function Sidebar() {
                     <div className="flex-1 min-width-0 overflow-hidden">
                         <div className="text-[13px] font-bold text-header truncate">{user?.name || user?.email?.split('@')[0]}</div>
                         <div className="text-[10px] text-muted truncate opacity-60 font-medium uppercase tracking-tighter">
-                            {organization?.name || 'Standard Account'}
+                            {organization?.name || 'Cuenta Estandar'}
                         </div>
                     </div>
                     <button
                         onClick={logout}
-                        className="p-2 rounded-lg hover:bg-red-500/10 text-muted hover:text-red-400 transition-all"
-                        title="Sign out"
+                        className="p-2 rounded-lg hover:bg-red-50 text-muted hover:text-red-400 transition-all"
+                        title="Cerrar sesion"
                     >
                         <Icons.Logout size={16} />
                     </button>
