@@ -4,16 +4,20 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Icons } from '@/components/icons';
 
-const STATUS_MAP: Record<string, { label: string; class: string; icon: any }> = {
-    PENDING: { label: 'PENDIENTE', class: 'neutral', icon: Icons.Credits },
-    RUNNING: { label: 'PROCESANDO', class: 'info', icon: Icons.AI },
-    SUCCESS: { label: 'EXITOSO', class: 'success', icon: Icons.Check },
-    ERROR: { label: 'ERROR', class: 'danger', icon: Icons.Logout },
-    TIMEOUT: { label: 'TIEMPO AGOTADO', class: 'warning', icon: Icons.Clock },
+const STATUS_MAP: Record<string, { label: string; color: string; bg: string; dot: string }> = {
+    PENDING: { label: 'Pendiente',      color: 'var(--text-secondary)',  bg: 'rgba(120,120,128,0.12)', dot: 'rgba(120,120,128,0.5)' },
+    RUNNING: { label: 'Procesando',     color: '#007AFF',                bg: 'rgba(0,122,255,0.1)',    dot: '#007AFF' },
+    SUCCESS: { label: 'Exitoso',        color: 'var(--brand-primary)',   bg: 'rgba(52,201,123,0.1)',   dot: 'var(--brand-primary)' },
+    ERROR:   { label: 'Error',          color: '#FF3B30',                bg: 'rgba(255,59,48,0.1)',    dot: '#FF3B30' },
+    TIMEOUT: { label: 'Tiempo agotado', color: '#FF9500',                bg: 'rgba(255,149,0,0.1)',    dot: '#FF9500' },
 };
 
+function IOSCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+    return <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', ...style }}>{children}</div>;
+}
+
 export default function AgentsPage() {
-    const [tasks, setTasks] = useState<any[]>([]);
+    const [tasks,   setTasks]   = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     const loadTasks = () => {
@@ -29,100 +33,157 @@ export default function AgentsPage() {
         return () => clearInterval(interval);
     }, []);
 
+    const runningCount = tasks.filter(t => t.status === 'RUNNING').length;
+    const successCount = tasks.filter(t => t.status === 'SUCCESS').length;
+    const errorCount   = tasks.filter(t => t.status === 'ERROR').length;
+
     return (
-        <div className="animate-in max-w-7xl mx-auto">
-            {/* Header Section */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+
+            {/* ── Header ── */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Nucleo de Inteligencia
-                        </span>
-                    </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Agentes IA</h1>
-                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--brand-primary)', marginBottom: 6 }}>
+                        Núcleo de Inteligencia
+                    </p>
+                    <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, color: '#000', lineHeight: 1.15, margin: 0 }}>
+                        Agentes IA
+                    </h1>
+                    <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 4 }}>
                         Monitoreo en tiempo real de ejecuciones de agentes IA.
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="glass-panel px-4 py-2 flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
-                        <span className="text-[10px] font-black tracking-widest text-header uppercase">Sincronizando</span>
-                    </div>
+                {/* Live indicator */}
+                <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 7,
+                    padding: '7px 14px', borderRadius: 20,
+                    background: 'rgba(52,201,123,0.1)', border: '1px solid rgba(52,201,123,0.25)',
+                    fontSize: 13, fontWeight: 600, color: 'var(--brand-primary)',
+                }}>
+                    <span style={{
+                        width: 7, height: 7, borderRadius: '50%',
+                        background: 'var(--brand-primary)', display: 'inline-block',
+                        boxShadow: '0 0 0 2px rgba(52,201,123,0.3)',
+                        animation: 'pulse 2s infinite',
+                    }} />
+                    Sincronizando
                 </div>
-            </header>
+            </div>
 
-            <div className="glass-panel overflow-hidden border-gray-200">
+            {/* ── Stats row (only when there are tasks) ── */}
+            {tasks.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
+                    {[
+                        { label: 'Total',       value: tasks.length,  color: '#000' },
+                        { label: 'En curso',     value: runningCount,  color: '#007AFF' },
+                        { label: 'Exitosos',     value: successCount,  color: 'var(--brand-primary)' },
+                        { label: 'Errores',      value: errorCount,    color: '#FF3B30' },
+                    ].map(s => (
+                        <IOSCard key={s.label} style={{ padding: '14px 16px' }}>
+                            <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', margin: '0 0 5px' }}>
+                                {s.label}
+                            </p>
+                            <p style={{ fontSize: 26, fontWeight: 700, color: s.color, margin: 0, letterSpacing: -0.5 }}>
+                                {s.value}
+                            </p>
+                        </IOSCard>
+                    ))}
+                </div>
+            )}
+
+            {/* ── Task list ── */}
+            <IOSCard>
                 {loading ? (
-                    <div className="p-12 space-y-4 animate-pulse">
-                        {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-10 bg-gray-100 rounded-lg w-full" />
+                    <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {[1,2,3,4].map(i => (
+                            <div key={i} style={{ height: 52, borderRadius: 9, background: 'rgba(120,120,128,0.08)' }} />
                         ))}
                     </div>
                 ) : tasks.length === 0 ? (
-                    <div className="text-center py-24 px-8">
-                        <div className="w-20 h-20 bg-gray-50/30 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Icons.Agents size={32} className="text-muted opacity-20" />
+                    <div style={{ textAlign: 'center', padding: '72px 32px' }}>
+                        <div style={{
+                            width: 72, height: 72, borderRadius: '50%',
+                            background: 'rgba(120,120,128,0.08)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            margin: '0 auto 16px',
+                        }}>
+                            <Icons.Agents size={32} color="rgba(120,120,128,0.4)" />
                         </div>
-                        <h3 className="text-lg font-bold text-header mb-2">Sin Tareas</h3>
-                        <p className="text-xs text-muted max-w-sm mx-auto opacity-60 italic leading-relaxed">
-                            No se detectaron ejecuciones de agentes. Ejecuta tu primer agente IA via API para ver los resultados aqui.
+                        <p style={{ fontSize: 17, fontWeight: 600, color: '#000', margin: '0 0 8px' }}>Sin Tareas</p>
+                        <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: 0, maxWidth: 320, lineHeight: 1.55, marginLeft: 'auto', marginRight: 'auto' }}>
+                            No se detectaron ejecuciones de agentes. Ejecuta tu primer agente IA vía API para ver los resultados aquí.
                         </p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Estado</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Modelo</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Pasos</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase">Duracion</th>
-                                    <th className="px-8 py-5 text-[10px] font-black tracking-[0.2em] text-muted uppercase text-right">Fecha</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {tasks.map((task) => {
-                                    const status = STATUS_MAP[task.status] || STATUS_MAP.PENDING;
-                                    return (
-                                        <tr key={task.id} className="group hover:bg-gray-50/20 transition-all">
-                                            <td className="px-8 py-4">
-                                                <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-[9px] font-black tracking-widest border 
-                                                    ${task.status === 'RUNNING' ? 'bg-info/10 text-info border-info/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]' :
-                                                        task.status === 'SUCCESS' ? 'bg-success/10 text-success border-success/20' :
-                                                            task.status === 'ERROR' ? 'bg-danger/10 text-danger border-danger/20' :
-                                                                'bg-gray-100 text-muted border-gray-200'}`}>
-                                                    {task.status === 'RUNNING' && <div className="w-1 h-1 rounded-full bg-info animate-ping" />}
-                                                    {status.label}
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-1 h-3 bg-brand-primary/20 rounded-full" />
-                                                    <span className="text-xs font-mono font-bold text-header uppercase tracking-tight opacity-80">{task.model}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-4">
-                                                <span className="text-xs font-black text-header">{task.stepsUsed || '0'}</span>
-                                            </td>
-                                            <td className="px-8 py-4">
-                                                <span className="text-xs font-bold text-muted tabular-nums">
-                                                    {task.durationMs ? `${(task.durationMs / 1000).toFixed(2)}s` : '—'}
-                                                </span>
-                                            </td>
-                                            <td className="px-8 py-4 text-right">
-                                                <span className="text-[10px] font-bold text-muted uppercase opacity-40">
-                                                    {new Date(task.createdAt).toLocaleString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                    <>
+                        {/* Table header */}
+                        <div style={{
+                            display: 'grid', gridTemplateColumns: '140px 1fr 60px 80px 100px',
+                            padding: '10px 18px',
+                            borderBottom: '1px solid rgba(60,60,67,0.1)',
+                            background: 'rgba(120,120,128,0.04)',
+                        }}>
+                            {['Estado', 'Modelo', 'Pasos', 'Duración', 'Hora'].map(h => (
+                                <span key={h} style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                    {h}
+                                </span>
+                            ))}
+                        </div>
+
+                        {/* Rows */}
+                        {tasks.map((task, i) => {
+                            const s = STATUS_MAP[task.status] || STATUS_MAP.PENDING;
+                            return (
+                                <div key={task.id} style={{
+                                    display: 'grid', gridTemplateColumns: '140px 1fr 60px 80px 100px',
+                                    padding: '13px 18px', alignItems: 'center',
+                                    borderBottom: i < tasks.length - 1 ? '1px solid rgba(60,60,67,0.08)' : 'none',
+                                }}>
+                                    {/* Status badge */}
+                                    <div style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                                        padding: '4px 10px', borderRadius: 20,
+                                        background: s.bg, width: 'fit-content',
+                                    }}>
+                                        <span style={{
+                                            width: 6, height: 6, borderRadius: '50%',
+                                            background: s.dot, display: 'inline-block',
+                                            ...(task.status === 'RUNNING' ? { animation: 'pulse 1.2s infinite' } : {}),
+                                        }} />
+                                        <span style={{ fontSize: 12, fontWeight: 600, color: s.color }}>{s.label}</span>
+                                    </div>
+
+                                    {/* Model */}
+                                    <span style={{
+                                        fontSize: 13, fontWeight: 600,
+                                        fontFamily: 'monospace', color: '#000',
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                    }}>
+                                        {task.model || '—'}
+                                    </span>
+
+                                    {/* Steps */}
+                                    <span style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>
+                                        {task.stepsUsed ?? '0'}
+                                    </span>
+
+                                    {/* Duration */}
+                                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>
+                                        {task.durationMs ? `${(task.durationMs / 1000).toFixed(2)}s` : '—'}
+                                    </span>
+
+                                    {/* Time */}
+                                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>
+                                        {new Date(task.createdAt).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </>
                 )}
-            </div>
+            </IOSCard>
+
+            <div style={{ height: 32 }} />
         </div>
     );
 }
