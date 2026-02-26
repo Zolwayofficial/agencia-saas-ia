@@ -4,189 +4,237 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { Icons } from '@/components/icons';
 
+function IOSCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+    return <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', ...style }}>{children}</div>;
+}
+
+function SectionHeader({ children, sub }: { children: React.ReactNode; sub?: string }) {
+    return (
+        <div style={{ marginBottom: 8, marginTop: 28, paddingLeft: 4 }}>
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-secondary)', margin: 0 }}>{children}</p>
+            {sub && <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '2px 0 0', opacity: 0.7 }}>{sub}</p>}
+        </div>
+    );
+}
+
+const PROJECTIONS = [
+    { count: 5,  avg: 79  },
+    { count: 10, avg: 149 },
+    { count: 25, avg: 149 },
+    { count: 50, avg: 199 },
+];
+
 export default function ReferralsPage() {
-    const [referral, setReferral] = useState<any>(null);
-    const [network, setNetwork] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [copied, setCopied] = useState(false);
+    const [referral, setReferral]   = useState<any>(null);
+    const [network,  setNetwork]    = useState<any>(null);
+    const [loading,  setLoading]    = useState(true);
+    const [copied,   setCopied]     = useState(false);
 
     useEffect(() => {
         Promise.all([
             api.getMyCode().catch(() => null),
             api.getNetwork().catch(() => null),
-        ])
-            .then(([ref, net]) => {
-                setReferral(ref);
-                setNetwork(net);
-            })
-            .finally(() => setLoading(false));
+        ]).then(([ref, net]) => { setReferral(ref); setNetwork(net); })
+          .finally(() => setLoading(false));
     }, []);
 
     const copyLink = () => {
         const link = `${window.location.origin}/register?ref=${referral?.code || ''}`;
         navigator.clipboard.writeText(link);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setTimeout(() => setCopied(false), 2500);
     };
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-80 bg-gray-100 rounded-lg" />
-                <div className="grid grid-cols-3 gap-6">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-32 bg-gray-100 rounded-2xl" />
-                    ))}
-                </div>
+            <div style={{ maxWidth: 860, margin: '0 auto' }}>
+                {[1,2,3].map(i => (
+                    <div key={i} style={{ height: 80, borderRadius: 12, background: 'rgba(120,120,128,0.08)', marginBottom: 12 }} />
+                ))}
             </div>
         );
     }
 
+    const activeReferrals = network?.referrals?.length || 0;
+
     return (
-        <div className="animate-in max-w-7xl mx-auto">
-            {/* Header Section */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+
+            {/* ── Header ── */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Programa de Referidos
-                        </span>
-                    </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Programa de Referidos</h1>
-                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--brand-primary)', marginBottom: 6 }}>
+                        Programa de Referidos
+                    </p>
+                    <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, color: '#000', lineHeight: 1.15, margin: 0 }}>
+                        Programa de Referidos
+                    </h1>
+                    <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 4 }}>
                         Multiplica tus ingresos invitando a otros a la plataforma.
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 rounded-lg bg-success/5 border border-success/20 flex items-center gap-3">
-                        <Icons.Check className="text-success" size={14} />
-                        <span className="text-[11px] font-black tracking-widest text-success">PROGRAMA ACTIVO</span>
-                    </div>
+                <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '7px 14px', borderRadius: 20,
+                    background: 'rgba(52,201,123,0.1)',
+                    border: '1px solid rgba(52,201,123,0.25)',
+                    fontSize: 12, fontWeight: 600, color: 'var(--brand-primary)',
+                }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--brand-primary)', display: 'inline-block' }} />
+                    Programa Activo
                 </div>
-            </header>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {/* Referral Code Card */}
-                <div className="glass-panel stat-card-premium flex flex-col justify-between">
+            {/* ── Top 3 cards ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+
+                {/* Tu código */}
+                <IOSCard style={{ padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 14 }}>
                     <div>
-                        <div className="label mb-4">Tu Codigo de Referido</div>
-                        <div className="p-4 bg-black/30 rounded-xl border border-gray-200 flex justify-between items-center group">
-                            <span className="text-lg font-mono font-black tracking-wider text-brand-primary">
-                                {referral?.code || 'X7-CORE'}
+                        <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', margin: '0 0 10px' }}>
+                            Tu Código de Referido
+                        </p>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '10px 12px', borderRadius: 9,
+                            background: 'rgba(52,201,123,0.06)',
+                            border: '1px solid rgba(52,201,123,0.2)',
+                        }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', color: 'var(--brand-primary)', letterSpacing: '0.05em' }}>
+                                {referral?.code || 'REF-FULLLOGIN'}
                             </span>
-                            <Icons.QrCode size={16} className="text-muted opacity-40" />
+                            <Icons.QrCode size={15} color="var(--brand-primary)" style={{ opacity: 0.5 }} />
                         </div>
                     </div>
                     <button
                         onClick={copyLink}
-                        className={`btn-premium w-full mt-6 !py-3 ${copied ? 'btn-premium-primary' : 'btn-premium-outline'}`}
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                            padding: '10px', borderRadius: 10, border: 'none',
+                            background: copied ? 'rgba(52,201,123,0.1)' : 'var(--brand-primary)',
+                            color: copied ? 'var(--brand-primary)' : '#fff',
+                            fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                            transition: 'all 0.2s',
+                        }}
                     >
                         {copied ? <Icons.Check size={14} /> : <Icons.Copy size={14} />}
-                        {copied ? 'LINK COPIADO' : 'COPIAR LINK DE REFERIDO'}
+                        {copied ? 'Link Copiado' : 'Copiar Link'}
                     </button>
-                </div>
+                </IOSCard>
 
-                {/* Flat Commission Card */}
-                <div className="glass-panel stat-card-premium">
-                    <div className="label mb-2">Comision</div>
-                    <div className="text-4xl font-black text-brand-primary font-display mb-1 flex items-baseline gap-1">
-                        20%
-                        <span className="text-xs font-bold text-muted opacity-40 uppercase tracking-widest">De por vida</span>
+                {/* Comisión */}
+                <IOSCard style={{ padding: '18px' }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', margin: '0 0 10px' }}>
+                        Comisión
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
+                        <span style={{ fontSize: 40, fontWeight: 700, color: 'var(--brand-primary)', letterSpacing: -1, lineHeight: 1 }}>20%</span>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)' }}>de por vida</span>
                     </div>
-                    <div className="text-[11px] font-black tracking-widest text-header uppercase mb-3">Comision Directa</div>
-                    <p className="text-[10px] text-muted leading-relaxed opacity-60 italic">
+                    <p style={{ fontSize: 13, fontWeight: 600, color: '#000', margin: '6px 0 4px' }}>Comisión Directa</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
                         Ganas el 20% de cada pago que hagan tus referidos. Sin complicaciones.
                     </p>
-                </div>
+                </IOSCard>
 
-                {/* Performance Card */}
-                <div className="glass-panel stat-card-premium">
-                    <div className="label mb-2">Tu Red</div>
-                    <div className="text-4xl font-black text-header font-display mb-1">
-                        {network?.referrals?.length || 0}
+                {/* Tu red */}
+                <IOSCard style={{ padding: '18px' }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', margin: '0 0 10px' }}>
+                        Tu Red
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 14 }}>
+                        <span style={{ fontSize: 40, fontWeight: 700, color: '#000', letterSpacing: -1, lineHeight: 1 }}>{activeReferrals}</span>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>referidos activos</span>
                     </div>
-                    <div className="text-[11px] font-black tracking-widest text-muted uppercase opacity-40 mb-4">Referidos Activos</div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-gray-50/30 border border-gray-200 rounded-lg">
-                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Pendientes</div>
-                            <div className="text-sm font-black text-header">0</div>
-                        </div>
-                        <div className="p-3 bg-gray-50/30 border border-gray-200 rounded-lg">
-                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Conversion</div>
-                            <div className="text-sm font-black text-header">0%</div>
-                        </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                        {[
+                            { label: 'Pendientes', value: '0' },
+                            { label: 'Conversión',  value: '0%' },
+                        ].map(s => (
+                            <div key={s.label} style={{ padding: '10px 12px', borderRadius: 9, background: 'rgba(120,120,128,0.07)' }}>
+                                <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-secondary)', margin: '0 0 4px' }}>{s.label}</p>
+                                <p style={{ fontSize: 17, fontWeight: 700, color: '#000', margin: 0 }}>{s.value}</p>
+                            </div>
+                        ))}
                     </div>
-                </div>
+                </IOSCard>
             </div>
 
-            {/* Steps Section */}
-            <section className="glass-panel p-8 mb-12">
-                <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-10 flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-brand-primary shadow-[0_0_10px_var(--brand-primary)]" />
-                    Como Funciona
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    {[
-                        { icon: Icons.Share, label: '1. COMPARTE TU LINK', color: 'var(--brand-primary)', desc: 'Comparte tu link en redes sociales, comunidades y grupos.' },
-                        { icon: Icons.UserPlus, label: '2. SE REGISTRAN', color: '#3b82f6', desc: 'Tus invitados se registran con tu codigo. Sigue el progreso aqui.' },
-                        { icon: Icons.TrendingUp, label: '3. GANAS COMISIONES', color: 'var(--brand-primary)', desc: 'Recibes el 20% neto por cada suscripcion activa de tus referidos.' }
-                    ].map((step, i) => (
-                        <div key={i} className="flex gap-4 group">
-                            <div className="w-10 h-10 rounded-full bg-gray-50/30 border border-gray-200 flex items-center justify-center shrink-0 group-hover:border-brand-primary/30 transition-all" style={{ color: step.color }}>
-                                <step.icon size={18} />
-                            </div>
-                            <div>
-                                <h4 className="text-[11px] font-black tracking-widest text-header uppercase mb-1">{step.label}</h4>
-                                <p className="text-[10px] text-muted leading-relaxed opacity-60 font-medium">{step.desc}</p>
-                            </div>
+            {/* ── Cómo funciona ── */}
+            <SectionHeader>Cómo Funciona</SectionHeader>
+            <IOSCard>
+                {[
+                    { icon: Icons.Share,      step: '1', label: 'Comparte tu link',    desc: 'Comparte tu link en redes sociales, comunidades y grupos.',                     color: 'var(--brand-primary)' },
+                    { icon: Icons.UserPlus,   step: '2', label: 'Se registran',         desc: 'Tus invitados se registran con tu código. Sigue el progreso aquí.',             color: '#007AFF' },
+                    { icon: Icons.TrendingUp, step: '3', label: 'Ganas comisiones',     desc: 'Recibes el 20% neto por cada suscripción activa de tus referidos.',             color: 'var(--brand-primary)' },
+                ].map((s, i) => (
+                    <div key={i} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 14,
+                        padding: '16px 18px',
+                        borderBottom: i < 2 ? '1px solid rgba(60,60,67,0.1)' : 'none',
+                    }}>
+                        <div style={{
+                            width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                            background: `${s.color}15`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: s.color,
+                        }}>
+                            <s.icon size={20} />
                         </div>
+                        <div>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: s.color, margin: '0 0 2px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                Paso {s.step}
+                            </p>
+                            <p style={{ fontSize: 15, fontWeight: 600, color: '#000', margin: '0 0 3px' }}>{s.label}</p>
+                            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
+                        </div>
+                    </div>
+                ))}
+            </IOSCard>
+
+            {/* ── Proyección de ingresos ── */}
+            <SectionHeader sub="Estimación de rendimiento anual">Proyección de Ingresos</SectionHeader>
+            <IOSCard>
+                {/* Table header */}
+                <div style={{
+                    display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                    padding: '10px 18px',
+                    borderBottom: '1px solid rgba(60,60,67,0.1)',
+                    background: 'rgba(120,120,128,0.04)',
+                }}>
+                    {['Referidos', 'Plan Promedio', 'Ingreso Mensual', 'Ingreso Anual Est.'].map(h => (
+                        <span key={h} style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</span>
                     ))}
                 </div>
-            </section>
-
-            {/* Projections Table */}
-            <section className="glass-panel p-8 mb-8">
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <h3 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">PROYECCION DE INGRESOS</h3>
-                        <p className="text-[10px] text-muted font-medium uppercase tracking-widest opacity-40">ESTIMACION DE RENDIMIENTO ANUAL</p>
-                    </div>
-                    <div className="flex items-center gap-2 px-3 py-1 rounded bg-gray-50/30 border border-gray-200">
-                        <Icons.Credits size={12} className="text-brand-primary" />
-                        <span className="text-[9px] font-bold text-muted uppercase italic tracking-widest">Programa V1.0</span>
-                    </div>
+                {PROJECTIONS.map((row, i) => {
+                    const monthly = row.count * row.avg * 0.20;
+                    const annual  = monthly * 12;
+                    const highlight = row.count >= 25;
+                    return (
+                        <div key={i} style={{
+                            display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr',
+                            padding: '14px 18px',
+                            borderBottom: i < PROJECTIONS.length - 1 ? '1px solid rgba(60,60,67,0.08)' : 'none',
+                            background: highlight ? 'rgba(52,201,123,0.03)' : 'transparent',
+                        }}>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: '#000' }}>{row.count} referidos</span>
+                            <span style={{ fontSize: 15, color: 'var(--text-secondary)' }}>${row.avg} prom.</span>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: highlight ? 'var(--brand-primary)' : '#000' }}>
+                                ${monthly.toLocaleString()}
+                            </span>
+                            <span style={{ fontSize: 15, fontWeight: 700, color: highlight ? 'var(--brand-primary)' : '#000' }}>
+                                ${annual.toLocaleString()}
+                            </span>
+                        </div>
+                    );
+                })}
+                <div style={{ padding: '12px 18px', borderTop: '1px solid rgba(60,60,67,0.08)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Icons.Credits size={13} color="var(--brand-primary)" />
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>Programa V1.0 · Comisión 20% de por vida</span>
                 </div>
+            </IOSCard>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="text-left border-b border-gray-200">
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">REFERIDOS</th>
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">PLAN PROMEDIO</th>
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">INGRESO MENSUAL</th>
-                                <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">INGRESO ANUAL EST.</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {[
-                                { count: 5, avg: 79, color: 'var(--text-header)' },
-                                { count: 10, avg: 149, color: 'var(--text-header)' },
-                                { count: 25, avg: 149, color: 'var(--brand-primary)', highlight: true },
-                                { count: 50, avg: 199, color: 'var(--brand-primary)', highlight: true },
-                            ].map((row, i) => (
-                                <tr key={i} className={`group hover:bg-gray-50/20 transition-all ${row.highlight ? 'bg-brand-primary/[0.02]' : ''}`}>
-                                    <td className="py-5 px-4 text-xs font-black text-header uppercase tracking-widest">{row.count} Referidos</td>
-                                    <td className="py-5 text-xs font-bold text-muted opacity-60 tracking-wider">${row.avg} Promedio</td>
-                                    <td className="py-5 text-xs font-black" style={{ color: row.color }}>${(row.count * row.avg * 0.20).toLocaleString()}</td>
-                                    <td className="py-5 text-right px-4 text-sm font-black" style={{ color: row.color }}>
-                                        ${(row.count * row.avg * 0.20 * 12).toLocaleString()}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+            <div style={{ height: 32 }} />
         </div>
     );
 }
