@@ -15,20 +15,24 @@ interface WhatsappInstance {
     createdAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; class: string; icon: any }> = {
-    CONNECTED: { label: 'CONECTADO', class: 'success', icon: Icons.Check },
-    QR_PENDING: { label: 'ESPERANDO QR', class: 'warning', icon: Icons.Pending },
-    DISCONNECTED: { label: 'DESCONECTADO', class: 'danger', icon: Icons.Alert },
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
+    CONNECTED:    { label: 'Conectado',     color: 'var(--brand-primary)', bg: 'rgba(52,201,123,0.1)',  dot: 'var(--brand-primary)' },
+    QR_PENDING:   { label: 'Esperando QR',  color: '#FF9500',              bg: 'rgba(255,149,0,0.1)',   dot: '#FF9500' },
+    DISCONNECTED: { label: 'Desconectado',  color: '#FF3B30',              bg: 'rgba(255,59,48,0.1)',   dot: '#FF3B30' },
 };
 
+function IOSCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+    return <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', ...style }}>{children}</div>;
+}
+
 export default function WhatsAppPage() {
-    const [instances, setInstances] = useState<WhatsappInstance[]>([]);
-    const [limit, setLimit] = useState(1);
-    const [loading, setLoading] = useState(true);
-    const [creating, setCreating] = useState(false);
-    const [qrModal, setQrModal] = useState<{ instanceId: string; qrCode: string | null; name: string } | null>(null);
-    const [error, setError] = useState('');
-    const pollRef = useRef<NodeJS.Timeout | null>(null);
+    const [instances,      setInstances]      = useState<WhatsappInstance[]>([]);
+    const [limit,          setLimit]          = useState(1);
+    const [loading,        setLoading]        = useState(true);
+    const [creating,       setCreating]       = useState(false);
+    const [qrModal,        setQrModal]        = useState<{ instanceId: string; qrCode: string | null; name: string } | null>(null);
+    const [error,          setError]          = useState('');
+    const pollRef                             = useRef<NodeJS.Timeout | null>(null);
     const [connectionType, setConnectionType] = useState<'QR' | 'API'>('QR');
 
     const fetchInstances = useCallback(async () => {
@@ -77,11 +81,7 @@ export default function WhatsAppPage() {
                 displayName: `Nodo WhatsApp ${instances.length + 1}`,
             });
             if (data.qrCode) {
-                setQrModal({
-                    instanceId: data.instance.id,
-                    qrCode: data.qrCode,
-                    name: data.instance.displayName,
-                });
+                setQrModal({ instanceId: data.instance.id, qrCode: data.qrCode, name: data.instance.displayName });
             }
             fetchInstances();
         } catch (err: any) {
@@ -126,206 +126,346 @@ export default function WhatsAppPage() {
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-80 bg-gray-100 rounded-lg" />
-                <div className="grid grid-cols-2 gap-6">
-                    {[1, 2].map((i) => (
-                        <div key={i} className="h-48 bg-gray-100 rounded-2xl" />
-                    ))}
-                </div>
+            <div style={{ maxWidth: 860, margin: '0 auto' }}>
+                {[1,2].map(i => (
+                    <div key={i} style={{ height: 160, borderRadius: 12, background: 'rgba(120,120,128,0.08)', marginBottom: 12 }} />
+                ))}
             </div>
         );
     }
 
     return (
-        <div className="animate-in max-w-7xl mx-auto">
-            {/* Header Section */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+
+            {/* ── Header ── */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Operaciones
-                        </span>
-                    </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Nodos WhatsApp</h1>
-                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--brand-primary)', marginBottom: 6 }}>
+                        Operaciones
+                    </p>
+                    <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, color: '#000', lineHeight: 1.15, margin: 0 }}>
+                        Nodos WhatsApp
+                    </h1>
+                    <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 4 }}>
                         Despliega y gestiona tus instancias de WhatsApp.
                     </p>
                 </div>
-                <div className="flex bg-black/[0.05] p-1 rounded-2xl">
-                    <button
-                        onClick={() => setConnectionType('QR')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all
-                        ${connectionType === 'QR' ? 'bg-brand-primary text-white' : 'text-muted hover:text-header'}`}
-                    >
-                        <Icons.QrCode size={12} /> Codigo QR
-                    </button>
-                    <button
-                        onClick={() => setConnectionType('API')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all
-                        ${connectionType === 'API' ? 'bg-brand-primary text-white' : 'text-muted hover:text-header'}`}
-                    >
-                        <Icons.Enterprise size={12} /> Meta API
-                    </button>
-                </div>
-            </header>
 
+                {/* Segmented Control QR / META API */}
+                <div style={{ display: 'inline-flex', background: 'rgba(118,118,128,0.12)', borderRadius: 9, padding: 2 }}>
+                    {(['QR', 'API'] as const).map(t => (
+                        <button key={t} onClick={() => setConnectionType(t)} style={{
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            padding: '7px 16px', borderRadius: 7, border: 'none',
+                            cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                            fontFamily: 'inherit', outline: 'none',
+                            background: connectionType === t ? '#fff' : 'transparent',
+                            color: connectionType === t ? '#000' : 'var(--text-secondary)',
+                            boxShadow: connectionType === t ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+                            transition: 'all 0.2s',
+                        }}>
+                            {t === 'QR' ? <Icons.QrCode size={13} /> : <Icons.Enterprise size={13} />}
+                            {t === 'QR' ? 'Código QR' : 'Meta API'}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* ── Error ── */}
             {error && (
-                <div className="mb-8 p-4 rounded-xl bg-danger/5 border border-danger/20 flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
-                    <Icons.Alert className="text-danger" size={16} />
-                    <span className="text-xs font-bold text-danger uppercase tracking-tight">{error}</span>
+                <div style={{
+                    marginBottom: 16, padding: '12px 16px', borderRadius: 10,
+                    background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.2)',
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    fontSize: 13, fontWeight: 500, color: '#FF3B30',
+                }}>
+                    <Icons.Alert size={16} />
+                    {error}
                 </div>
             )}
 
-            {connectionType === 'QR' ? (
-                <div className="space-y-8">
-                    <div className="flex justify-between items-center px-4">
+            {/* ── QR Mode ── */}
+            {connectionType === 'QR' && (
+                <div>
+                    {/* Sub-header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingLeft: 4 }}>
                         <div>
-                            <h2 className="text-xs font-black tracking-[0.2em] text-muted uppercase">Instancias Activas</h2>
-                            <p className="text-[10px] text-muted opacity-40 font-medium uppercase mt-1">Capacidad: {instances.length} / {limit}</p>
+                            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-secondary)', margin: 0 }}>
+                                Instancias Activas
+                            </p>
+                            <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '2px 0 0', opacity: 0.7 }}>
+                                Capacidad: {instances.length} / {limit}
+                            </p>
                         </div>
                         <button
-                            className="btn-premium btn-premium-primary !py-2.5 !px-6"
                             onClick={createInstance}
                             disabled={creating || instances.length >= limit}
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 7,
+                                padding: '10px 20px', borderRadius: 10, border: 'none',
+                                background: (creating || instances.length >= limit) ? 'rgba(52,201,123,0.4)' : 'var(--brand-primary)',
+                                color: '#fff', fontSize: 15, fontWeight: 600,
+                                cursor: (creating || instances.length >= limit) ? 'not-allowed' : 'pointer',
+                                fontFamily: 'inherit',
+                                boxShadow: '0 2px 8px rgba(52,201,123,0.3)',
+                            }}
                         >
-                            {creating ? 'Creando...' : 'Crear Nuevo Nodo'}
+                            <Icons.Plus size={16} />
+                            {creating ? 'Creando…' : 'Crear Nuevo Nodo'}
                         </button>
                     </div>
 
+                    {/* Empty state */}
                     {instances.length === 0 && (
-                        <div className="glass-panel py-24 text-center border-dashed border-gray-200">
-                            <div className="w-20 h-20 bg-gray-50/30 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Icons.WhatsApp size={32} className="text-muted opacity-20" />
+                        <IOSCard>
+                            <div style={{ textAlign: 'center', padding: '64px 32px' }}>
+                                <div style={{
+                                    width: 72, height: 72, borderRadius: '50%',
+                                    background: 'rgba(52,201,123,0.08)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    margin: '0 auto 16px',
+                                }}>
+                                    <Icons.WhatsApp size={32} color="rgba(52,201,123,0.4)" />
+                                </div>
+                                <p style={{ fontSize: 17, fontWeight: 600, color: '#000', margin: '0 0 8px' }}>Sin Instancias Activas</p>
+                                <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: '0 0 24px', maxWidth: 280, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.5 }}>
+                                    Crea tu primera instancia de WhatsApp escaneando un código QR.
+                                </p>
+                                <button
+                                    onClick={createInstance}
+                                    disabled={creating}
+                                    style={{
+                                        padding: '10px 24px', borderRadius: 10, border: 'none',
+                                        background: 'var(--brand-primary)', color: '#fff',
+                                        fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                                    }}
+                                >
+                                    Crear Instancia
+                                </button>
                             </div>
-                            <h3 className="text-header font-bold mb-2">Sin Instancias Activas</h3>
-                            <p className="text-xs text-muted max-w-xs mx-auto opacity-50 italic mb-8">Crea tu primera instancia de WhatsApp escaneando un codigo QR.</p>
-                            <button className="btn-premium btn-premium-outline" onClick={createInstance} disabled={creating}>
-                                Crear Instancia
-                            </button>
-                        </div>
+                        </IOSCard>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {instances.map((inst) => {
-                            const statusCfg = STATUS_CONFIG[inst.connectionStatus] || STATUS_CONFIG.DISCONNECTED;
+                    {/* Instance cards */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 12 }}>
+                        {instances.map(inst => {
+                            const s = STATUS_CONFIG[inst.connectionStatus] || STATUS_CONFIG.DISCONNECTED;
                             return (
-                                <div key={inst.id} className="glass-panel p-6 group hover:border-brand-primary/20 transition-all duration-500">
-                                    <div className="flex justify-between items-start mb-8">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-gray-50/30 border border-gray-200 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                <Icons.WhatsApp className="text-brand-primary" size={24} />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-sm font-black text-header uppercase tracking-tight">{inst.displayName}</h3>
-                                                <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest border mt-1
-                                                    ${inst.connectionStatus === 'CONNECTED' ? 'bg-success/5 text-success border-success/20' :
-                                                        inst.connectionStatus === 'QR_PENDING' ? 'bg-warning/5 text-warning border-warning/20 animate-pulse' :
-                                                            'bg-danger/5 text-danger border-danger/20'}`}>
-                                                    {statusCfg.label}
-                                                </div>
+                                <IOSCard key={inst.id}>
+                                    {/* Card header */}
+                                    <div style={{ padding: '16px 16px 14px', borderBottom: '1px solid rgba(60,60,67,0.1)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div style={{
+                                            width: 42, height: 42, borderRadius: 10, flexShrink: 0,
+                                            background: 'rgba(37,211,102,0.1)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        }}>
+                                            <Icons.WhatsApp size={22} color="#25D366" />
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <p style={{ fontSize: 15, fontWeight: 600, color: '#000', margin: 0 }}>{inst.displayName}</p>
+                                            <div style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: 5,
+                                                marginTop: 3, padding: '3px 8px', borderRadius: 20,
+                                                background: s.bg,
+                                            }}>
+                                                <span style={{
+                                                    width: 5, height: 5, borderRadius: '50%',
+                                                    background: s.dot, display: 'inline-block',
+                                                    ...(inst.connectionStatus === 'QR_PENDING' ? { animation: 'pulse 1.2s infinite' } : {}),
+                                                }} />
+                                                <span style={{ fontSize: 11, fontWeight: 600, color: s.color }}>{s.label}</span>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <button onClick={() => deleteInstance(inst.id)} className="p-2 rounded-lg bg-gray-50/50 border border-gray-200 text-muted hover:text-danger hover:bg-danger/5 hover:border-danger/20 transition-all">
-                                                <Icons.Trash size={14} />
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={() => deleteInstance(inst.id)}
+                                            style={{
+                                                width: 30, height: 30, borderRadius: 8,
+                                                border: 'none', background: 'rgba(255,59,48,0.08)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', color: '#FF3B30',
+                                            }}
+                                        >
+                                            <Icons.Trash size={14} />
+                                        </button>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4 mb-8">
-                                        <div className="p-3 bg-gray-50/30 border border-gray-200 rounded-lg">
-                                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Numero</div>
-                                            <div className="text-xs font-mono font-bold text-header">{inst.phoneNumber || 'PENDIENTE'}</div>
-                                        </div>
-                                        <div className="p-3 bg-gray-50/30 border border-gray-200 rounded-lg">
-                                            <div className="text-[9px] font-bold text-muted uppercase tracking-widest mb-1">Mensajes (24h)</div>
-                                            <div className="text-xs font-bold text-header">{inst.messagesLast24h} msgs</div>
-                                        </div>
+                                    {/* Stats */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid rgba(60,60,67,0.1)' }}>
+                                        {[
+                                            { label: 'Número',        value: inst.phoneNumber || 'Pendiente' },
+                                            { label: 'Mensajes (24h)', value: `${inst.messagesLast24h} msgs` },
+                                        ].map((s, i) => (
+                                            <div key={s.label} style={{
+                                                padding: '12px 16px',
+                                                borderRight: i === 0 ? '1px solid rgba(60,60,67,0.1)' : 'none',
+                                            }}>
+                                                <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-secondary)', margin: '0 0 3px' }}>
+                                                    {s.label}
+                                                </p>
+                                                <p style={{ fontSize: 14, fontWeight: 600, color: '#000', margin: 0, fontFamily: 'monospace' }}>
+                                                    {s.value}
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
 
-                                    <div className="pt-6 border-t border-gray-200">
+                                    {/* Action */}
+                                    <div style={{ padding: '12px 16px' }}>
                                         {inst.connectionStatus === 'CONNECTED' ? (
-                                            <button className="btn-premium btn-premium-outline w-full !py-2.5" onClick={() => logout(inst.id)}>
+                                            <button
+                                                onClick={() => logout(inst.id)}
+                                                style={{
+                                                    width: '100%', padding: '10px', borderRadius: 10,
+                                                    border: '1.5px solid rgba(60,60,67,0.2)',
+                                                    background: 'transparent', color: 'var(--text-secondary)',
+                                                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                                                }}
+                                            >
                                                 Desconectar
                                             </button>
                                         ) : (
-                                            <button className="btn-premium btn-premium-primary w-full !py-2.5" onClick={() => reconnect(inst)}>
+                                            <button
+                                                onClick={() => reconnect(inst)}
+                                                style={{
+                                                    width: '100%', padding: '10px', borderRadius: 10,
+                                                    border: 'none', background: 'var(--brand-primary)',
+                                                    color: '#fff', fontSize: 14, fontWeight: 600,
+                                                    cursor: 'pointer', fontFamily: 'inherit',
+                                                    boxShadow: '0 2px 6px rgba(52,201,123,0.3)',
+                                                }}
+                                            >
                                                 Conectar WhatsApp
                                             </button>
                                         )}
                                     </div>
-                                </div>
+                                </IOSCard>
                             );
                         })}
                     </div>
                 </div>
-            ) : (
-                <div className="glass-panel py-32 text-center overflow-hidden relative">
-                    {/* Background Glow */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-brand-primary/10 rounded-full blur-[100px] pointer-events-none" />
-
-                    <div className="relative">
-                        <div className="flex justify-center items-center gap-6 mb-10">
-                            <Icons.LogoMeta className="text-[#0668E1]" size={48} />
-                            <div className="w-px h-12 bg-gray-100" />
-                            <Icons.LogoWhatsApp className="text-[#25D366]" size={48} />
-                        </div>
-                        <h2 className="text-2xl font-bold font-display text-header tracking-tight mb-4">Ecosistema Meta Business</h2>
-                        <p className="text-xs text-muted max-w-lg mx-auto opacity-60 leading-relaxed italic mb-12">
-                            Integra via la API oficial de Meta Cloud para maxima estabilidad,
-                            identidad verificada y velocidad de mensajes a escala industrial.
-                        </p>
-                        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gray-50/50 border border-gray-200 grayscale opacity-50 cursor-not-allowed">
-                            <Icons.Lock size={12} className="text-muted" />
-                            <span className="text-[10px] font-black tracking-[0.2em] text-muted uppercase">Proximamente</span>
-                        </div>
-                    </div>
-                </div>
             )}
 
-            {/* QR Modal Hardware */}
+            {/* ── META API Mode ── */}
+            {connectionType === 'API' && (
+                <IOSCard style={{ padding: '64px 32px', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 20, marginBottom: 24 }}>
+                        <Icons.LogoMeta color="#0668E1" size={48} />
+                        <div style={{ width: 1, height: 48, background: 'rgba(60,60,67,0.15)' }} />
+                        <Icons.LogoWhatsApp color="#25D366" size={48} />
+                    </div>
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#000', margin: '0 0 10px', letterSpacing: -0.3 }}>
+                        Ecosistema Meta Business
+                    </p>
+                    <p style={{ fontSize: 14, color: 'var(--text-secondary)', maxWidth: 420, margin: '0 auto 28px', lineHeight: 1.6 }}>
+                        Integra vía la API oficial de Meta Cloud para máxima estabilidad, identidad verificada y velocidad de mensajes a escala industrial.
+                    </p>
+                    <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        padding: '9px 20px', borderRadius: 20,
+                        border: '1px solid rgba(60,60,67,0.15)',
+                        background: 'rgba(120,120,128,0.06)',
+                        fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)',
+                        cursor: 'not-allowed', opacity: 0.6,
+                    }}>
+                        <Icons.Lock size={12} />
+                        Próximamente
+                    </div>
+                </IOSCard>
+            )}
+
+            {/* ── QR Modal — lógica intacta, solo visual ── */}
             {qrModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in transition-all">
-                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setQrModal(null)} />
-                    <div className="relative glass-panel w-full max-w-sm overflow-hidden p-8 animate-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-8">
+                <div
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 100,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: 20, background: 'rgba(0,0,0,0.45)',
+                        backdropFilter: 'blur(10px)',
+                    }}
+                    onClick={() => setQrModal(null)}
+                >
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: '#fff', borderRadius: 20,
+                            width: '100%', maxWidth: 360,
+                            overflow: 'hidden',
+                            boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
+                        }}
+                    >
+                        {/* Modal header */}
+                        <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(60,60,67,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
-                                <h2 className="text-xs font-black tracking-[0.2em] text-brand-primary uppercase">Escanea el QR</h2>
-                                <p className="text-[10px] text-muted opacity-40 uppercase font-medium mt-1">Instancia: {qrModal.name}</p>
+                                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--brand-primary)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    Escanea el QR
+                                </p>
+                                <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '2px 0 0' }}>
+                                    Instancia: {qrModal.name}
+                                </p>
                             </div>
-                            <button className="text-muted hover:text-header transition-colors" onClick={() => setQrModal(null)}>
-                                <Icons.Logout size={18} />
+                            <button
+                                onClick={() => setQrModal(null)}
+                                style={{
+                                    width: 28, height: 28, borderRadius: '50%', border: 'none',
+                                    background: 'rgba(120,120,128,0.12)', cursor: 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    color: 'var(--text-secondary)', fontSize: 16,
+                                }}
+                            >
+                                ✕
                             </button>
                         </div>
 
-                        <div className="aspect-square bg-white rounded-2xl p-4 flex items-center justify-center relative group overflow-hidden">
-                            {/* Scanning Line Animation */}
-                            <div className="absolute inset-0 z-10 opacity-40 pointer-events-none">
-                                <div className="w-full h-1 bg-brand-primary/50 shadow-[0_0_15px_var(--brand-primary)] absolute top-0 animate-scanner" />
+                        {/* QR area — lógica de imagen intacta */}
+                        <div style={{ padding: 20 }}>
+                            <div style={{
+                                background: '#fff', borderRadius: 12, padding: 12,
+                                border: '1px solid rgba(60,60,67,0.12)',
+                                aspectRatio: '1', display: 'flex',
+                                alignItems: 'center', justifyContent: 'center',
+                                overflow: 'hidden', position: 'relative',
+                            }}>
+                                {qrModal.qrCode ? (
+                                    <img
+                                        src={qrModal.qrCode.startsWith('data:') ? qrModal.qrCode : `data:image/png;base64,${qrModal.qrCode}`}
+                                        alt="Código QR"
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    />
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, color: 'var(--text-secondary)' }}>
+                                        <div style={{
+                                            width: 32, height: 32,
+                                            border: '3px solid rgba(52,201,123,0.3)',
+                                            borderTopColor: 'var(--brand-primary)',
+                                            borderRadius: '50%',
+                                            animation: 'spin 0.8s linear infinite',
+                                        }} />
+                                        <span style={{ fontSize: 12, fontWeight: 600 }}>Generando QR…</span>
+                                    </div>
+                                )}
                             </div>
-
-                            {qrModal.qrCode ? (
-                                <img src={qrModal.qrCode.startsWith("data:") ? qrModal.qrCode : `data:image/png;base64,${qrModal.qrCode}`} alt="Codigo QR" className="w-full h-full relative z-0" />
-                            ) : (
-                                <div className="flex flex-col items-center gap-4 text-gray-600">
-                                    <div className="w-10 h-10 border-4 border-black/10 border-t-brand-primary rounded-full animate-spin" />
-                                    <span className="text-[10px] font-black tracking-widest uppercase">Generando QR...</span>
-                                </div>
-                            )}
                         </div>
 
-                        <div className="mt-8 flex flex-col items-center gap-4 italic opacity-60">
-                            <p className="text-[10px] text-muted text-center font-medium">
-                                El QR se actualiza cada 4 segundos automaticamente.
+                        {/* Footer */}
+                        <div style={{ padding: '0 20px 18px', textAlign: 'center' }}>
+                            <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0 }}>
+                                El QR se actualiza cada 4 segundos automáticamente.
                             </p>
-                            <div className="flex gap-1">
-                                {[1, 2, 3].map(i => <div key={i} className="w-1 h-1 rounded-full bg-brand-primary animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />)}
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 4, marginTop: 8 }}>
+                                {[0, 0.2, 0.4].map((d, i) => (
+                                    <div key={i} style={{
+                                        width: 5, height: 5, borderRadius: '50%',
+                                        background: 'var(--brand-primary)',
+                                        animation: `pulse 1.2s ease-in-out ${d}s infinite`,
+                                    }} />
+                                ))}
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            <div style={{ height: 32 }} />
         </div>
     );
 }
