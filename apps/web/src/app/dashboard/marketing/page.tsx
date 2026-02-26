@@ -132,7 +132,7 @@ export default function MarketingPage() {
                         <h3 className="text-[10px] font-black tracking-[0.2em] text-muted uppercase mb-1">Historial de Campanas</h3>
                         <p className="text-[10px] font-medium text-muted opacity-60 uppercase tracking-tighter">Registro de ejecucion de campanas</p>
                     </div>
-                    <div className="flex p-1 bg-gray-50/50 rounded-xl border border-gray-200">
+                    <div className="flex p-1 bg-black/[0.05] rounded-2xl">
                         {['Todas', 'Activas', 'Pausadas', 'Completadas'].map(filter => (
                             <button key={filter} onClick={() => setCampaignFilter(filter)} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === campaignFilter ? 'bg-brand-primary text-white shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
                                 }`}>

@@ -67,7 +67,7 @@ export default function IntegrationsPage() {
                         Conecta tu plataforma con servicios de terceros.
                     </p>
                 </div>
-                <div className="flex p-1 bg-gray-50/50 rounded-xl border border-gray-200">
+                <div className="flex p-1 bg-black/[0.05] rounded-2xl">
                     {['All', 'Connected', 'Setup'].map(f => (
                         <button
                             key={f}

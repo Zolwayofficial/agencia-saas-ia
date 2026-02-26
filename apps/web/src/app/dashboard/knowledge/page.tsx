@@ -70,7 +70,7 @@ export default function KnowledgePage() {
             </header>
 
             {/* Tabs */}
-            <div className="flex gap-1 mb-8 p-1 rounded-xl bg-gray-50/30 border border-gray-200 w-fit">
+            <div className="flex gap-1 mb-8 p-1.5 rounded-2xl bg-black/[0.05] w-fit">
                 {([
                     { key: 'config' as Tab, label: 'Agente IA', icon: 'BOT' },
                     { key: 'knowledge' as Tab, label: 'Conocimiento', icon: 'DOC' },

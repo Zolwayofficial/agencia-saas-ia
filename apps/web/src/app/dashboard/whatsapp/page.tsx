@@ -152,7 +152,7 @@ export default function WhatsAppPage() {
                         Despliega y gestiona tus instancias de WhatsApp.
                     </p>
                 </div>
-                <div className="flex bg-gray-50/30 border border-gray-200 p-1 rounded-xl">
+                <div className="flex bg-black/[0.05] p-1 rounded-2xl">
                     <button
                         onClick={() => setConnectionType('QR')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all
