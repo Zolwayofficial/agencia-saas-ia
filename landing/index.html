@@ -573,8 +573,8 @@
                     ES
                 </button>
 
-                <a href="/login" class="nav-btn-secondary">Login</a>
-                <a href="#pricing" class="nav-btn-primary">Registrarse</a>
+                <a href="https://app.fulllogin.com/login" class="nav-btn-secondary">Login</a>
+                <a href="https://app.fulllogin.com/register" class="nav-btn-primary">Registrarse</a>
 
                 <!-- Mobile Menu Toggle -->
                 <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -611,10 +611,10 @@
         <!-- CTAs closer to navigation -->
         <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
             <a href="#pricing" class="nav-btn-primary"
-                style="text-align: center; display: block; width: 100%; padding: 0.875rem 1rem; font-size: 1rem;">Empezar
+                href="https://app.fulllogin.com/register" style="text-align: center; display: block; width: 100%; padding: 0.875rem 1rem; font-size: 1rem;">Empezar
                 Prueba Gratis</a>
             <a href="/login"
-                style="text-align: center; display: block; width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; color: #555; text-decoration: none;">¿Ya
+                href="https://app.fulllogin.com/login" style="text-align: center; display: block; width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; color: #555; text-decoration: none;">¿Ya
                 tienes cuenta? Inicia sesión</a>
         </div>
     </nav>
@@ -4022,7 +4022,7 @@
             <div class="cta-content">
                 <h2 class="cta-headline">Empieza a automatizar hoy.</h2>
                 <p class="cta-subheadline">Recupera tu tiempo y escala tu agencia sin contratar más personal.</p>
-                <a href="#" class="cta-button">Empezar prueba gratis</a>
+                <a href="https://app.fulllogin.com/register" class="cta-button">Empezar prueba gratis</a>
             </div>
         </div>
     </section>
@@ -4814,7 +4814,7 @@
     function handleHeroForm(e) {
         e.preventDefault();
         const email = e.target.querySelector('.email-input').value;
-        window.location.href = '/login?email=' + encodeURIComponent(email);
+        window.location.href = 'https://app.fulllogin.com/register?email=' + encodeURIComponent(email);
     }
     </script>
 
