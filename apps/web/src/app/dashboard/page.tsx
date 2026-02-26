@@ -6,13 +6,13 @@ import { useAuth } from '../../lib/auth-context';
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
 
-// ── Canales de mensajería ─────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────────
 const MESSAGING_CHANNELS = [
     { id: 'whatsapp',  name: 'WhatsApp',          icon: Icons.LogoWhatsApp,       color: '#25D366', href: '/dashboard/whatsapp' },
     { id: 'instagram', name: 'Instagram DM',       icon: Icons.LogoInstagram,      color: '#E1306C', href: '/dashboard/inbox' },
     { id: 'facebook',  name: 'Facebook Messenger', icon: Icons.LogoFacebook,       color: '#1877F2', href: '/dashboard/inbox' },
     { id: 'telegram',  name: 'Telegram',           icon: Icons.LogoTelegram,       color: '#229ED9', href: '/dashboard/inbox' },
-    { id: 'tiktok',    name: 'TikTok',             icon: Icons.LogoTikTok,         color: '#010101', href: '/dashboard/inbox' },
+    { id: 'tiktok',    name: 'TikTok',             icon: Icons.LogoTikTok,         color: '#333333', href: '/dashboard/inbox' },
     { id: 'email',     name: 'Email Omnicanal',    icon: Icons.Mail,               color: '#EA4335', href: '/dashboard/inbox' },
     { id: 'twitter',   name: 'X / Twitter DM',     icon: Icons.LogoX,              color: '#111111', href: '/dashboard/inbox' },
     { id: 'sms',       name: 'SMS · Twilio',       icon: Icons.LogoTwilio,         color: '#F22F46', href: '/dashboard/inbox' },
@@ -20,96 +20,141 @@ const MESSAGING_CHANNELS = [
     { id: 'google',    name: 'Google Business',    icon: Icons.LogoGoogle,         color: '#4285F4', href: '/dashboard/inbox' },
 ];
 
-// ── Herramientas de productividad ─────────────────────────────────────────────
 const TOOL_INTEGRATIONS = [
-    { id: 'slack',  name: 'Slack',            desc: 'Notificaciones',        icon: Icons.LogoSlack,          color: '#4A154B' },
-    { id: 'linear', name: 'Linear',           desc: 'Issue tracking',        icon: Icons.LogoLinear,         color: '#5E6AD2' },
-    { id: 'notion', name: 'Notion',           desc: 'Conocimiento',          icon: Icons.LogoNotion,         color: '#333333' },
-    { id: 'shopify',name: 'Shopify',          desc: 'E-commerce',            icon: Icons.LogoShopify,        color: '#96BF48' },
-    { id: 'teams',  name: 'Microsoft Teams',  desc: 'Colaboración',          icon: Icons.LogoMicrosoftTeams, color: '#6264A7' },
+    { id: 'slack',   name: 'Slack',           desc: 'Notificaciones',  icon: Icons.LogoSlack,          color: '#4A154B' },
+    { id: 'linear',  name: 'Linear',          desc: 'Issue tracking',  icon: Icons.LogoLinear,         color: '#5E6AD2' },
+    { id: 'notion',  name: 'Notion',          desc: 'Conocimiento',    icon: Icons.LogoNotion,         color: '#333333' },
+    { id: 'shopify', name: 'Shopify',         desc: 'E-commerce',      icon: Icons.LogoShopify,        color: '#96BF48' },
+    { id: 'teams',   name: 'Microsoft Teams', desc: 'Colaboración',    icon: Icons.LogoMicrosoftTeams, color: '#6264A7' },
 ];
 
 const QUICK_ACTIONS = [
-    { href: '/dashboard/inbox',       Icon: Icons.Inbox,    label: 'Bandeja Omnicanal', desc: 'Gestionar conversaciones',   color: '#5abf8a' },
-    { href: '/dashboard/marketing',   Icon: Icons.Rocket,   label: 'Motor de Campanas', desc: 'Crear nueva automatización', color: '#3b82f6' },
-    { href: '/dashboard/whatsapp',    Icon: Icons.WhatsApp, label: 'Nodos WhatsApp',    desc: 'Escanear y gestionar',       color: '#25D366' },
-    { href: '/dashboard/integrations',Icon: Icons.Link,     label: 'Integraciones',     desc: 'Sincronizar aplicaciones',   color: '#f59e0b' },
+    { href: '/dashboard/inbox',        Icon: Icons.Inbox,    label: 'Bandeja Omnicanal', desc: 'Gestionar conversaciones',    iconBg: '#34C759', iconColor: '#fff' },
+    { href: '/dashboard/marketing',    Icon: Icons.Rocket,   label: 'Motor de Campañas', desc: 'Crear nueva automatización',  iconBg: '#007AFF', iconColor: '#fff' },
+    { href: '/dashboard/whatsapp',     Icon: Icons.WhatsApp, label: 'Nodos WhatsApp',    desc: 'Escanear y gestionar',        iconBg: '#25D366', iconColor: '#fff' },
+    { href: '/dashboard/integrations', Icon: Icons.Link,     label: 'Integraciones',     desc: 'Sincronizar aplicaciones',    iconBg: '#FF9500', iconColor: '#fff' },
 ];
 
-// ── Channel pill ──────────────────────────────────────────────────────────────
-function ChannelPill({
-    ch, status, label,
-}: {
-    ch: typeof MESSAGING_CHANNELS[0];
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const card: React.CSSProperties = {
+    background:   '#FFFFFF',
+    borderRadius: 20,
+    boxShadow:    '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+    overflow:     'hidden',
+};
+
+const label11: React.CSSProperties = {
+    fontFamily:    '"Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+    fontSize:      '0.6875rem',
+    fontWeight:    600,
+    letterSpacing: '0.07em',
+    textTransform: 'uppercase' as const,
+    color:         'rgba(60,60,67,0.50)',
+};
+
+const body15: React.CSSProperties = {
+    fontFamily:    '"Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+    fontSize:      '0.9375rem',
+    fontWeight:    400,
+    color:         '#3A3A3C',
+    letterSpacing: '-0.01em',
+};
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+function ChannelRow({ ch, status, label }: {
+    ch:     typeof MESSAGING_CHANNELS[0];
     status: 'connected' | 'setup';
     label?: string;
 }) {
     const Icon = ch.icon;
-    const darkIcon = ch.color === '#010101' || ch.color === '#111111';
     return (
-        <Link
-            href={ch.href}
-            className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200"
-        >
-            <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
-                style={{ background: `${ch.color}18`, color: darkIcon ? '#555' : ch.color }}
+        <Link href={ch.href} style={{ textDecoration: 'none' }}>
+            <div style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '10px 16px',
+                cursor: 'pointer',
+                transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.03)'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
             >
-                <Icon size={18} />
-            </div>
-            <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-semibold text-gray-800 truncate group-hover:text-brand-primary transition-colors leading-tight">
-                    {ch.name}
+                {/* Icon */}
+                <div style={{
+                    width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                    background: `${ch.color}18`, color: ch.color,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                    <Icon size={18} />
                 </div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                    <div
-                        className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
-                            status === 'connected'
-                                ? 'bg-green-400 shadow-[0_0_4px_#4ade80]'
-                                : 'bg-gray-200'
-                        }`}
-                    />
-                    <span className={`text-[10px] font-medium tracking-tight truncate ${
-                        status === 'connected' ? 'text-green-600' : 'text-gray-400'
-                    }`}>
-                        {label ?? (status === 'connected' ? 'Activo' : 'Inactivo')}
-                    </span>
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ ...body15, fontWeight: 500, color: '#1C1C1E', fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {ch.name}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                        <div style={{
+                            width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                            background: status === 'connected' ? '#34C759' : '#C7C7CC',
+                            boxShadow: status === 'connected' ? '0 0 4px #34C759' : 'none',
+                        }} />
+                        <span style={{ fontSize: '0.75rem', color: status === 'connected' ? '#34C759' : 'rgba(60,60,67,0.45)', fontWeight: 500 }}>
+                            {label ?? (status === 'connected' ? 'Activo' : 'Inactivo')}
+                        </span>
+                    </div>
                 </div>
+                {/* Chevron */}
+                <Icons.ArrowRight size={14} style={{ color: 'rgba(60,60,67,0.25)', flexShrink: 0 }} />
             </div>
         </Link>
     );
 }
 
-// ── Tool pill ─────────────────────────────────────────────────────────────────
-function ToolPill({ tool }: { tool: typeof TOOL_INTEGRATIONS[0] }) {
+function ToolRow({ tool }: { tool: typeof TOOL_INTEGRATIONS[0] }) {
     const Icon = tool.icon;
-    const darkIcon = tool.color === '#333333';
     return (
-        <div className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer">
-            <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
-                style={{ background: `${tool.color}15`, color: darkIcon ? '#555' : tool.color }}
-            >
+        <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '10px 16px',
+            cursor: 'pointer',
+            transition: 'background 0.15s',
+        }}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.03)'}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+        >
+            <div style={{
+                width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                background: `${tool.color}18`, color: tool.color === '#333333' ? '#555' : tool.color,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
                 <Icon size={18} />
             </div>
-            <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-semibold text-gray-800 truncate leading-tight">{tool.name}</div>
-                <div className="text-[10px] text-gray-400 font-medium">{tool.desc}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ ...body15, fontWeight: 500, color: '#1C1C1E', fontSize: '0.875rem' }}>{tool.name}</div>
+                <div style={{ fontSize: '0.75rem', color: 'rgba(60,60,67,0.45)', fontWeight: 400 }}>{tool.desc}</div>
             </div>
-            <div className="shrink-0 px-1.5 py-0.5 rounded-full bg-gray-100 text-[9px] font-bold text-gray-400 uppercase tracking-wide">
+            <div style={{
+                padding: '3px 8px', borderRadius: 20,
+                background: 'rgba(0,122,255,0.10)', color: '#007AFF',
+                fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.02em',
+                flexShrink: 0,
+            }}>
                 Conectar
             </div>
         </div>
     );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+function Separator() {
+    return <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.10)', margin: '0 16px' }} />;
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
     const { user, organization } = useAuth();
-    const [balance, setBalance] = useState<any>(null);
-    const [history, setHistory] = useState<any[]>([]);
+    const [balance, setBalance]     = useState<any>(null);
+    const [history, setHistory]     = useState<any[]>([]);
     const [instances, setInstances] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading]     = useState(true);
 
     useEffect(() => {
         Promise.all([
@@ -126,208 +171,243 @@ export default function DashboardPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const msgPercent = balance?.usage
-        ? Math.min(100, (balance.usage.messagesUsed / balance.usage.messagesLimit) * 100)
-        : 0;
-
+    const msgPercent       = balance?.usage ? Math.min(100, (balance.usage.messagesUsed / balance.usage.messagesLimit) * 100) : 0;
     const whatsappConnected = instances.length > 0;
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-5 p-6 max-w-7xl mx-auto">
-                <div className="h-10 w-56 bg-gray-100 rounded-2xl" />
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[1,2,3,4].map(i => <div key={i} className="h-28 bg-gray-100 rounded-3xl" />)}
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                    <div className="h-72 bg-gray-100 rounded-3xl" />
-                    <div className="lg:col-span-2 space-y-4">
-                        <div className="h-52 bg-gray-100 rounded-3xl" />
-                        <div className="h-44 bg-gray-100 rounded-3xl" />
-                    </div>
+            <div className="animate-pulse" style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+                <div style={{ height: 40, width: 220, background: '#f0f0f0', borderRadius: 12, marginBottom: 32 }} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 20 }}>
+                    {[1,2,3,4].map(i => <div key={i} style={{ height: 100, background: '#f0f0f0', borderRadius: 20 }} />)}
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="animate-in max-w-7xl mx-auto space-y-5">
-
-            {/* ── Header ──────────────────────────────────────────────────────── */}
-            <header className="flex justify-between items-end pt-1">
+        <div
+            className="animate-in"
+            style={{
+                maxWidth: 1100,
+                margin: '0 auto',
+                padding: '1.75rem 2rem',
+                fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 20,
+            }}
+        >
+            {/* ── Header ─────────────────────────────────────── */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                    <div style={{ marginBottom: 6 }}>
+                        <span style={{
+                            display: 'inline-block',
+                            padding: '2px 8px',
+                            borderRadius: 6,
+                            background: 'rgba(52,201,123,0.10)',
+                            color: '#25a562',
+                            fontSize: '0.6875rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.07em',
+                            textTransform: 'uppercase',
+                        }}>
                             Centro Operativo
                         </span>
                     </div>
-                    <h1 className="text-[2rem] font-bold font-display tracking-tight text-gradient leading-none mb-1">
+                    <h1 style={{
+                        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif',
+                        fontSize: '2rem',
+                        fontWeight: 700,
+                        letterSpacing: '-0.03em',
+                        color: '#1C1C1E',
+                        lineHeight: 1.1,
+                        margin: 0,
+                    }}>
                         Centro de Control
                     </h1>
-                    <p className="text-sm text-gray-400 font-medium">
-                        {organization?.name || 'Full Login'} — Estrategia Activa
+                    <p style={{ ...body15, fontSize: '0.875rem', color: 'rgba(60,60,67,0.55)', marginTop: 4 }}>
+                        {organization?.name ?? 'Full Login'} — Estrategia Activa
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="text-right hidden sm:block">
-                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Plan Actual</div>
-                        <div className="text-sm font-semibold text-gray-700">{balance?.plan?.name || 'Pro (Trial)'}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ ...label11, marginBottom: 2 }}>Plan Actual</div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1C1C1E' }}>
+                            {balance?.plan?.name ?? 'Pro (Trial)'}
+                        </div>
                     </div>
-                    <Link href="/dashboard/billing" className="btn-premium btn-premium-primary !rounded-2xl !py-2.5 !px-5">
+                    <Link href="/dashboard/billing" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        padding: '9px 18px',
+                        borderRadius: 12,
+                        background: '#34c97b',
+                        color: '#fff',
+                        fontFamily: '"Inter", -apple-system, system-ui, sans-serif',
+                        fontWeight: 600,
+                        fontSize: '0.9375rem',
+                        letterSpacing: '-0.01em',
+                        textDecoration: 'none',
+                        boxShadow: '0 2px 8px rgba(52,201,123,0.35)',
+                        whiteSpace: 'nowrap',
+                    }}>
                         <Icons.Billing size={15} />
                         Mejorar Plan
                     </Link>
                 </div>
-            </header>
+            </div>
 
-            {/* ── KPI Row ─────────────────────────────────────────────────────── */}
-            <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* ── KPI Cards ──────────────────────────────────── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
                 {/* Ingresos */}
-                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Ingresos Mensuales</div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black font-display text-gray-900">${(balance?.mrr || 0).toLocaleString()}</span>
-                        <span className="text-[11px] font-bold text-green-500 flex items-center gap-0.5">
+                <div style={{ ...card, padding: '18px 20px' }}>
+                    <div style={{ ...label11, marginBottom: 10 }}>Ingresos Mensuales</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: '1.875rem', fontWeight: 700, letterSpacing: '-0.04em', color: '#1C1C1E', lineHeight: 1 }}>
+                            ${(balance?.mrr ?? 0).toLocaleString()}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#34C759', display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Icons.ArrowUp size={10} />12.4%
                         </span>
                     </div>
-                    <div className="mt-3 flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
-                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Proyección activa</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34C759' }} />
+                        <span style={{ ...label11, fontSize: '0.625rem' }}>Proyección activa</span>
                     </div>
                 </div>
 
                 {/* Mensajes */}
-                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Volumen de Mensajes</div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black font-display text-gray-900">{(balance?.usage?.messagesUsed || 0).toLocaleString()}</span>
-                        <span className="text-[11px] text-gray-400 font-medium">/ {balance?.usage?.messagesLimit || '10000'}</span>
+                <div style={{ ...card, padding: '18px 20px' }}>
+                    <div style={{ ...label11, marginBottom: 10 }}>Volumen de Mensajes</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: '1.875rem', fontWeight: 700, letterSpacing: '-0.04em', color: '#1C1C1E', lineHeight: 1 }}>
+                            {(balance?.usage?.messagesUsed ?? 0).toLocaleString()}
+                        </span>
+                        <span style={{ fontSize: '0.8125rem', color: 'rgba(60,60,67,0.45)', fontWeight: 400 }}>
+                            / {balance?.usage?.messagesLimit ?? '10000'}
+                        </span>
                     </div>
-                    <div className="mt-3 w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                            className="h-full rounded-full bg-brand-primary transition-all duration-1000"
-                            style={{ width: `${msgPercent}%` }}
-                        />
+                    <div style={{ marginTop: 12, height: 4, background: 'rgba(0,0,0,0.07)', borderRadius: 4, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${msgPercent}%`, background: '#34c97b', borderRadius: 4, transition: 'width 1s ease' }} />
                     </div>
-                    <div className="mt-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                        Volumen: {Math.round(msgPercent)}% · Escalado automático
+                    <div style={{ ...label11, fontSize: '0.625rem', marginTop: 6 }}>
+                        Volumen: {Math.round(msgPercent)}% · Escalado auto
                     </div>
                 </div>
 
                 {/* IA */}
-                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Resolución IA</div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black font-display text-gray-900">84.2%</span>
-                        <span className="text-[11px] font-bold text-green-500 flex items-center gap-0.5">
+                <div style={{ ...card, padding: '18px 20px' }}>
+                    <div style={{ ...label11, marginBottom: 10 }}>Resolución IA</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: '1.875rem', fontWeight: 700, letterSpacing: '-0.04em', color: '#1C1C1E', lineHeight: 1 }}>84.2%</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#34C759', display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Icons.ArrowUp size={10} />2.1%
                         </span>
                     </div>
-                    <div className="mt-3 flex items-center gap-1.5">
-                        <Icons.AI size={13} className="text-brand-primary opacity-70" />
-                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Eficiencia autónoma</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
+                        <Icons.AI size={12} style={{ color: '#AF52DE' }} />
+                        <span style={{ ...label11, fontSize: '0.625rem' }}>Eficiencia autónoma</span>
                     </div>
                 </div>
 
                 {/* Referidos */}
-                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Comisiones Referidos</div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black font-display text-gray-900">${(balance?.commissions || 0).toFixed(2)}</span>
+                <div style={{ ...card, padding: '18px 20px' }}>
+                    <div style={{ ...label11, marginBottom: 10 }}>Comisiones Referidos</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                        <span style={{ fontSize: '1.875rem', fontWeight: 700, letterSpacing: '-0.04em', color: '#1C1C1E', lineHeight: 1 }}>
+                            ${(balance?.commissions ?? 0).toFixed(2)}
+                        </span>
                     </div>
-                    <div className="mt-3 flex items-center gap-1.5">
-                        <Icons.Referrals size={13} className="text-amber-400 opacity-80" />
-                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Nivel único 20% activo</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
+                        <Icons.Referrals size={12} style={{ color: '#FF9500' }} />
+                        <span style={{ ...label11, fontSize: '0.625rem' }}>Nivel único 20% activo</span>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            {/* ── Main Grid ────────────────────────────────────────────────────── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* ── Main Grid ──────────────────────────────────── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 14 }}>
 
                 {/* Acciones Rápidas */}
-                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Acciones Rápidas</h2>
-                        <div className="w-6 h-1 rounded-full bg-brand-primary/30" />
-                    </div>
-                    <div className="space-y-1.5">
-                        {QUICK_ACTIONS.map(action => (
-                            <Link
-                                key={action.href}
-                                href={action.href}
-                                className="flex items-center gap-3.5 p-3 rounded-2xl hover:bg-gray-50 transition-all duration-200 group"
-                            >
-                                <div
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
-                                    style={{ background: `${action.color}18`, color: action.color }}
+                <div style={card}>
+                    <div style={{ padding: '16px 16px 10px', ...label11 }}>Acciones Rápidas</div>
+                    {QUICK_ACTIONS.map((action, i) => (
+                        <div key={action.href}>
+                            <Link href={action.href} style={{ textDecoration: 'none' }}>
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 12,
+                                    padding: '11px 16px',
+                                    cursor: 'pointer',
+                                    transition: 'background 0.15s',
+                                }}
+                                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.03)'}
+                                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
                                 >
-                                    <action.Icon size={20} />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-[13px] font-semibold text-gray-800 group-hover:text-brand-primary transition-colors">
-                                        {action.label}
+                                    <div style={{
+                                        width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                                        background: action.iconBg, color: action.iconColor,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        boxShadow: `0 2px 6px ${action.iconBg}55`,
+                                    }}>
+                                        <action.Icon size={17} />
                                     </div>
-                                    <div className="text-[10px] text-gray-400 font-medium uppercase tracking-tight mt-0.5">
-                                        {action.desc}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ ...body15, fontWeight: 500, color: '#1C1C1E', fontSize: '0.875rem' }}>{action.label}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'rgba(60,60,67,0.45)', marginTop: 1 }}>{action.desc}</div>
                                     </div>
+                                    <Icons.ArrowRight size={14} style={{ color: 'rgba(60,60,67,0.25)', flexShrink: 0 }} />
                                 </div>
-                                <Icons.ArrowRight
-                                    size={14}
-                                    className="text-gray-300 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all shrink-0"
-                                />
                             </Link>
-                        ))}
-                    </div>
+                            {i < QUICK_ACTIONS.length - 1 && <Separator />}
+                        </div>
+                    ))}
                 </div>
 
-                {/* Channels + Tools col */}
-                <div className="lg:col-span-2 space-y-4">
+                {/* Channels + Tools */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-                    {/* Canales de Comunicación */}
-                    <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Canales de Comunicación</h2>
-                                <p className="text-[10px] text-gray-300 font-medium mt-0.5">Escáner de canales en tiempo real</p>
-                            </div>
-                            <Link
-                                href="/dashboard/inbox"
-                                className="text-[11px] font-semibold text-brand-primary flex items-center gap-1 hover:opacity-70 transition-opacity"
-                            >
-                                Ver todos <Icons.External size={10} />
+                    {/* Canales */}
+                    <div style={card}>
+                        <div style={{ padding: '16px 16px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={label11}>Canales de Comunicación</span>
+                            <Link href="/dashboard/inbox" style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#34c97b', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                Ver todos <Icons.External size={11} />
                             </Link>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            {MESSAGING_CHANNELS.map(ch => (
-                                <ChannelPill
-                                    key={ch.id}
-                                    ch={ch}
-                                    status={ch.id === 'whatsapp' && whatsappConnected ? 'connected' : 'setup'}
-                                    label={ch.id === 'whatsapp' ? `${instances.length} nodo(s) activo(s)` : undefined}
-                                />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                            {MESSAGING_CHANNELS.map((ch, i) => (
+                                <div key={ch.id}>
+                                    <ChannelRow
+                                        ch={ch}
+                                        status={ch.id === 'whatsapp' && whatsappConnected ? 'connected' : 'setup'}
+                                        label={ch.id === 'whatsapp' ? `${instances.length} nodo(s) activo(s)` : undefined}
+                                    />
+                                    {/* Separator only between rows, not after last */}
+                                    {i % 2 === 0 && i < MESSAGING_CHANNELS.length - 1 && (
+                                        <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.08)', margin: '0 16px' }} />
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* Herramientas de Productividad */}
-                    <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Herramientas</h2>
-                                <p className="text-[10px] text-gray-300 font-medium mt-0.5">CRM · Productividad · E-commerce</p>
-                            </div>
-                            <Link
-                                href="/dashboard/integrations"
-                                className="text-[11px] font-semibold text-brand-primary flex items-center gap-1 hover:opacity-70 transition-opacity"
-                            >
-                                Ver todos <Icons.External size={10} />
+                    {/* Herramientas */}
+                    <div style={card}>
+                        <div style={{ padding: '16px 16px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={label11}>Herramientas</span>
+                            <Link href="/dashboard/integrations" style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#34c97b', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                Ver todos <Icons.External size={11} />
                             </Link>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {TOOL_INTEGRATIONS.map(tool => (
-                                <ToolPill key={tool.id} tool={tool} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                            {TOOL_INTEGRATIONS.map((tool, i) => (
+                                <div key={tool.id}>
+                                    <ToolRow tool={tool} />
+                                    {i % 2 === 0 && i < TOOL_INTEGRATIONS.length - 1 && (
+                                        <div style={{ height: '0.5px', background: 'rgba(60,60,67,0.08)', margin: '0 16px' }} />
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -335,64 +415,75 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* ── Activity Feed ─────────────────────────────────────────────────── */}
-            <section className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-6">
+            {/* ── Activity Feed ───────────────────────────────── */}
+            <div style={card}>
+                <div style={{ padding: '16px 16px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                        <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Actividad Reciente</h2>
-                        <p className="text-[10px] text-gray-300 font-medium mt-0.5">Registro de transacciones</p>
+                        <span style={label11}>Actividad Reciente</span>
+                        <div style={{ fontSize: '0.75rem', color: 'rgba(60,60,67,0.40)', marginTop: 2 }}>Registro de transacciones</div>
                     </div>
-                    <Link href="/dashboard/billing" className="btn-premium btn-premium-outline !py-2 !px-4 !text-[11px] !rounded-xl">
-                        Ver Historial Completo
+                    <Link href="/dashboard/billing" style={{
+                        padding: '6px 14px', borderRadius: 10,
+                        background: 'rgba(0,0,0,0.05)', color: '#1C1C1E',
+                        fontSize: '0.8125rem', fontWeight: 600,
+                        textDecoration: 'none',
+                    }}>
+                        Ver historial
                     </Link>
                 </div>
+
                 {history.length === 0 ? (
-                    <div className="py-16 text-center rounded-2xl bg-gray-50/60 border border-dashed border-gray-200">
-                        <Icons.Inbox size={40} className="mx-auto mb-3 text-gray-200" />
-                        <p className="text-sm font-medium text-gray-300">No hay movimientos registrados</p>
+                    <div style={{ padding: '48px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(0,0,0,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Icons.Inbox size={22} style={{ color: 'rgba(60,60,67,0.25)' }} />
+                        </div>
+                        <span style={{ fontSize: '0.875rem', color: 'rgba(60,60,67,0.35)', fontWeight: 500 }}>
+                            No hay movimientos registrados
+                        </span>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="text-left border-b border-gray-100">
-                                    <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3">Tipo</th>
-                                    <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Descripción</th>
-                                    <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right px-3">Monto</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {history.map(tx => (
-                                    <tr key={tx.id} className="group hover:bg-gray-50/40 transition-colors">
-                                        <td className="py-4 px-3">
-                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                                                tx.type === 'COMMISSION'
-                                                    ? 'bg-amber-50 text-amber-600 border-amber-200'
-                                                    : 'bg-blue-50 text-blue-600 border-blue-200'
-                                            }`}>
-                                                {tx.type}
-                                            </span>
-                                        </td>
-                                        <td className="py-4">
-                                            <div className="text-[13px] font-semibold text-gray-800 group-hover:text-brand-primary transition-colors line-clamp-1">
-                                                {tx.description}
-                                            </div>
-                                            <div className="text-[10px] text-gray-400 font-medium mt-0.5">
-                                                {new Date(tx.createdAt).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 text-right px-3">
-                                            <div className={`text-sm font-black font-display ${tx.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                {tx.amount >= 0 ? '+' : '-'}${Math.abs(tx.amount).toFixed(2)}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div>
+                        {history.map((tx, i) => (
+                            <div key={tx.id}>
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 14,
+                                    padding: '12px 16px',
+                                    transition: 'background 0.15s',
+                                }}
+                                onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.02)'}
+                                onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                                >
+                                    <div style={{
+                                        width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+                                        background: tx.type === 'COMMISSION' ? 'rgba(255,149,0,0.12)' : 'rgba(0,122,255,0.10)',
+                                        color: tx.type === 'COMMISSION' ? '#FF9500' : '#007AFF',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: '0.6875rem', fontWeight: 700,
+                                    }}>
+                                        {tx.type === 'COMMISSION' ? '₿' : '→'}
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontSize: '0.875rem', fontWeight: 500, color: '#1C1C1E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {tx.description}
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', color: 'rgba(60,60,67,0.45)', marginTop: 2 }}>
+                                            {new Date(tx.createdAt).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        fontSize: '0.9375rem', fontWeight: 700,
+                                        color: tx.amount >= 0 ? '#34C759' : '#FF3B30',
+                                        letterSpacing: '-0.02em', flexShrink: 0,
+                                    }}>
+                                        {tx.amount >= 0 ? '+' : '-'}${Math.abs(tx.amount).toFixed(2)}
+                                    </div>
+                                </div>
+                                {i < history.length - 1 && <Separator />}
+                            </div>
+                        ))}
                     </div>
                 )}
-            </section>
+            </div>
 
         </div>
     );
