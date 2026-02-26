@@ -5,24 +5,38 @@ import { api } from '@/lib/api';
 import { Icons } from '@/components/icons';
 
 const INTEGRATIONS = [
-    { id: 'chatwoot', name: 'Chatwoot', cat: 'Infraestructura Principal', status: 'connected', desc: 'Plataforma omnicanal de soporte y atencion al cliente.' },
-    { id: 'evolution', name: 'WhatsApp Evolution', cat: 'Infraestructura Principal', status: 'connected', desc: 'API de mensajeria para nodos WhatsApp.' },
-    { id: 'n8n', name: 'n8n Workflow', cat: 'Infraestructura Principal', status: 'connected', desc: 'Automatizacion de flujos de trabajo y logica multi-paso.' },
-    { id: 'openai', name: 'OpenAI (GPT-4)', cat: 'Modelos IA', status: 'connected', desc: 'Modelo de lenguaje avanzado para agentes IA autonomos.' },
-    { id: 'livekit', name: 'LiveKit Voice', cat: 'Modelos IA', status: 'setup', desc: 'Agentes de voz en tiempo real de baja latencia.' },
-    { id: 'litellm', name: 'LiteLLM Proxy', cat: 'Modelos IA', status: 'connected', desc: 'Orquestacion y balanceo de carga entre proveedores de modelos.' },
-    { id: 'stripe', name: 'Stripe Payments', cat: 'Pagos y CRM', status: 'setup', desc: 'Pasarela de pagos y gestion de suscripciones.' },
-    { id: 'shopify', name: 'Shopify Store', cat: 'Pagos y CRM', status: 'setup', desc: 'Integracion nativa con catalogo y logistica e-commerce.' },
-    { id: 'hubspot', name: 'HubSpot CRM', cat: 'Pagos y CRM', status: 'setup', desc: 'Sincronizacion y seguimiento de leads de ventas.' },
-    { id: 'ga4', name: 'Google Analytics', cat: 'Herramientas', status: 'connected', desc: 'Telemetria de eventos y metricas de uso.' },
-    { id: 'calendly', name: 'Calendly', cat: 'Herramientas', status: 'setup', desc: 'Programacion autonoma de demos y citas.' },
-    { id: 'opentable', name: 'OpenTable', cat: 'Herramientas', status: 'setup', desc: 'Integracion con sistema de reservas para restaurantes.' },
+    { id: 'chatwoot',  name: 'Chatwoot',           cat: 'Infraestructura Principal', status: 'connected', desc: 'Plataforma omnicanal de soporte y atención al cliente.',                color: '#1F93FF' },
+    { id: 'evolution', name: 'WhatsApp Evolution',  cat: 'Infraestructura Principal', status: 'connected', desc: 'API de mensajería para nodos WhatsApp.',                               color: '#25D366' },
+    { id: 'n8n',       name: 'n8n Workflow',         cat: 'Infraestructura Principal', status: 'connected', desc: 'Automatización de flujos de trabajo y lógica multi-paso.',             color: '#EA4B71' },
+    { id: 'openai',    name: 'OpenAI (GPT-4)',        cat: 'Modelos IA',                status: 'connected', desc: 'Modelo de lenguaje avanzado para agentes IA autónomos.',              color: '#10A37F' },
+    { id: 'livekit',   name: 'LiveKit Voice',         cat: 'Modelos IA',                status: 'setup',     desc: 'Agentes de voz en tiempo real de baja latencia.',                    color: '#FF6B35' },
+    { id: 'litellm',   name: 'LiteLLM Proxy',         cat: 'Modelos IA',                status: 'connected', desc: 'Orquestación y balanceo de carga entre proveedores de modelos.',     color: '#7C3AED' },
+    { id: 'stripe',    name: 'Stripe Payments',       cat: 'Pagos y CRM',               status: 'setup',     desc: 'Pasarela de pagos y gestión de suscripciones.',                      color: '#635BFF' },
+    { id: 'shopify',   name: 'Shopify Store',          cat: 'Pagos y CRM',               status: 'setup',     desc: 'Integración nativa con catálogo y logística e-commerce.',           color: '#96BF48' },
+    { id: 'hubspot',   name: 'HubSpot CRM',            cat: 'Pagos y CRM',               status: 'setup',     desc: 'Sincronización y seguimiento de leads de ventas.',                  color: '#FF7A59' },
+    { id: 'ga4',       name: 'Google Analytics',       cat: 'Herramientas',              status: 'connected', desc: 'Telemetría de eventos y métricas de uso.',                          color: '#F9AB00' },
+    { id: 'calendly',  name: 'Calendly',               cat: 'Herramientas',              status: 'setup',     desc: 'Programación autónoma de demos y citas.',                           color: '#006BFF' },
+    { id: 'opentable', name: 'OpenTable',              cat: 'Herramientas',              status: 'setup',     desc: 'Integración con sistema de reservas para restaurantes.',            color: '#DA3743' },
 ];
+
+const CATEGORIES = ['Infraestructura Principal', 'Modelos IA', 'Pagos y CRM', 'Herramientas'];
+
+function IOSCard({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+    return <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', ...style }}>{children}</div>;
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+    return (
+        <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-secondary)', margin: '28px 0 8px 4px' }}>
+            {children}
+        </p>
+    );
+}
 
 export default function IntegrationsPage() {
     const [instances, setInstances] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('All');
+    const [loading,   setLoading]   = useState(true);
+    const [filter,    setFilter]    = useState('Todas');
 
     useEffect(() => {
         api.getInstances()
@@ -31,110 +45,166 @@ export default function IntegrationsPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const filtered = INTEGRATIONS.map(i => {
-        if (i.id === 'evolution') return { ...i, status: instances.length > 0 ? 'connected' : 'setup' };
-        return i;
-    }).filter(i => {
-        if (filter === 'All') return true;
-        return i.status === filter.toLowerCase();
-    });
+    const list = INTEGRATIONS.map(i =>
+        i.id === 'evolution' ? { ...i, status: instances.length > 0 ? 'connected' : 'setup' } : i
+    );
+
+    const filtered = filter === 'Todas'     ? list
+                   : filter === 'Activas'   ? list.filter(i => i.status === 'connected')
+                   : list.filter(i => i.status === 'setup');
+
+    const connectedCount = list.filter(i => i.status === 'connected').length;
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-64 bg-gray-100 rounded-lg" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="h-44 bg-gray-100 rounded-2xl" />
-                    ))}
-                </div>
+            <div style={{ maxWidth: 860, margin: '0 auto' }}>
+                {[1,2,3].map(i => (
+                    <div key={i} style={{ height: 72, borderRadius: 12, background: 'rgba(120,120,128,0.08)', marginBottom: 10 }} />
+                ))}
             </div>
         );
     }
 
     return (
-        <div className="animate-in max-w-7xl mx-auto">
-            {/* Header section */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
+
+            {/* ── Header ── */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Integraciones
-                        </span>
-                    </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Integraciones</h1>
-                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
+                    <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--brand-primary)', marginBottom: 6 }}>
+                        Integraciones
+                    </p>
+                    <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, color: '#000', lineHeight: 1.15, margin: 0 }}>
+                        Integraciones
+                    </h1>
+                    <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 4 }}>
                         Conecta tu plataforma con servicios de terceros.
                     </p>
                 </div>
-                <div className="flex p-1 bg-black/[0.05] rounded-2xl">
-                    {['All', 'Connected', 'Setup'].map(f => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`px-5 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase transition-all ${filter === f ? 'bg-brand-primary text-white shadow-[0_5px_15px_rgba(var(--brand-primary-rgb),0.2)]' : 'text-muted hover:text-header'
-                                }`}
-                        >
-                            {f === 'All' ? 'Todas' : f === 'Connected' ? 'Activas' : 'Pendientes'}
-                        </button>
-                    ))}
+                {/* Active count badge */}
+                <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '7px 14px', borderRadius: 20,
+                    background: 'rgba(52,201,123,0.1)', border: '1px solid rgba(52,201,123,0.25)',
+                    fontSize: 13, fontWeight: 600, color: 'var(--brand-primary)',
+                }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--brand-primary)', display: 'inline-block' }} />
+                    {connectedCount} de {list.length} activas
                 </div>
-            </header>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {filtered.map(integration => (
-                    <div key={integration.id} className={`group glass-panel p-6 flex flex-col transition-all duration-500 ${integration.status === 'connected' ? 'border-brand-primary/10 shadow-[0_10px_30px_-15px_rgba(var(--brand-primary-rgb),0.1)]' : ''
-                        }`}>
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="w-12 h-12 rounded-xl bg-gray-50/50 flex items-center justify-center text-muted group-hover:text-brand-primary border border-gray-200 transition-colors">
-                                <Icons.Link size={22} />
-                            </div>
-                            <div className={`px-2 py-0.5 rounded-full text-[9px] font-black tracking-widest border transition-all ${integration.status === 'connected'
-                                    ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/20'
-                                    : 'bg-gray-100 text-muted border-gray-200 opacity-40'
-                                }`}>
-                                {integration.status === 'connected' ? 'ACTIVO' : 'PENDIENTE'}
-                            </div>
-                        </div>
-
-                        <div className="mb-8">
-                            <h3 className="text-base font-bold font-display text-header mb-1 group-hover:text-brand-primary transition-colors">{integration.name}</h3>
-                            <div className="text-[10px] font-bold text-brand-primary opacity-60 uppercase tracking-widest">{integration.cat}</div>
-                            <p className="text-xs text-muted font-medium leading-relaxed mt-4 opacity-50">
-                                {integration.desc}
-                            </p>
-                        </div>
-
-                        <div className="mt-auto grid grid-cols-2 gap-3 pt-6 border-t border-gray-200">
-                            <button className="btn-premium btn-premium-outline !py-2 !text-[10px] justify-center opacity-40 hover:opacity-100">
-                                <Icons.Alert size={12} /> Detalles
-                            </button>
-                            <button className={`btn-premium !py-2 !text-[10px] justify-center ${integration.status === 'connected'
-                                    ? 'btn-premium-outline !border-gray-200 !bg-gray-50/30'
-                                    : 'btn-premium-primary'
-                                }`}>
-                                {integration.status === 'connected' ? 'Configurar' : 'Activar'}
-                            </button>
-                        </div>
-                    </div>
+            {/* ── Segmented Control ── */}
+            <div style={{ display: 'inline-flex', background: 'rgba(118,118,128,0.12)', borderRadius: 9, padding: 2, marginBottom: 20 }}>
+                {['Todas', 'Activas', 'Pendientes'].map(f => (
+                    <button key={f} onClick={() => setFilter(f)} style={{
+                        padding: '6px 18px', borderRadius: 7, border: 'none', cursor: 'pointer',
+                        fontSize: 13, fontWeight: 500, fontFamily: 'inherit',
+                        background: filter === f ? '#fff' : 'transparent',
+                        color: filter === f ? '#000' : 'var(--text-secondary)',
+                        boxShadow: filter === f ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+                        transition: 'all 0.2s', outline: 'none',
+                    }}>
+                        {f}
+                    </button>
                 ))}
             </div>
 
-            {/* Scale Alert */}
-            <div className="glass-panel p-6 border-dashed border-gray-200 flex items-center justify-between gap-6 opacity-60 hover:opacity-100 transition-all">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-muted">
-                        <Icons.Plus size={18} />
+            {/* ── Grouped by category ── */}
+            {CATEGORIES.map(cat => {
+                const items = filtered.filter(i => i.cat === cat);
+                if (items.length === 0) return null;
+                return (
+                    <div key={cat}>
+                        <SectionHeader>{cat}</SectionHeader>
+                        <IOSCard>
+                            {items.map((item, idx) => (
+                                <div key={item.id} style={{
+                                    display: 'flex', alignItems: 'center', gap: 14,
+                                    padding: '13px 16px',
+                                    borderBottom: idx < items.length - 1 ? '1px solid rgba(60,60,67,0.1)' : 'none',
+                                }}>
+                                    {/* Color dot icon */}
+                                    <div style={{
+                                        width: 38, height: 38, borderRadius: 9, flexShrink: 0,
+                                        background: `${item.color}18`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                        <Icons.Link size={18} color={item.color} />
+                                    </div>
+
+                                    {/* Text */}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <p style={{ fontSize: 15, fontWeight: 500, color: '#000', margin: 0 }}>{item.name}</p>
+                                        <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '1px 0 0' }}>{item.desc}</p>
+                                    </div>
+
+                                    {/* Status + action */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                                        <span style={{
+                                            display: 'flex', alignItems: 'center', gap: 4,
+                                            fontSize: 12, fontWeight: 600,
+                                            color: item.status === 'connected' ? 'var(--brand-primary)' : 'var(--text-secondary)',
+                                        }}>
+                                            <span style={{
+                                                width: 6, height: 6, borderRadius: '50%', display: 'inline-block',
+                                                background: item.status === 'connected' ? 'var(--brand-primary)' : 'rgba(120,120,128,0.4)',
+                                            }} />
+                                            {item.status === 'connected' ? 'Activo' : 'Pendiente'}
+                                        </span>
+
+                                        <button style={{
+                                            padding: '6px 14px', borderRadius: 8, border: 'none',
+                                            cursor: 'pointer', fontFamily: 'inherit',
+                                            fontSize: 13, fontWeight: 600,
+                                            background: item.status === 'connected'
+                                                ? 'rgba(120,120,128,0.1)'
+                                                : 'var(--brand-primary)',
+                                            color: item.status === 'connected' ? 'var(--text-secondary)' : '#fff',
+                                            transition: 'opacity 0.15s',
+                                        }}>
+                                            {item.status === 'connected' ? 'Configurar' : 'Activar'}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </IOSCard>
                     </div>
-                    <div>
-                        <h4 className="text-xs font-bold text-header uppercase tracking-widest">Solicitar Integracion</h4>
-                        <p className="text-[10px] text-muted font-medium">Solicita una integracion personalizada para tu negocio.</p>
-                    </div>
+                );
+            })}
+
+            {/* ── Solicitar integración ── */}
+            <div style={{
+                marginTop: 24, padding: '14px 18px', borderRadius: 12,
+                border: '1.5px dashed rgba(60,60,67,0.2)',
+                display: 'flex', alignItems: 'center', gap: 14,
+                background: 'rgba(120,120,128,0.03)',
+            }}>
+                <div style={{
+                    width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                    background: 'rgba(120,120,128,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--text-secondary)',
+                }}>
+                    <Icons.Plus size={18} />
                 </div>
-                <button className="btn-premium btn-premium-outline !py-2 !px-4 !text-[10px]">
+                <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 15, fontWeight: 500, color: '#000', margin: 0 }}>Solicitar Integración</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '1px 0 0' }}>
+                        Solicita una integración personalizada para tu negocio.
+                    </p>
+                </div>
+                <button style={{
+                    padding: '7px 16px', borderRadius: 9,
+                    border: '1.5px solid rgba(52,201,123,0.35)',
+                    background: 'rgba(52,201,123,0.06)',
+                    color: 'var(--brand-primary)',
+                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                }}>
                     Solicitar
                 </button>
             </div>
+
+            <div style={{ height: 32 }} />
         </div>
     );
 }
