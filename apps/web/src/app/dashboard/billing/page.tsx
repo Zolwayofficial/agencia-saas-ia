@@ -3,7 +3,6 @@
 import { Suspense, useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Icons } from '@/components/icons';
 
 interface Plan {
     id: string;
@@ -29,8 +28,9 @@ const PLANS = [
         id: 'plan_starter',
         name: 'Starter',
         price: 29,
-        features: ['1 Nodo WhatsApp', '1,000 Mensajes / mes', 'Protocolos IA Basicos', 'Soporte por Email'],
+        features: ['1 Nodo WhatsApp', '1,000 Mensajes / mes', 'Protocolos IA Básicos', 'Soporte por Email'],
         recommended: false,
+        color: '#34C759',
     },
     {
         id: 'plan_pro',
@@ -38,6 +38,7 @@ const PLANS = [
         price: 79,
         features: ['3 Nodos WhatsApp', '10,000 Mensajes / mes', 'GPT-4 Avanzado', 'Soporte Prioritario', 'Marca Blanca'],
         recommended: true,
+        color: '#007AFF',
     },
     {
         id: 'plan_agency',
@@ -45,6 +46,7 @@ const PLANS = [
         price: 199,
         features: ['10 Nodos WhatsApp', 'Mensajes Ilimitados', 'Agentes IA Personalizados', 'Acceso API Completo', 'Infraestructura Enterprise'],
         recommended: false,
+        color: '#AF52DE',
     },
 ];
 
@@ -99,11 +101,11 @@ function BillingContent() {
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-64 bg-gray-100 rounded-lg" />
-                <div className="grid grid-cols-3 gap-6">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-32 bg-gray-100 rounded-2xl" />
+            <div style={{ padding: '24px', background: '#F2F2F7', minHeight: '100vh' }}>
+                <div style={{ height: 32, width: 200, background: '#E5E5EA', borderRadius: 8, marginBottom: 24 }} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                    {[1, 2, 3].map(i => (
+                        <div key={i} style={{ height: 110, background: '#E5E5EA', borderRadius: 12 }} />
                     ))}
                 </div>
             </div>
@@ -112,122 +114,197 @@ function BillingContent() {
 
     const currentPlanName = sub?.plan?.name || 'Plan Gratuito';
     const isActive = sub?.status === 'active';
+    const messagesUsed = sub?.messagesUsed || 0;
+    const messagesLimit = sub?.messagesLimit || 1000;
+    const runsUsed = sub?.agentRunsUsed || 0;
+    const runsLimit = sub?.agentRunsLimit || 100;
+    const messagesPct = Math.min((messagesUsed / messagesLimit) * 100, 100);
+    const runsPct = Math.min((runsUsed / runsLimit) * 100, 100);
 
     return (
-        <div className="animate-in max-w-7xl mx-auto">
-            {/* Header section */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div style={{ background: '#F2F2F7', minHeight: '100vh', padding: '28px 24px 48px', fontFamily: '-apple-system, "Inter", sans-serif' }}>
+
+            {/* Page Title */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
                 <div>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
-                            Facturacion
-                        </span>
-                    </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Facturacion y Capacidad</h1>
-                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
-                        Gestiona tus recursos y suscripcion.
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+                        Facturación
                     </p>
+                    <h1 style={{ fontSize: 28, fontWeight: 700, color: '#1C1C1E', letterSpacing: -0.5, margin: 0 }}>
+                        Plan y Capacidad
+                    </h1>
                 </div>
                 {isActive && (
                     <button
-                        className="btn-premium btn-premium-outline !py-2.5"
                         onClick={handlePortal}
                         disabled={!!processing}
+                        style={{
+                            background: '#007AFF',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 20,
+                            padding: '9px 18px',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            opacity: processing ? 0.6 : 1,
+                        }}
                     >
-                        <Icons.Settings size={14} />
-                        Portal de Suscripcion
+                        Gestionar suscripción
                     </button>
                 )}
-            </header>
-
-            {/* Usage Stats Grid */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                <div className="glass-panel stat-card-premium">
-                    <div className="label">Plan Actual</div>
-                    <div className="flex items-baseline gap-2 mb-3">
-                        <span className="value text-gradient">{currentPlanName}</span>
-                    </div>
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest border ${isActive ? 'bg-success/5 text-success border-success/20' : 'bg-warning/5 text-warning border-warning/20'
-                        }`}>
-                        <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-success' : 'bg-warning'}`} />
-                        {isActive ? 'ACTIVO' : 'PENDIENTE'}
-                    </div>
-                </div>
-
-                <div className="glass-panel stat-card-premium overflow-hidden">
-                    <div className="label mb-2">Mensajes Utilizados</div>
-                    <div className="flex items-baseline gap-2 mb-4">
-                        <span className="value">{sub?.messagesUsed.toLocaleString() || '0'}</span>
-                        <span className="text-xs font-bold text-muted opacity-40 uppercase tracking-widest">
-                            / {sub?.messagesLimit === -1 ? '∞' : sub?.messagesLimit.toLocaleString() || '1,000'}
-                        </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-gray-50/50 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-primary transition-all duration-1000 shadow-[0_0_10px_rgba(var(--brand-primary-rgb),0.3)]"
-                            style={{ width: `${Math.min(((sub?.messagesUsed || 0) / (sub?.messagesLimit || 1000)) * 100, 100)}%` }} />
-                    </div>
-                </div>
-
-                <div className="glass-panel stat-card-premium overflow-hidden">
-                    <div className="label mb-2">Ejecuciones IA</div>
-                    <div className="flex items-baseline gap-2 mb-4">
-                        <span className="value">{sub?.agentRunsUsed.toLocaleString() || '0'}</span>
-                        <span className="text-xs font-bold text-muted opacity-40 uppercase tracking-widest">
-                            / {sub?.agentRunsLimit === -1 ? '∞' : sub?.agentRunsLimit.toLocaleString() || '100'}
-                        </span>
-                    </div>
-                    <div className="h-1.5 w-full bg-gray-50/50 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-primary transition-all duration-1000 shadow-[0_0_10px_rgba(var(--brand-primary-rgb),0.3)]"
-                            style={{ width: `${Math.min(((sub?.agentRunsUsed || 0) / (sub?.agentRunsLimit || 100)) * 100, 100)}%` }} />
-                    </div>
-                </div>
-            </section>
-
-            {/* Plans Selection */}
-            <div className="text-center mb-12">
-                <h2 className="text-xs font-black tracking-[0.3em] text-muted uppercase mb-4 opacity-60 italic">Planes Disponibles</h2>
-                <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-brand-primary to-transparent mx-auto" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                {PLANS.map((plan) => (
-                    <div key={plan.id} className={`group relative glass-panel p-8 flex flex-col transition-all duration-500 hover:-translate-y-2 ${plan.recommended ? 'border-brand-primary/30 bg-gray-50/30' : 'border-gray-200'
-                        }`}>
-                        {plan.recommended && (
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-brand-primary text-white text-[9px] font-black tracking-[0.2em] rounded-full uppercase shadow-[0_0_15px_rgba(var(--brand-primary-rgb),0.4)]">
-                                Recomendado
-                            </div>
-                        )}
+            {/* Stats Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
 
-                        <div className="mb-8">
-                            <h3 className="text-lg font-bold font-display text-header mb-1 group-hover:text-brand-primary transition-colors">{plan.name}</h3>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-4xl font-black text-header">${plan.price}</span>
-                                <span className="text-xs font-bold text-muted uppercase tracking-widest opacity-40">/ mes</span>
-                            </div>
-                        </div>
+                {/* Plan Actual */}
+                <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: '#8E8E93', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Plan Actual
+                    </p>
+                    <p style={{ fontSize: 22, fontWeight: 700, color: '#1C1C1E', margin: '0 0 10px' }}>
+                        {currentPlanName}
+                    </p>
+                    <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        background: isActive ? 'rgba(52,199,89,0.12)' : 'rgba(255,149,0,0.12)',
+                        color: isActive ? '#34C759' : '#FF9500',
+                        borderRadius: 20, padding: '3px 10px',
+                        fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
+                    }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: isActive ? '#34C759' : '#FF9500', display: 'inline-block' }} />
+                        {isActive ? 'ACTIVO' : 'PENDIENTE'}
+                    </span>
+                </div>
 
-                        <div className="space-y-4 mb-10 flex-1">
-                            {plan.features.map((feat) => (
-                                <div key={feat} className="flex items-start gap-3">
-                                    <div className="mt-1 w-4 h-4 rounded-full bg-brand-primary/10 flex items-center justify-center border border-brand-primary/20">
-                                        <Icons.Check size={10} className="text-brand-primary" />
-                                    </div>
-                                    <span className="text-xs font-medium text-muted leading-tight">{feat}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <button
-                            className={`btn-premium w-full !py-3.5 ${plan.recommended ? 'btn-premium-primary shadow-[0_10px_30px_-10px_rgba(var(--brand-primary-rgb),0.3)]' : 'btn-premium-outline'}`}
-                            onClick={() => handleSubscribe(plan.id)}
-                            disabled={!!processing || (isActive && sub?.plan?.name === plan.name)}
-                        >
-                            {processing === plan.id ? 'Procesando...' :
-                                (isActive && sub?.plan?.name === plan.name) ? 'Plan Activo' : 'Seleccionar Plan'}
-                        </button>
+                {/* Mensajes */}
+                <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: '#8E8E93', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Mensajes
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 12 }}>
+                        <span style={{ fontSize: 28, fontWeight: 700, color: '#1C1C1E' }}>{messagesUsed.toLocaleString()}</span>
+                        <span style={{ fontSize: 13, color: '#8E8E93' }}>/ {messagesLimit === -1 ? '∞' : messagesLimit.toLocaleString()}</span>
                     </div>
-                ))}
+                    <div style={{ height: 4, background: '#F2F2F7', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${messagesPct}%`, background: messagesPct > 80 ? '#FF3B30' : '#007AFF', borderRadius: 2, transition: 'width 0.6s ease' }} />
+                    </div>
+                </div>
+
+                {/* Ejecuciones IA */}
+                <div style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: '#8E8E93', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Ejecuciones IA
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 12 }}>
+                        <span style={{ fontSize: 28, fontWeight: 700, color: '#1C1C1E' }}>{runsUsed.toLocaleString()}</span>
+                        <span style={{ fontSize: 13, color: '#8E8E93' }}>/ {runsLimit === -1 ? '∞' : runsLimit.toLocaleString()}</span>
+                    </div>
+                    <div style={{ height: 4, background: '#F2F2F7', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${runsPct}%`, background: runsPct > 80 ? '#FF3B30' : '#AF52DE', borderRadius: 2, transition: 'width 0.6s ease' }} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Section Header */}
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12, paddingLeft: 4 }}>
+                Planes Disponibles
+            </p>
+
+            {/* Plan Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {PLANS.map((plan) => {
+                    const isCurrentPlan = isActive && sub?.plan?.name === plan.name;
+                    return (
+                        <div key={plan.id} style={{
+                            background: '#fff',
+                            borderRadius: 16,
+                            padding: '24px 20px 20px',
+                            boxShadow: plan.recommended
+                                ? `0 4px 20px rgba(0,122,255,0.12)`
+                                : '0 1px 3px rgba(0,0,0,0.06)',
+                            border: plan.recommended ? '2px solid #007AFF' : '1px solid rgba(60,60,67,0.1)',
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}>
+                            {plan.recommended && (
+                                <div style={{
+                                    position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
+                                    background: '#007AFF', color: '#fff',
+                                    fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
+                                    padding: '4px 12px', borderRadius: 20,
+                                    textTransform: 'uppercase', whiteSpace: 'nowrap',
+                                }}>
+                                    Más Popular
+                                </div>
+                            )}
+
+                            {/* Plan name + price */}
+                            <div style={{ marginBottom: 20 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: plan.color, display: 'inline-block', flexShrink: 0 }} />
+                                    <span style={{ fontSize: 16, fontWeight: 700, color: '#1C1C1E' }}>{plan.name}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                                    <span style={{ fontSize: 36, fontWeight: 800, color: '#1C1C1E', letterSpacing: -1 }}>${plan.price}</span>
+                                    <span style={{ fontSize: 13, color: '#8E8E93', fontWeight: 500 }}>/mes</span>
+                                </div>
+                            </div>
+
+                            {/* Separator */}
+                            <div style={{ height: 1, background: 'rgba(60,60,67,0.1)', marginBottom: 16 }} />
+
+                            {/* Features */}
+                            <div style={{ flex: 1, marginBottom: 20 }}>
+                                {plan.features.map((feat) => (
+                                    <div key={feat} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid rgba(60,60,67,0.06)' }}>
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <circle cx="8" cy="8" r="8" fill={plan.color} fillOpacity="0.12" />
+                                            <path d="M5 8l2 2 4-4" stroke={plan.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                        <span style={{ fontSize: 13, color: '#3C3C43', fontWeight: 500 }}>{feat}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* CTA Button */}
+                            <button
+                                onClick={() => handleSubscribe(plan.id)}
+                                disabled={!!processing || isCurrentPlan}
+                                style={{
+                                    width: '100%',
+                                    padding: '13px',
+                                    borderRadius: 12,
+                                    border: 'none',
+                                    background: isCurrentPlan
+                                        ? 'rgba(60,60,67,0.08)'
+                                        : plan.recommended
+                                            ? '#007AFF'
+                                            : `rgba(0,122,255,0.08)`,
+                                    color: isCurrentPlan
+                                        ? '#8E8E93'
+                                        : plan.recommended
+                                            ? '#fff'
+                                            : '#007AFF',
+                                    fontSize: 15,
+                                    fontWeight: 600,
+                                    cursor: isCurrentPlan ? 'default' : 'pointer',
+                                    opacity: processing === plan.id ? 0.6 : 1,
+                                    transition: 'opacity 0.2s',
+                                    fontFamily: '-apple-system, "Inter", sans-serif',
+                                }}
+                            >
+                                {processing === plan.id
+                                    ? 'Procesando...'
+                                    : isCurrentPlan
+                                        ? '✓ Plan Actual'
+                                        : 'Seleccionar Plan'}
+                            </button>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
@@ -236,8 +313,8 @@ function BillingContent() {
 export default function BillingPage() {
     return (
         <Suspense fallback={
-            <div className="animate-pulse space-y-8 p-8 max-w-7xl mx-auto">
-                <div className="h-10 w-64 bg-gray-100 rounded-lg" />
+            <div style={{ padding: 24, background: '#F2F2F7', minHeight: '100vh' }}>
+                <div style={{ height: 32, width: 200, background: '#E5E5EA', borderRadius: 8 }} />
             </div>
         }>
             <BillingContent />
