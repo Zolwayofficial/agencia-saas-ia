@@ -38,7 +38,7 @@ const PLANS = [
         price: 79,
         features: ['3 Nodos WhatsApp', '10,000 Mensajes / mes', 'GPT-4 Avanzado', 'Soporte Prioritario', 'Marca Blanca'],
         recommended: true,
-        color: '#007AFF',
+        color: 'var(--brand-primary, #5abf8a)',
     },
     {
         id: 'plan_agency',
@@ -139,7 +139,7 @@ function BillingContent() {
                         onClick={handlePortal}
                         disabled={!!processing}
                         style={{
-                            background: '#007AFF',
+                            background: 'var(--brand-primary, #5abf8a)',
                             color: '#fff',
                             border: 'none',
                             borderRadius: 20,
@@ -188,7 +188,7 @@ function BillingContent() {
                         <span style={{ fontSize: 13, color: '#8E8E93' }}>/ {messagesLimit === -1 ? '∞' : messagesLimit.toLocaleString()}</span>
                     </div>
                     <div style={{ height: 4, background: '#F2F2F7', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${messagesPct}%`, background: messagesPct > 80 ? '#FF3B30' : '#007AFF', borderRadius: 2, transition: 'width 0.6s ease' }} />
+                        <div style={{ height: '100%', width: `${messagesPct}%`, background: messagesPct > 80 ? '#FF3B30' : 'var(--brand-primary, #5abf8a)', borderRadius: 2, transition: 'width 0.6s ease' }} />
                     </div>
                 </div>
 
@@ -224,7 +224,7 @@ function BillingContent() {
                             boxShadow: plan.recommended
                                 ? `0 4px 20px rgba(0,122,255,0.12)`
                                 : '0 1px 3px rgba(0,0,0,0.06)',
-                            border: plan.recommended ? '2px solid #007AFF' : '1px solid rgba(60,60,67,0.1)',
+                            border: plan.recommended ? '2px solid var(--brand-primary, #5abf8a)' : '1px solid rgba(60,60,67,0.1)',
                             position: 'relative',
                             display: 'flex',
                             flexDirection: 'column',
@@ -232,7 +232,7 @@ function BillingContent() {
                             {plan.recommended && (
                                 <div style={{
                                     position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                                    background: '#007AFF', color: '#fff',
+                                    background: 'var(--brand-primary, #5abf8a)', color: '#fff',
                                     fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
                                     padding: '4px 12px', borderRadius: 20,
                                     textTransform: 'uppercase', whiteSpace: 'nowrap',
@@ -281,13 +281,13 @@ function BillingContent() {
                                     background: isCurrentPlan
                                         ? 'rgba(60,60,67,0.08)'
                                         : plan.recommended
-                                            ? '#007AFF'
+                                            ? 'var(--brand-primary, #5abf8a)'
                                             : `rgba(0,122,255,0.08)`,
                                     color: isCurrentPlan
                                         ? '#8E8E93'
                                         : plan.recommended
                                             ? '#fff'
-                                            : '#007AFF',
+                                            : 'var(--brand-primary, #5abf8a)',
                                     fontSize: 15,
                                     fontWeight: 600,
                                     cursor: isCurrentPlan ? 'default' : 'pointer',
