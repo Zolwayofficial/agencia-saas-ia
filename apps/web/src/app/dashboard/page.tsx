@@ -6,31 +6,104 @@ import { useAuth } from '../../lib/auth-context';
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
 
-const CHANNEL_ICONS: Record<string, ((props: any) => JSX.Element)> = {
-    whatsapp: (props) => <Icons.WhatsApp {...props} />,
-    instagram: (props) => <Icons.Instagram {...props} />,
-    telegram: (props) => <Icons.Telegram {...props} />,
-    facebook: (props) => <Icons.Facebook {...props} />,
-    email: (props) => <Icons.Mail {...props} />,
-    discord: (props) => <Icons.Discord {...props} />,
-};
+// ── Canales de mensajería ─────────────────────────────────────────────────────
+const MESSAGING_CHANNELS = [
+    { id: 'whatsapp',  name: 'WhatsApp',          icon: Icons.LogoWhatsApp,       color: '#25D366', href: '/dashboard/whatsapp' },
+    { id: 'instagram', name: 'Instagram DM',       icon: Icons.LogoInstagram,      color: '#E1306C', href: '/dashboard/inbox' },
+    { id: 'facebook',  name: 'Facebook Messenger', icon: Icons.LogoFacebook,       color: '#1877F2', href: '/dashboard/inbox' },
+    { id: 'telegram',  name: 'Telegram',           icon: Icons.LogoTelegram,       color: '#229ED9', href: '/dashboard/inbox' },
+    { id: 'tiktok',    name: 'TikTok',             icon: Icons.LogoTikTok,         color: '#010101', href: '/dashboard/inbox' },
+    { id: 'email',     name: 'Email Omnicanal',    icon: Icons.Mail,               color: '#EA4335', href: '/dashboard/inbox' },
+    { id: 'twitter',   name: 'X / Twitter DM',     icon: Icons.LogoX,              color: '#111111', href: '/dashboard/inbox' },
+    { id: 'sms',       name: 'SMS · Twilio',       icon: Icons.LogoTwilio,         color: '#F22F46', href: '/dashboard/inbox' },
+    { id: 'line',      name: 'LINE',               icon: Icons.LogoLine,           color: '#06C755', href: '/dashboard/inbox' },
+    { id: 'google',    name: 'Google Business',    icon: Icons.LogoGoogle,         color: '#4285F4', href: '/dashboard/inbox' },
+];
 
-const CHANNELS = [
-    { id: 'whatsapp', name: 'WhatsApp', icon: CHANNEL_ICONS.whatsapp, color: '#25D366', status: 'connected', label: 'Instancias activas' },
-    { id: 'instagram', name: 'Instagram', icon: CHANNEL_ICONS.instagram, color: '#E1306C', status: 'setup', label: 'No configurado' },
-    { id: 'telegram', name: 'Telegram', icon: CHANNEL_ICONS.telegram, color: '#0088cc', status: 'setup', label: 'No configurado' },
-    { id: 'facebook', name: 'Facebook', icon: CHANNEL_ICONS.facebook, color: '#1877F2', status: 'setup', label: 'No configurado' },
-    { id: 'email', name: 'Email', icon: CHANNEL_ICONS.email, color: '#EA4335', status: 'setup', label: 'No configurado' },
-    { id: 'discord', name: 'Discord', icon: CHANNEL_ICONS.discord, color: '#5865F2', status: 'setup', label: 'No configurado' },
+// ── Herramientas de productividad ─────────────────────────────────────────────
+const TOOL_INTEGRATIONS = [
+    { id: 'slack',  name: 'Slack',            desc: 'Notificaciones',        icon: Icons.LogoSlack,          color: '#4A154B' },
+    { id: 'linear', name: 'Linear',           desc: 'Issue tracking',        icon: Icons.LogoLinear,         color: '#5E6AD2' },
+    { id: 'notion', name: 'Notion',           desc: 'Conocimiento',          icon: Icons.LogoNotion,         color: '#333333' },
+    { id: 'shopify',name: 'Shopify',          desc: 'E-commerce',            icon: Icons.LogoShopify,        color: '#96BF48' },
+    { id: 'teams',  name: 'Microsoft Teams',  desc: 'Colaboración',          icon: Icons.LogoMicrosoftTeams, color: '#6264A7' },
 ];
 
 const QUICK_ACTIONS = [
-    { href: '/dashboard/inbox', Icon: Icons.Inbox, label: 'Bandeja Omnicanal', desc: 'Gestionar conversaciones', color: '#50CD95' },
-    { href: '/dashboard/marketing', Icon: Icons.Rocket, label: 'Motor de Campanas', desc: 'Crear nueva automatizacion', color: '#3b82f6' },
-    { href: '/dashboard/whatsapp', Icon: Icons.WhatsApp, label: 'Nodos WhatsApp', desc: 'Escanear y gestionar instancias', color: '#25D366' },
-    { href: '/dashboard/integrations', Icon: Icons.Link, label: 'Integraciones', desc: 'Sincronizar aplicaciones', color: '#f59e0b' },
+    { href: '/dashboard/inbox',       Icon: Icons.Inbox,    label: 'Bandeja Omnicanal', desc: 'Gestionar conversaciones',   color: '#5abf8a' },
+    { href: '/dashboard/marketing',   Icon: Icons.Rocket,   label: 'Motor de Campanas', desc: 'Crear nueva automatización', color: '#3b82f6' },
+    { href: '/dashboard/whatsapp',    Icon: Icons.WhatsApp, label: 'Nodos WhatsApp',    desc: 'Escanear y gestionar',       color: '#25D366' },
+    { href: '/dashboard/integrations',Icon: Icons.Link,     label: 'Integraciones',     desc: 'Sincronizar aplicaciones',   color: '#f59e0b' },
 ];
 
+// ── Channel pill ──────────────────────────────────────────────────────────────
+function ChannelPill({
+    ch, status, label,
+}: {
+    ch: typeof MESSAGING_CHANNELS[0];
+    status: 'connected' | 'setup';
+    label?: string;
+}) {
+    const Icon = ch.icon;
+    const darkIcon = ch.color === '#010101' || ch.color === '#111111';
+    return (
+        <Link
+            href={ch.href}
+            className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200"
+        >
+            <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                style={{ background: `${ch.color}18`, color: darkIcon ? '#555' : ch.color }}
+            >
+                <Icon size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="text-[12px] font-semibold text-gray-800 truncate group-hover:text-brand-primary transition-colors leading-tight">
+                    {ch.name}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                    <div
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                            status === 'connected'
+                                ? 'bg-green-400 shadow-[0_0_4px_#4ade80]'
+                                : 'bg-gray-200'
+                        }`}
+                    />
+                    <span className={`text-[10px] font-medium tracking-tight truncate ${
+                        status === 'connected' ? 'text-green-600' : 'text-gray-400'
+                    }`}>
+                        {label ?? (status === 'connected' ? 'Activo' : 'Inactivo')}
+                    </span>
+                </div>
+            </div>
+        </Link>
+    );
+}
+
+// ── Tool pill ─────────────────────────────────────────────────────────────────
+function ToolPill({ tool }: { tool: typeof TOOL_INTEGRATIONS[0] }) {
+    const Icon = tool.icon;
+    const darkIcon = tool.color === '#333333';
+    return (
+        <div className="group flex items-center gap-3 p-3 rounded-2xl bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer">
+            <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                style={{ background: `${tool.color}15`, color: darkIcon ? '#555' : tool.color }}
+            >
+                <Icon size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="text-[12px] font-semibold text-gray-800 truncate leading-tight">{tool.name}</div>
+                <div className="text-[10px] text-gray-400 font-medium">{tool.desc}</div>
+            </div>
+            <div className="shrink-0 px-1.5 py-0.5 rounded-full bg-gray-100 text-[9px] font-bold text-gray-400 uppercase tracking-wide">
+                Conectar
+            </div>
+        </div>
+    );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
     const { user, organization } = useAuth();
     const [balance, setBalance] = useState<any>(null);
@@ -57,217 +130,259 @@ export default function DashboardPage() {
         ? Math.min(100, (balance.usage.messagesUsed / balance.usage.messagesLimit) * 100)
         : 0;
 
-    const enrichedChannels = CHANNELS.map((c) =>
-        c.id === 'whatsapp'
-            ? { ...c, label: `${instances.length} nodo(s) activo(s)`, status: instances.length > 0 ? 'connected' : 'setup' }
-            : c
-    );
+    const whatsappConnected = instances.length > 0;
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-8 p-8 max-w-6xl mx-auto">
-                <div className="h-8 w-64 bg-gray-100 rounded-lg" />
-                <div className="grid grid-cols-4 gap-6">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-32 bg-gray-100 rounded-2xl" />
-                    ))}
+            <div className="animate-pulse space-y-5 p-6 max-w-7xl mx-auto">
+                <div className="h-10 w-56 bg-gray-100 rounded-2xl" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[1,2,3,4].map(i => <div key={i} className="h-28 bg-gray-100 rounded-3xl" />)}
                 </div>
-                <div className="grid grid-cols-2 gap-6">
-                    <div className="h-64 bg-gray-100 rounded-2xl" />
-                    <div className="h-64 bg-gray-100 rounded-2xl" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div className="h-72 bg-gray-100 rounded-3xl" />
+                    <div className="lg:col-span-2 space-y-4">
+                        <div className="h-52 bg-gray-100 rounded-3xl" />
+                        <div className="h-44 bg-gray-100 rounded-3xl" />
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="animate-in max-w-7xl mx-auto">
-            {/* Centro de Control Header */}
-            <header className="flex justify-between items-end mb-12">
+        <div className="animate-in max-w-7xl mx-auto space-y-5">
+
+            {/* ── Header ──────────────────────────────────────────────────────── */}
+            <header className="flex justify-between items-end pt-1">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-50 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/20 tracking-widest uppercase">
                             Centro Operativo
                         </span>
                     </div>
-                    <h1 className="text-4xl font-bold font-display tracking-tight text-gradient">Centro de Control</h1>
-                    <p className="text-muted text-sm mt-1 font-medium italic opacity-60">
-                        {organization?.name || 'Mi Empresa'} — Estrategia Activa
+                    <h1 className="text-[2rem] font-bold font-display tracking-tight text-gradient leading-none mb-1">
+                        Centro de Control
+                    </h1>
+                    <p className="text-sm text-gray-400 font-medium">
+                        {organization?.name || 'Full Login'} — Estrategia Activa
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <div className="text-right hidden sm:block">
-                        <div className="text-xs font-bold text-muted uppercase tracking-widest mb-1">PLAN ACTUAL</div>
-                        <div className="text-sm font-semibold text-header">{balance?.plan?.name || 'Profesional'}</div>
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Plan Actual</div>
+                        <div className="text-sm font-semibold text-gray-700">{balance?.plan?.name || 'Pro (Trial)'}</div>
                     </div>
-                    <Link href="/dashboard/billing" className="btn-premium btn-premium-primary">
-                        <Icons.Billing size={16} />
+                    <Link href="/dashboard/billing" className="btn-premium btn-premium-primary !rounded-2xl !py-2.5 !px-5">
+                        <Icons.Billing size={15} />
                         Mejorar Plan
                     </Link>
                 </div>
             </header>
 
-            {/* Strategic KPI Row */}
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div className="glass-panel stat-card-premium">
-                    <div className="label">Ingresos Mensuales</div>
+            {/* ── KPI Row ─────────────────────────────────────────────────────── */}
+            <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Ingresos */}
+                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Ingresos Mensuales</div>
                     <div className="flex items-baseline gap-2">
-                        <span className="value">${(balance?.mrr || 0).toLocaleString()}</span>
-                        <span className="trend trend-up">
-                            <Icons.ArrowUp size={12} className="mr-1" />
-                            12.4%
+                        <span className="text-2xl font-black font-display text-gray-900">${(balance?.mrr || 0).toLocaleString()}</span>
+                        <span className="text-[11px] font-bold text-green-500 flex items-center gap-0.5">
+                            <Icons.ArrowUp size={10} />12.4%
                         </span>
                     </div>
-                    <div className="mt-4 flex items-center gap-2">
-                        <Icons.MRR size={14} className="text-brand-primary opacity-50" />
-                        <span className="text-[10px] font-bold text-muted underline decoration-brand-primary/20 underline-offset-4">PROYECCION ACTIVA</span>
+                    <div className="mt-3 flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
+                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Proyección activa</span>
                     </div>
                 </div>
 
-                <div className="glass-panel stat-card-premium">
-                    <div className="label">Volumen de Mensajes</div>
+                {/* Mensajes */}
+                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Volumen de Mensajes</div>
                     <div className="flex items-baseline gap-2">
-                        <span className="value">{(balance?.usage?.messagesUsed || 0).toLocaleString()}</span>
-                        <span className="text-xs font-medium text-muted">/ {balance?.usage?.messagesLimit || '5k'}</span>
+                        <span className="text-2xl font-black font-display text-gray-900">{(balance?.usage?.messagesUsed || 0).toLocaleString()}</span>
+                        <span className="text-[11px] text-gray-400 font-medium">/ {balance?.usage?.messagesLimit || '10000'}</span>
                     </div>
-                    <div className="mt-4 w-full h-1 bg-gray-50 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-primary shadow-[0_0_8px_var(--brand-primary)]" style={{ width: `${msgPercent}%` }} />
+                    <div className="mt-3 w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                            className="h-full rounded-full bg-brand-primary transition-all duration-1000"
+                            style={{ width: `${msgPercent}%` }}
+                        />
                     </div>
-                    <div className="mt-4 flex justify-between items-center text-[10px] font-bold tracking-widest text-muted">
-                        <span>VOLUMEN: {Math.round(msgPercent)}%</span>
-                        <span className="opacity-40">ESCALADO AUTOMATICO</span>
+                    <div className="mt-2 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                        Volumen: {Math.round(msgPercent)}% · Escalado automático
                     </div>
                 </div>
 
-                <div className="glass-panel stat-card-premium">
-                    <div className="label">Resolucion IA</div>
+                {/* IA */}
+                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Resolución IA</div>
                     <div className="flex items-baseline gap-2">
-                        <span className="value">84.2%</span>
-                        <span className="trend trend-up">
-                            <Icons.ArrowUp size={12} className="mr-1" />
-                            2.1%
+                        <span className="text-2xl font-black font-display text-gray-900">84.2%</span>
+                        <span className="text-[11px] font-bold text-green-500 flex items-center gap-0.5">
+                            <Icons.ArrowUp size={10} />2.1%
                         </span>
                     </div>
-                    <div className="mt-4 flex items-center gap-2">
-                        <Icons.AI size={14} className="text-primary-light opacity-80" />
-                        <span className="text-[10px] font-bold text-muted">EFICIENCIA AUTONOMA</span>
+                    <div className="mt-3 flex items-center gap-1.5">
+                        <Icons.AI size={13} className="text-brand-primary opacity-70" />
+                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Eficiencia autónoma</span>
                     </div>
                 </div>
 
-                <div className="glass-panel stat-card-premium">
-                    <div className="label">Comisiones de Referidos</div>
+                {/* Referidos */}
+                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                    <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Comisiones Referidos</div>
                     <div className="flex items-baseline gap-2">
-                        <span className="value">${(balance?.commissions || 0).toFixed(2)}</span>
+                        <span className="text-2xl font-black font-display text-gray-900">${(balance?.commissions || 0).toFixed(2)}</span>
                     </div>
-                    <div className="mt-4 flex items-center gap-2">
-                        <Icons.Referrals size={14} className="text-warning opacity-50" />
-                        <span className="text-[10px] font-bold text-muted">NIVEL UNICO 20% ACTIVO</span>
+                    <div className="mt-3 flex items-center gap-1.5">
+                        <Icons.Referrals size={13} className="text-amber-400 opacity-80" />
+                        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Nivel único 20% activo</span>
                     </div>
                 </div>
             </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-                {/* Tactical Actions */}
-                <div className="lg:col-span-1 glass-panel p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase">ACCIONES RAPIDAS</h2>
-                        <div className="w-8 h-1 bg-brand-primary/20 rounded-full" />
+            {/* ── Main Grid ────────────────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                {/* Acciones Rápidas */}
+                <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Acciones Rápidas</h2>
+                        <div className="w-6 h-1 rounded-full bg-brand-primary/30" />
                     </div>
-                    <div className="grid grid-cols-1 gap-3">
-                        {QUICK_ACTIONS.map((action) => (
-                            <Link key={action.href} href={action.href} className="flex items-center gap-4 p-4 glass-panel hover:bg-gray-50/50 transition-all group !border-gray-100">
-                                <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300"
-                                    style={{ background: `${action.color}15`, color: action.color }}>
+                    <div className="space-y-1.5">
+                        {QUICK_ACTIONS.map(action => (
+                            <Link
+                                key={action.href}
+                                href={action.href}
+                                className="flex items-center gap-3.5 p-3 rounded-2xl hover:bg-gray-50 transition-all duration-200 group"
+                            >
+                                <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                                    style={{ background: `${action.color}18`, color: action.color }}
+                                >
                                     <action.Icon size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-[13px] font-bold text-header group-hover:text-brand-primary transition-colors">{action.label}</div>
-                                    <div className="text-[10px] text-muted font-medium uppercase tracking-tight opacity-60">{action.desc}</div>
+                                    <div className="text-[13px] font-semibold text-gray-800 group-hover:text-brand-primary transition-colors">
+                                        {action.label}
+                                    </div>
+                                    <div className="text-[10px] text-gray-400 font-medium uppercase tracking-tight mt-0.5">
+                                        {action.desc}
+                                    </div>
                                 </div>
-                                <Icons.ArrowRight size={14} className="text-muted group-hover:translate-x-1 group-hover:text-header transition-all" />
+                                <Icons.ArrowRight
+                                    size={14}
+                                    className="text-gray-300 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all shrink-0"
+                                />
                             </Link>
                         ))}
                     </div>
                 </div>
 
-                {/* Infrastructure Status */}
-                <div className="lg:col-span-2 glass-panel p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase">CANALES DE COMUNICACION</h2>
-                        <Link href="/dashboard/whatsapp" className="text-[10px] flex items-center gap-1 font-bold text-brand-primary uppercase tracking-widest hover:opacity-80 transition-all">
-                            Ver Todos <Icons.External size={10} />
-                        </Link>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {enrichedChannels.map((ch) => (
-                            <div key={ch.id} className="flex items-center gap-4 p-4 glass-panel !border-gray-100">
-                                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                    style={{ background: `${ch.color}10`, color: ch.color }}>
-                                    {(() => {
-                                        const Icon = ch.icon;
-                                        return <Icon size={20} />;
-                                    })()}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-[13px] font-bold text-header truncate">{ch.name}</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-1.5 h-1.5 rounded-full ${ch.status === 'connected' ? 'bg-success animate-pulse' : 'bg-gray-100'}`}
-                                            style={{ backgroundColor: ch.status === 'connected' ? 'hsl(var(--success))' : undefined }} />
-                                        <span className={`text-[10px] font-bold tracking-tight uppercase ${ch.status === 'connected' ? 'text-brand-primary' : 'text-muted opacity-40'}`}>
-                                            {ch.label}
-                                        </span>
-                                    </div>
-                                </div>
+                {/* Channels + Tools col */}
+                <div className="lg:col-span-2 space-y-4">
+
+                    {/* Canales de Comunicación */}
+                    <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Canales de Comunicación</h2>
+                                <p className="text-[10px] text-gray-300 font-medium mt-0.5">Escáner de canales en tiempo real</p>
                             </div>
-                        ))}
+                            <Link
+                                href="/dashboard/inbox"
+                                className="text-[11px] font-semibold text-brand-primary flex items-center gap-1 hover:opacity-70 transition-opacity"
+                            >
+                                Ver todos <Icons.External size={10} />
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            {MESSAGING_CHANNELS.map(ch => (
+                                <ChannelPill
+                                    key={ch.id}
+                                    ch={ch}
+                                    status={ch.id === 'whatsapp' && whatsappConnected ? 'connected' : 'setup'}
+                                    label={ch.id === 'whatsapp' ? `${instances.length} nodo(s) activo(s)` : undefined}
+                                />
+                            ))}
+                        </div>
                     </div>
+
+                    {/* Herramientas de Productividad */}
+                    <div className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Herramientas</h2>
+                                <p className="text-[10px] text-gray-300 font-medium mt-0.5">CRM · Productividad · E-commerce</p>
+                            </div>
+                            <Link
+                                href="/dashboard/integrations"
+                                className="text-[11px] font-semibold text-brand-primary flex items-center gap-1 hover:opacity-70 transition-opacity"
+                            >
+                                Ver todos <Icons.External size={10} />
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            {TOOL_INTEGRATIONS.map(tool => (
+                                <ToolPill key={tool.id} tool={tool} />
+                            ))}
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            {/* Strategic Activity Feed */}
-            <section className="glass-panel p-6 mb-8">
-                <div className="flex items-center justify-between mb-8">
+            {/* ── Activity Feed ─────────────────────────────────────────────────── */}
+            <section className="rounded-3xl bg-white border border-gray-100 p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h2 className="text-xs font-bold tracking-[0.2em] text-muted uppercase mb-1">ACTIVIDAD RECIENTE</h2>
-                        <p className="text-[10px] text-muted font-medium">REGISTRO DE TRANSACCIONES</p>
+                        <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.15em]">Actividad Reciente</h2>
+                        <p className="text-[10px] text-gray-300 font-medium mt-0.5">Registro de transacciones</p>
                     </div>
-                    <Link href="/dashboard/billing" className="btn-premium btn-premium-outline !py-2 !px-4 !text-[11px]">
+                    <Link href="/dashboard/billing" className="btn-premium btn-premium-outline !py-2 !px-4 !text-[11px] !rounded-xl">
                         Ver Historial Completo
                     </Link>
                 </div>
                 {history.length === 0 ? (
-                    <div className="py-20 text-center glass-panel !border-dashed !bg-transparent border-gray-200 opacity-40">
-                        <Icons.Inbox size={48} className="mx-auto mb-4 opacity-5" />
-                        <p className="text-sm font-medium">No hay movimientos registrados</p>
+                    <div className="py-16 text-center rounded-2xl bg-gray-50/60 border border-dashed border-gray-200">
+                        <Icons.Inbox size={40} className="mx-auto mb-3 text-gray-200" />
+                        <p className="text-sm font-medium text-gray-300">No hay movimientos registrados</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="text-left border-b border-gray-200">
-                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] px-4">TIPO</th>
-                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em]">DESCRIPCION</th>
-                                    <th className="pb-4 text-[10px] font-bold text-muted uppercase tracking-[0.1em] text-right px-4">MONTO</th>
+                                <tr className="text-left border-b border-gray-100">
+                                    <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3">Tipo</th>
+                                    <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Descripción</th>
+                                    <th className="pb-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right px-3">Monto</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {history.map((tx) => (
-                                    <tr key={tx.id} className="group hover:bg-gray-50/20 transition-all">
-                                        <td className="py-5 px-4">
-                                            <span className={`text-[10px] font-black px-2 py-0.5 rounded border ${tx.type === 'COMMISSION'
-                                                    ? 'bg-warning/5 text-warning border-warning/20'
-                                                    : 'bg-info/5 text-info border-info/20'}`}>
+                            <tbody className="divide-y divide-gray-50">
+                                {history.map(tx => (
+                                    <tr key={tx.id} className="group hover:bg-gray-50/40 transition-colors">
+                                        <td className="py-4 px-3">
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                                tx.type === 'COMMISSION'
+                                                    ? 'bg-amber-50 text-amber-600 border-amber-200'
+                                                    : 'bg-blue-50 text-blue-600 border-blue-200'
+                                            }`}>
                                                 {tx.type}
                                             </span>
                                         </td>
-                                        <td className="py-5">
-                                            <div className="text-[13px] font-bold text-header group-hover:text-brand-primary transition-all line-clamp-1">{tx.description}</div>
-                                            <div className="text-[10px] text-muted font-medium opacity-40">
+                                        <td className="py-4">
+                                            <div className="text-[13px] font-semibold text-gray-800 group-hover:text-brand-primary transition-colors line-clamp-1">
+                                                {tx.description}
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 font-medium mt-0.5">
                                                 {new Date(tx.createdAt).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </td>
-                                        <td className="py-5 text-right px-4">
-                                            <div className={`text-sm font-black font-display ${tx.amount >= 0 ? 'text-brand-primary' : 'text-danger'}`}>
+                                        <td className="py-4 text-right px-3">
+                                            <div className={`text-sm font-black font-display ${tx.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                                 {tx.amount >= 0 ? '+' : '-'}${Math.abs(tx.amount).toFixed(2)}
                                             </div>
                                         </td>
@@ -278,7 +393,7 @@ export default function DashboardPage() {
                     </div>
                 )}
             </section>
+
         </div>
     );
 }
-
