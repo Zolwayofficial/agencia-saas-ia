@@ -100,25 +100,42 @@ export const whatsappController = {
                 orderBy: { createdAt: 'desc' },
             });
 
-            // Sync status with Evolution API (Optimized: skip parallel DB updates if not needed)
+            // Sync status with Evolution API
             const enriched = await Promise.all(
                 instances.map(async (inst: any) => {
                     try {
                         const status = await evolutionApi.getInstanceStatus(inst.instanceName);
                         const state = status?.instance?.state || status?.state || 'close';
-                        const connStatus = state === 'open' ? 'CONNECTED' : state === 'connecting' ? 'QR_PENDING' : 'DISCONNECTED';
 
+                        if (state === 'open') {
+                            // Upgrade to CONNECTED with phone number if available
+                            const ownerJid = status?.instance?.ownerJid || '';
+                            const phoneNumber = ownerJid.replace('@s.whatsapp.net', '') || inst.phoneNumber || '';
+                            if (inst.connectionStatus !== 'CONNECTED') {
+                                await prisma.whatsappInstance.update({
+                                    where: { id: inst.id },
+                                    data: { connectionStatus: 'CONNECTED', health: 'ACTIVE', phoneNumber, isNew: false },
+                                });
+                            }
+                            return { ...inst, connectionStatus: 'CONNECTED', phoneNumber };
+                        }
+
+                        // If DB already shows CONNECTED, trust it (avoids flicker during transient reconnects)
+                        if (inst.connectionStatus === 'CONNECTED') {
+                            return inst;
+                        }
+
+                        // Non-connected: sync normally
+                        const connStatus = state === 'connecting' ? 'QR_PENDING' : 'DISCONNECTED';
                         if (connStatus !== inst.connectionStatus) {
                             await prisma.whatsappInstance.update({
                                 where: { id: inst.id },
-                                data: {
-                                    connectionStatus: connStatus as any,
-                                    health: connStatus === 'CONNECTED' ? 'ACTIVE' : 'WARMUP',
-                                },
+                                data: { connectionStatus: connStatus as any, health: 'WARMUP' },
                             });
                         }
                         return { ...inst, connectionStatus: connStatus };
                     } catch {
+                        // Evolution API unavailable -- trust DB state
                         return inst;
                     }
                 })
@@ -148,19 +165,27 @@ export const whatsappController = {
 
             if (!instance) throw new AppError(404, 'INSTANCE_NOT_FOUND', 'Instancia no encontrada');
 
-            // Check if already connected
+            // 1. Trust DB if already CONNECTED (set by webhook)
+            if (instance.connectionStatus === 'CONNECTED') {
+                return res.json({ status: 'CONNECTED', qrCode: null });
+            }
+
+            // 2. Check live Evolution API state
             try {
                 const status = await evolutionApi.getInstanceStatus(instance.instanceName);
-                if ((status?.instance?.state || status?.state) === 'open') {
+                const liveState = status?.instance?.state || status?.state;
+                if (liveState === 'open') {
+                    const ownerJid = status?.instance?.ownerJid || '';
+                    const phoneNumber = ownerJid.replace('@s.whatsapp.net', '') || (instance as any).phoneNumber || '';
                     await prisma.whatsappInstance.update({
                         where: { id },
-                        data: { connectionStatus: 'CONNECTED', health: 'ACTIVE' },
+                        data: { connectionStatus: 'CONNECTED', health: 'ACTIVE', phoneNumber, isNew: false },
                     });
                     return res.json({ status: 'CONNECTED', qrCode: null });
                 }
-            } catch { /* continue */ }
+            } catch { /* instance may not exist yet */ }
 
-            // 1. Use QR stored from webhook event (Evolution API v2 delivers via webhook)
+            // 3. Use QR stored from webhook event
             let qr: string | null = (instance as any).qrCode || null;
 
             // 2. Fallback: try Evolution API connect endpoint
