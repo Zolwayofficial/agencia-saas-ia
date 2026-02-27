@@ -27,7 +27,7 @@ async function evoFetch(path: string, options: RequestInit = {}): Promise<any> {
 export const evolutionApi = {
     /**
      * Create a new WhatsApp instance in Evolution API.
-     * After creation, call connect() to get the QR code.
+     * Includes apikey header in webhook config so saas-api accepts the callbacks.
      */
     async createInstance(instanceName: string, webhookUrl: string) {
         return evoFetch('/instance/create', {
@@ -38,6 +38,7 @@ export const evolutionApi = {
                 qrcode: true,
                 webhook: {
                     url: webhookUrl,
+                    headers: { apikey: EVOLUTION_KEY },
                     events: [
                         'CONNECTION_UPDATE',
                         'MESSAGES_UPSERT',
@@ -45,6 +46,26 @@ export const evolutionApi = {
                     ],
                     byEvents: false,
                 },
+            }),
+        });
+    },
+
+    /**
+     * Set/update webhook for an existing instance.
+     */
+    async setWebhook(instanceName: string, webhookUrl: string) {
+        return evoFetch(`/webhook/set/${instanceName}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                url: webhookUrl,
+                headers: { apikey: EVOLUTION_KEY },
+                events: [
+                    'CONNECTION_UPDATE',
+                    'MESSAGES_UPSERT',
+                    'QRCODE_UPDATED',
+                ],
+                byEvents: false,
+                enabled: true,
             }),
         });
     },
