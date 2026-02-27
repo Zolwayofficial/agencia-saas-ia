@@ -111,6 +111,7 @@ model WhatsappInstance {
   displayName      String           @default("")
   health           InstanceHealth   @default(WARMUP)
   connectionStatus ConnectionStatus @default(DISCONNECTED)
+  qrCode           String?
   isNew            Boolean          @default(true)
   messagesLast24h  Int              @default(0)
   organizationId   String
