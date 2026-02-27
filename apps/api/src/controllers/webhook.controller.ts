@@ -57,11 +57,14 @@ export const webhookController = {
 
                 // ── New QR code generated ──
                 case 'qrcode.updated': {
-                    logger.info({ instanceName }, 'QR code updated, waiting for scan');
+                    const qrBase64 = event.data?.qrcode?.base64 || event.data?.base64 || null;
+                    logger.info({ instanceName, hasQr: !!qrBase64 }, 'QR code updated');
                     if (instanceName) {
+                        const updateData: any = { connectionStatus: 'QR_PENDING' };
+                        if (qrBase64) updateData.qrCode = qrBase64;
                         await prisma.whatsappInstance.updateMany({
                             where: { instanceName },
-                            data: { connectionStatus: 'QR_PENDING' },
+                            data: updateData,
                         });
                     }
                     break;
