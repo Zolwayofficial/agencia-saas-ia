@@ -160,18 +160,9 @@ export const whatsappController = {
                 }
             } catch { /* continue */ }
 
-            // 1. Use QR stored from webhook event (Evolution API v2 delivers via webhook)
-            let qr: string | null = (instance as any).qrCode || null;
-
-            // 2. Fallback: try Evolution API connect endpoint
-            if (!qr) {
-                try {
-                    const connectResult = await evolutionApi.connectInstance(instance.instanceName);
-                    qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
-                } catch { /* ignore */ }
-            }
-
-            // Strip data URI prefix if present
+            const connectResult = await evolutionApi.connectInstance(instance.instanceName);
+            let qr = connectResult?.base64 || connectResult?.qrcode?.base64 || null;
+            // Strip data URI prefix if present (Evolution v2.3+ includes it)
             if (qr && qr.startsWith('data:')) {
                 qr = qr.replace(/^data:image\/[^;]+;base64,/, '');
             }

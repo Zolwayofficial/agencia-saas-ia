@@ -40,13 +40,16 @@ export const webhookController = {
                             },
                         });
 
-                        // If connected, try to get phone number
-                        if (state === 'open' && event.data?.wuid) {
-                            const phone = event.data.wuid.replace('@s.whatsapp.net', '');
-                            await prisma.whatsappInstance.updateMany({
-                                where: { instanceName },
-                                data: { phoneNumber: phone, isNew: false },
-                            });
+                        // If connected, save phone number
+                        if (state === 'open') {
+                            const rawId = event.data?.me?.id || event.data?.wuid || null;
+                            if (rawId) {
+                                const phone = rawId.replace(/@s\.whatsapp\.net$/, '').replace(/:[0-9]+$/, '');
+                                await prisma.whatsappInstance.updateMany({
+                                    where: { instanceName },
+                                    data: { phoneNumber: phone, isNew: false },
+                                });
+                            }
                         }
                     }
                     break;
@@ -54,14 +57,11 @@ export const webhookController = {
 
                 // ── New QR code generated ──
                 case 'qrcode.updated': {
-                    const qrBase64 = event.data?.qrcode?.base64 || event.data?.base64 || null;
-                    logger.info({ instanceName, hasQr: !!qrBase64 }, 'QR code updated');
+                    logger.info({ instanceName }, 'QR code updated, waiting for scan');
                     if (instanceName) {
-                        const updateData: any = { connectionStatus: 'QR_PENDING' };
-                        if (qrBase64) updateData.qrCode = qrBase64;
                         await prisma.whatsappInstance.updateMany({
                             where: { instanceName },
-                            data: updateData,
+                            data: { connectionStatus: 'QR_PENDING' },
                         });
                     }
                     break;
