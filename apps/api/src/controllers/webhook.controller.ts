@@ -40,16 +40,13 @@ export const webhookController = {
                             },
                         });
 
-                        // If connected, save phone number
-                        if (state === 'open') {
-                            const rawId = event.data?.me?.id || event.data?.wuid || null;
-                            if (rawId) {
-                                const phone = rawId.replace(/@s\.whatsapp\.net$/, '').replace(/:[0-9]+$/, '');
-                                await prisma.whatsappInstance.updateMany({
-                                    where: { instanceName },
-                                    data: { phoneNumber: phone, isNew: false },
-                                });
-                            }
+                        // If connected, try to get phone number
+                        if (state === 'open' && event.data?.wuid) {
+                            const phone = event.data.wuid.replace('@s.whatsapp.net', '');
+                            await prisma.whatsappInstance.updateMany({
+                                where: { instanceName },
+                                data: { phoneNumber: phone, isNew: false },
+                            });
                         }
                     }
                     break;

@@ -35,9 +35,7 @@ services:
       - internal
 
   evolution-api:
-    build:
-      context: .
-      dockerfile: Dockerfile.evolution
+    image: atendai/evolution-api:latest
     restart: always
     env_file: .env.prod
     depends_on: [ redis ]

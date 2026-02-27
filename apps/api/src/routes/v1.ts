@@ -43,6 +43,7 @@ router.get('/auth/me', authController.me);
 router.get('/billing/balance', billingController.getBalance);
 router.get('/billing/plans', billingController.getPlans);
 router.get('/billing/history', billingController.getHistory);
+router.get('/billing/plans', stripeController.getPlans);
 router.get('/billing/subscription', stripeController.getSubscription);
 router.post('/billing/checkout', stripeController.createCheckout);
 router.post('/billing/portal', stripeController.createPortal);
@@ -74,7 +75,7 @@ router.delete('/knowledge/:id', knowledgeController.deleteEntry);
 router.get('/knowledge/agent-config', knowledgeController.getAgentConfig);
 router.put('/knowledge/agent-config', knowledgeController.updateAgentConfig);
 router.get('/knowledge/conversations', knowledgeController.listConversations);
-router.post('/knowledge/upload', upload.single('file') as any, uploadController.uploadDocument);
+router.post('/knowledge/upload', upload.single('file'), uploadController.uploadDocument);
 
 // Chatwoot SSO
 router.get('/chatwoot/sso', chatwootController.sso);
