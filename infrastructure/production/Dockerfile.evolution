@@ -1,0 +1,7 @@
+FROM atendai/evolution-api:v2.2.3
+
+# Update Baileys to latest version compatible with current WhatsApp protocol
+RUN npm install baileys@6.17.16 --prefix /evolution --save
+
+# Remove hardcoded WhatsApp version (let Baileys auto-detect current version)
+RUN sed -i '/CONFIG_SESSION_PHONE_VERSION/d' /evolution/.env 2>/dev/null || true
