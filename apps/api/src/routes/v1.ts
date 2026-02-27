@@ -75,7 +75,7 @@ router.delete('/knowledge/:id', knowledgeController.deleteEntry);
 router.get('/knowledge/agent-config', knowledgeController.getAgentConfig);
 router.put('/knowledge/agent-config', knowledgeController.updateAgentConfig);
 router.get('/knowledge/conversations', knowledgeController.listConversations);
-router.post('/knowledge/upload', upload.single('file'), uploadController.uploadDocument);
+router.post('/knowledge/upload', upload.single('file') as any, uploadController.uploadDocument);
 
 // Chatwoot SSO
 router.get('/chatwoot/sso', chatwootController.sso);

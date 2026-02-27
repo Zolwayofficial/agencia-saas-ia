@@ -7,6 +7,21 @@ export const billingController = {
      * GET /api/v1/billing/balance
      * Retorna el uso actual del plan, comisiones y estadísticas de analytics reales.
      */
+    getPlans: async (req: Request, res: Response) => {
+        try {
+            const orgId = (req as any).organizationId;
+            const org = await prisma.organization.findUnique({ where: { id: orgId }, include: { plan: true } });
+            const plans = await prisma.plan.findMany({ where: { name: { not: "Admin" } }, orderBy: { priceMonthly: "asc" } });
+            const plansWithMeta = plans.map(plan => ({
+                id: plan.id, name: plan.name, priceMonthly: plan.priceMonthly,
+                messagesIncluded: plan.messagesIncluded, agentRunsIncluded: plan.agentRunsIncluded,
+                maxInstances: plan.maxInstances, stripePriceId: plan.stripePriceId,
+                isCurrent: org?.planId === plan.id, isPopular: plan.name === "Pro",
+            }));
+            res.json({ plans: plansWithMeta, currentPlan: org?.plan?.name || "Sin plan" });
+        } catch (error) { res.status(500).json({ error: "Error al obtener planes" }); }
+    },
+
     getBalance: async (req: Request, res: Response) => {
         try {
             const orgId = (req as any).organizationId;
