@@ -7,6 +7,8 @@ import { queueService } from '../services/queue.service';
  * Webhook Controller
  * Recibe eventos de servicios externos (Evolution API, Chatwoot).
  */
+const webhookRestartCooldown = new Map();
+
 export const webhookController = {
     /**
      * POST /api/v1/webhooks/evolution
@@ -40,13 +42,29 @@ export const webhookController = {
                             },
                         });
 
-                        // If connected, try to get phone number
-                        if (state === 'open' && event.data?.wuid) {
-                            const phone = event.data.wuid.replace('@s.whatsapp.net', '');
-                            await prisma.whatsappInstance.updateMany({
-                                where: { instanceName },
-                                data: { phoneNumber: phone, isNew: false },
-                            });
+                        if (state === 'open') {
+                            const phoneData: any = { qrCode: null, isNew: false };
+                            if (event.data?.wuid) {
+                                phoneData.phoneNumber = event.data.wuid.replace('@s.whatsapp.net', '');
+                            }
+                            await prisma.whatsappInstance.updateMany({ where: { instanceName }, data: phoneData });
+                            logger.info({ instanceName, phone: phoneData.phoneNumber }, 'WhatsApp connected, phone captured');
+                        } else if (state === 'connecting') {
+                            const inst = await prisma.whatsappInstance.findUnique({ where: { instanceName }, select: { qrCode: true } });
+                            if (inst && inst.qrCode) {
+                                const now = Date.now();
+                                const lastRestart = webhookRestartCooldown.get(instanceName) || 0;
+                                if (now - lastRestart > 30000) {
+                                    webhookRestartCooldown.set(instanceName, now);
+                                    logger.info({ instanceName }, 'Webhook: 515 detected after QR, triggering restart in 2s');
+                                    setTimeout(() => {
+                                        const evoMod = require('../lib/evolution');
+                                        evoMod.evolutionApi.restartInstance(instanceName).catch((e) => {
+                                            logger.warn({ instanceName, err: e && e.message }, 'Webhook restart failed');
+                                        });
+                                    }, 2000);
+                                }
+                            }
                         }
                     }
                     break;
