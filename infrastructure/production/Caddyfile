@@ -6,7 +6,7 @@ fulllogin.com, www.fulllogin.com {
 wa.fulllogin.com {
     handle /autologin* {
         header Content-Type text/html
-        respond `<html><head><title>Loading...</title></head><body><script>localStorage.setItem('apiUrl','https://wa.fulllogin.com');localStorage.setItem('token','87a4f16b637b11d0beb911329900c559');window.location='https://wa.fulllogin.com/manager/';</script></body></html>` 200
+        respond `<html><head><title>Loading...</title></head><body><script>localStorage.setItem('apiUrl','https://wa.fulllogin.com');localStorage.setItem('token','87a4f16b637b11d0beb911329900c559');localStorage.setItem('version','2.3.7');localStorage.setItem('clientName','evolution_exchange');window.location='https://wa.fulllogin.com/manager/';</script></body></html>` 200
     }
     reverse_proxy evolution-api:8080
 }
