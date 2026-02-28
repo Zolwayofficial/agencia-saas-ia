@@ -23,8 +23,8 @@ export const webhookController = {
             switch (eventType) {
                 // ── Connection state changed ──
                 case 'connection.update': {
-                    const state = event.data?.state || event.data?.statusReason;
-                    logger.info({ instanceName, state }, 'WhatsApp connection update');
+                    const state = event.data?.state || event.data?.connection || event.data?.statusReason;
+                    logger.info({ instanceName, state, rawData: event.data }, 'WhatsApp connection update');
 
                     if (instanceName) {
                         const connStatus = state === 'open' ? 'CONNECTED'

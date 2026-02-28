@@ -49,7 +49,7 @@ export default function WhatsAppPage() {
 
     useEffect(() => {
         fetchInstances();
-        const interval = setInterval(fetchInstances, 15000);
+        const interval = setInterval(fetchInstances, 5000);
         return () => clearInterval(interval);
     }, [fetchInstances]);
 
@@ -69,7 +69,7 @@ export default function WhatsAppPage() {
                 }
             } catch { /* retry */ }
         };
-        pollRef.current = setInterval(poll, 4000);
+        pollRef.current = setInterval(poll, 1500);
         return () => { if (pollRef.current) clearInterval(pollRef.current); };
     }, [qrModal?.instanceId, fetchInstances]);
 
