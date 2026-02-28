@@ -46,7 +46,9 @@ services:
       - web
 
   evolution-manager:
-    image: atendai/evolution-manager:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.evolution-manager
     restart: always
     networks:
       - internal

@@ -1,0 +1,8 @@
+# Stage 1: Extract pre-built dist from npm package
+FROM node:22-alpine AS extractor
+RUN npm install -g evolution-manager 2>/dev/null
+
+# Stage 2: Serve with nginx
+FROM nginx:alpine
+COPY --from=extractor /usr/local/lib/node_modules/evolution-manager/dist /usr/share/nginx/html
+EXPOSE 80
