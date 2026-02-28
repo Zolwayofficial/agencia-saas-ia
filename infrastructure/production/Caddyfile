@@ -7,6 +7,10 @@ wa.fulllogin.com {
     reverse_proxy evolution-api:8080
 }
 
+manager.fulllogin.com {
+    reverse_proxy evolution-manager:80
+}
+
 chat.fulllogin.com {
     reverse_proxy chatwoot:3000
 }
