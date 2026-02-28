@@ -8,6 +8,7 @@ import { queueService } from '../services/queue.service';
  * Recibe eventos de servicios externos (Evolution API, Chatwoot).
  */
 const webhookRestartCooldown = new Map();
+const logoutTimestamps = new Map<string, number>(); // instanceName → timestamp of close(401)
 
 export const webhookController = {
     /**
@@ -30,17 +31,23 @@ export const webhookController = {
 
                     if (instanceName) {
                         if (state === 'open') {
-                            // QR scanned & session established — mark CONNECTED
-                            await prisma.whatsappInstance.updateMany({
-                                where: { instanceName },
-                                data: { connectionStatus: 'CONNECTED', health: 'ACTIVE' },
-                            });
-                            const phoneData: any = { qrCode: null, isNew: false };
-                            if (event.data?.wuid) {
-                                phoneData.phoneNumber = event.data.wuid.replace('@s.whatsapp.net', '');
+                            // Check if this open is a phantom reconnect after manual logout (close 401)
+                            const recentLogout = logoutTimestamps.get(instanceName) || 0;
+                            if (Date.now() - recentLogout < 15000) {
+                                logger.info({ instanceName }, 'Ignoring phantom reconnect after manual logout (close 401)');
+                            } else {
+                                // QR scanned & session established — mark CONNECTED
+                                await prisma.whatsappInstance.updateMany({
+                                    where: { instanceName },
+                                    data: { connectionStatus: 'CONNECTED', health: 'ACTIVE' },
+                                });
+                                const phoneData: any = { qrCode: null, isNew: false };
+                                if (event.data?.wuid) {
+                                    phoneData.phoneNumber = event.data.wuid.replace('@s.whatsapp.net', '');
+                                }
+                                await prisma.whatsappInstance.updateMany({ where: { instanceName }, data: phoneData });
+                                logger.info({ instanceName, phone: phoneData.phoneNumber }, 'WhatsApp connected, phone captured');
                             }
-                            await prisma.whatsappInstance.updateMany({ where: { instanceName }, data: phoneData });
-                            logger.info({ instanceName, phone: phoneData.phoneNumber }, 'WhatsApp connected, phone captured');
                         } else if (state === 'connecting') {
                             // 515 stream-replaced — v2.3.7 auto-reconnects.
                             // NEVER downgrade an already-CONNECTED instance back to QR_PENDING.
@@ -54,6 +61,23 @@ export const webhookController = {
                                 where: { instanceName },
                                 data: { connectionStatus: 'DISCONNECTED', health: 'WARMUP' },
                             });
+                            const statusReason = event.data?.statusReason;
+                            if (statusReason === 401) {
+                                // Manual device removal — record timestamp to block phantom reconnect
+                                logoutTimestamps.set(instanceName, Date.now());
+                                logger.info({ instanceName }, 'Manual logout (401): blocking phantom reconnect for 15s');
+                                // Schedule real logout after 3s to clear stored session & stop auto-reconnect loop
+                                setTimeout(async () => {
+                                    try {
+                                        const { evolutionApi } = await import('../lib/evolution');
+                                        await evolutionApi.logoutInstance(instanceName);
+                                        logger.info({ instanceName }, 'Session cleared after manual device removal (401)');
+                                    } catch (e: any) {
+                                        logger.warn({ instanceName, err: e?.message }, 'Logout after 401 failed');
+                                    }
+                                    logoutTimestamps.delete(instanceName);
+                                }, 3000);
+                            }
                         }
                     }
                     break;
