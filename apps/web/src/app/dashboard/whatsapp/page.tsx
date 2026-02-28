@@ -75,7 +75,7 @@ export default function WhatsAppPage() {
                 </div>
 
                 <a
-                    href="https://wa.fulllogin.com/manager"
+                    href="https://manager.fulllogin.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -132,7 +132,7 @@ export default function WhatsAppPage() {
                             Crea y conecta instancias desde Evolution API.
                         </p>
                         <a
-                            href="https://wa.fulllogin.com/manager"
+                            href="https://manager.fulllogin.com"
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{
