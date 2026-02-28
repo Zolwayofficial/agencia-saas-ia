@@ -9,6 +9,10 @@ import { SendMessageSchema, CreateInstanceSchema } from '@repo/types';
 import { AppError } from '../middlewares/error-handler';
 
 const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL || 'http://evolution_api:8080';
+
+// Tracks when each instance was first seen in 'connecting' state (for auto-reconnect)
+const connectingStateTracker = new Map<string, number>(); // instanceId → timestamp
+const AUTO_RECONNECT_AFTER_MS = 90_000; // 90 seconds stuck in connecting → auto-restart
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY || '';
 
 export const whatsappController = {
@@ -133,6 +137,26 @@ export const whatsappController = {
                                 data: { connectionStatus: connStatus as any, health: 'WARMUP' },
                             });
                         }
+
+                        // Auto-reconnect: if stuck in 'connecting' > 90s, restart the instance
+                        // This handles the case where QR was scanned but a 515 knocked out the connection
+                        if (state === 'connecting') {
+                            const now = Date.now();
+                            if (!connectingStateTracker.has(inst.id)) {
+                                connectingStateTracker.set(inst.id, now);
+                            }
+                            const connectingSince = connectingStateTracker.get(inst.id)!;
+                            if (now - connectingSince > AUTO_RECONNECT_AFTER_MS) {
+                                connectingStateTracker.delete(inst.id);
+                                logger.info({ instanceName: inst.instanceName }, 'Auto-restart: instance stuck in connecting, triggering reconnect');
+                                evolutionApi.restartInstance(inst.instanceName).catch((e: any) => {
+                                    logger.warn({ instanceName: inst.instanceName, err: e?.message }, 'Auto-restart failed');
+                                });
+                            }
+                        } else {
+                            connectingStateTracker.delete(inst.id);
+                        }
+
                         return { ...inst, connectionStatus: connStatus };
                     } catch {
                         // Evolution API unavailable -- trust DB state

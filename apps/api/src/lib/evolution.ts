@@ -118,6 +118,16 @@ export const evolutionApi = {
     },
 
     /**
+     * Restart an instance. If stored credentials exist, reconnects automatically.
+     * If no credentials, generates a fresh QR code.
+     */
+    async restartInstance(instanceName: string) {
+        return evoFetch(`/instance/restart/${instanceName}`, {
+            method: 'PUT',
+        });
+    },
+
+    /**
      * Send a text message.
      */
     async sendText(instanceName: string, to: string, text: string) {
