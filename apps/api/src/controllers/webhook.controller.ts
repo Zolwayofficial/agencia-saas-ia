@@ -59,7 +59,7 @@ export const webhookController = {
                                     logger.info({ instanceName }, 'Webhook: 515 detected after QR, triggering restart in 2s');
                                     setTimeout(() => {
                                         const evoMod = require('../lib/evolution');
-                                        evoMod.evolutionApi.restartInstance(instanceName).catch((e) => {
+                                        evoMod.evolutionApi.restartInstance(instanceName).catch((e: any) => {
                                             logger.warn({ instanceName, err: e && e.message }, 'Webhook restart failed');
                                         });
                                     }, 2000);
