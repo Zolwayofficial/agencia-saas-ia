@@ -104,16 +104,25 @@ export const whatsappController = {
                 orderBy: { createdAt: 'desc' },
             });
 
-            // Sync status with Evolution API
+            // Sync status with Evolution API using fetchAllInstances (stable DB state).
+            // Avoids per-instance connectionState which flickers during 515 reconnect loops.
+            let evoMap: Record<string, any> = {};
+            try {
+                const allEvo = await evolutionApi.fetchAllInstances();
+                if (Array.isArray(allEvo)) {
+                    for (const ei of allEvo) { evoMap[ei.name] = ei; }
+                }
+            } catch { /* Evolution API unavailable, fall back to DB */ }
+
             const enriched = await Promise.all(
                 instances.map(async (inst: any) => {
                     try {
-                        const status = await evolutionApi.getInstanceStatus(inst.instanceName);
-                        const state = status?.instance?.state || status?.state || 'close';
+                        const evoInst = evoMap[inst.instanceName];
+                        // fetchInstances connectionStatus: 'open' | 'connecting' | 'close'
+                        const state = evoInst?.connectionStatus || 'close';
 
                         if (state === 'open') {
-                            // Upgrade to CONNECTED with phone number if available
-                            const ownerJid = status?.instance?.ownerJid || '';
+                            const ownerJid = evoInst?.ownerJid || '';
                             const phoneNumber = ownerJid.replace('@s.whatsapp.net', '') || inst.phoneNumber || '';
                             if (inst.connectionStatus !== 'CONNECTED') {
                                 await prisma.whatsappInstance.update({
@@ -121,11 +130,12 @@ export const whatsappController = {
                                     data: { connectionStatus: 'CONNECTED', health: 'ACTIVE', phoneNumber, isNew: false },
                                 });
                             }
+                            connectingStateTracker.delete(inst.id);
                             return { ...inst, connectionStatus: 'CONNECTED', phoneNumber };
                         }
 
-                        // If DB already shows CONNECTED, trust it (avoids flicker during transient reconnects)
-                        // But if Evolution API shows 'connecting', try background restart to restore session
+                        // If DB already shows CONNECTED but Evolution says otherwise, keep CONNECTED
+                        // until auto-restart timer kicks in (avoids false disconnects)
                         if (inst.connectionStatus === 'CONNECTED') {
                             if (state === 'connecting') {
                                 const now = Date.now();
@@ -154,29 +164,8 @@ export const whatsappController = {
                                 data: { connectionStatus: connStatus as any, health: 'WARMUP' },
                             });
                         }
-
-                        // Auto-reconnect: if stuck in 'connecting' > 90s, restart the instance
-                        // This handles the case where QR was scanned but a 515 knocked out the connection
-                        if (state === 'connecting') {
-                            const now = Date.now();
-                            if (!connectingStateTracker.has(inst.id)) {
-                                connectingStateTracker.set(inst.id, now);
-                            }
-                            const connectingSince = connectingStateTracker.get(inst.id)!;
-                            if (now - connectingSince > AUTO_RECONNECT_AFTER_MS) {
-                                connectingStateTracker.delete(inst.id);
-                                logger.info({ instanceName: inst.instanceName }, 'Auto-restart: instance stuck in connecting, triggering reconnect');
-                                evolutionApi.restartInstance(inst.instanceName).catch((e: any) => {
-                                    logger.warn({ instanceName: inst.instanceName, err: e?.message }, 'Auto-restart failed');
-                                });
-                            }
-                        } else {
-                            connectingStateTracker.delete(inst.id);
-                        }
-
                         return { ...inst, connectionStatus: connStatus };
                     } catch {
-                        // Evolution API unavailable -- trust DB state
                         return inst;
                     }
                 })

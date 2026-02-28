@@ -33,13 +33,23 @@ export default function WhatsAppPage() {
     const [qrModal,        setQrModal]        = useState<{ instanceId: string; qrCode: string | null; name: string } | null>(null);
     const [error,          setError]          = useState('');
     const pollRef                             = useRef<NodeJS.Timeout | null>(null);
+    const [connectingIds,  setConnectingIds]  = useState<Set<string>>(new Set());
     const [connectionType, setConnectionType] = useState<'QR' | 'API'>('QR');
 
     const fetchInstances = useCallback(async () => {
         try {
             const data = await api.get('/whatsapp/instances');
-            setInstances(data.instances || []);
+            const newInstances = data.instances || [];
+            setInstances(newInstances);
             setLimit(data.limit || 1);
+            // Auto-clear connecting state for instances that are now CONNECTED
+            setConnectingIds(prev => {
+                const next = new Set(prev);
+                for (const inst of newInstances) {
+                    if (inst.connectionStatus === 'CONNECTED') next.delete(inst.id);
+                }
+                return next;
+            });
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -62,6 +72,7 @@ export default function WhatsAppPage() {
             try {
                 const data = await api.get(`/whatsapp/instances/${qrModal.instanceId}/qr`);
                 if (data.status === 'CONNECTED') {
+                    setConnectingIds(prev => { const s = new Set(prev); s.delete(qrModal.instanceId); return s; });
                     setQrModal(null);
                     fetchInstances();
                 } else if (data.qrCode) {
@@ -334,7 +345,7 @@ export default function WhatsAppPage() {
                                                     boxShadow: '0 2px 6px rgba(52,201,123,0.3)',
                                                 }}
                                             >
-                                                Conectar WhatsApp
+                                                {connectingIds.has(inst.id) ? 'Conectando…' : 'Conectar WhatsApp'}
                                             </button>
                                         )}
                                     </div>
@@ -404,7 +415,7 @@ export default function WhatsAppPage() {
                                 </p>
                             </div>
                             <button
-                                onClick={() => setQrModal(null)}
+                                onClick={() => { if (qrModal) setConnectingIds(prev => { const s = new Set(prev); s.add(qrModal.instanceId); return s; }); setQrModal(null); }}
                                 style={{
                                     width: 28, height: 28, borderRadius: '50%', border: 'none',
                                     background: 'rgba(120,120,128,0.12)', cursor: 'pointer',

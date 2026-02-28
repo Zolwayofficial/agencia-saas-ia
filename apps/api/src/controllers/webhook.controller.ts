@@ -29,20 +29,12 @@ export const webhookController = {
                     logger.info({ instanceName, state, rawData: event.data }, 'WhatsApp connection update');
 
                     if (instanceName) {
-                        const connStatus = state === 'open' ? 'CONNECTED'
-                            : state === 'connecting' ? 'QR_PENDING'
-                                : 'DISCONNECTED';
-                        const health = state === 'open' ? 'ACTIVE' : 'WARMUP';
-
-                        await prisma.whatsappInstance.updateMany({
-                            where: { instanceName },
-                            data: {
-                                connectionStatus: connStatus as any,
-                                health: health as any,
-                            },
-                        });
-
                         if (state === 'open') {
+                            // QR scanned & session established — mark CONNECTED
+                            await prisma.whatsappInstance.updateMany({
+                                where: { instanceName },
+                                data: { connectionStatus: 'CONNECTED', health: 'ACTIVE' },
+                            });
                             const phoneData: any = { qrCode: null, isNew: false };
                             if (event.data?.wuid) {
                                 phoneData.phoneNumber = event.data.wuid.replace('@s.whatsapp.net', '');
@@ -50,21 +42,18 @@ export const webhookController = {
                             await prisma.whatsappInstance.updateMany({ where: { instanceName }, data: phoneData });
                             logger.info({ instanceName, phone: phoneData.phoneNumber }, 'WhatsApp connected, phone captured');
                         } else if (state === 'connecting') {
-                            const inst = await prisma.whatsappInstance.findUnique({ where: { instanceName }, select: { qrCode: true } });
-                            if (inst && inst.qrCode) {
-                                const now = Date.now();
-                                const lastRestart = webhookRestartCooldown.get(instanceName) || 0;
-                                if (now - lastRestart > 30000) {
-                                    webhookRestartCooldown.set(instanceName, now);
-                                    logger.info({ instanceName }, 'Webhook: 515 detected after QR, triggering restart in 2s');
-                                    setTimeout(() => {
-                                        const evoMod = require('../lib/evolution');
-                                        evoMod.evolutionApi.restartInstance(instanceName).catch((e: any) => {
-                                            logger.warn({ instanceName, err: e && e.message }, 'Webhook restart failed');
-                                        });
-                                    }, 2000);
-                                }
-                            }
+                            // 515 stream-replaced — v2.3.7 auto-reconnects.
+                            // NEVER downgrade an already-CONNECTED instance back to QR_PENDING.
+                            await prisma.whatsappInstance.updateMany({
+                                where: { instanceName, connectionStatus: { not: 'CONNECTED' } },
+                                data: { connectionStatus: 'QR_PENDING', health: 'WARMUP' },
+                            });
+                        } else {
+                            // state === 'close' or unknown — truly disconnected
+                            await prisma.whatsappInstance.updateMany({
+                                where: { instanceName },
+                                data: { connectionStatus: 'DISCONNECTED', health: 'WARMUP' },
+                            });
                         }
                     }
                     break;
