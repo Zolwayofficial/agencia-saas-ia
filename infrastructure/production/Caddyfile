@@ -6,8 +6,6 @@ fulllogin.com, www.fulllogin.com {
 wa.fulllogin.com {
     reverse_proxy evolution-api:8080
 }
-    reverse_proxy evolution-api:8080
-}
 
 manager.fulllogin.com {
     reverse_proxy evolution-manager:80
