@@ -125,7 +125,24 @@ export const whatsappController = {
                         }
 
                         // If DB already shows CONNECTED, trust it (avoids flicker during transient reconnects)
+                        // But if Evolution API shows 'connecting', try background restart to restore session
                         if (inst.connectionStatus === 'CONNECTED') {
+                            if (state === 'connecting') {
+                                const now = Date.now();
+                                if (!connectingStateTracker.has(inst.id)) {
+                                    connectingStateTracker.set(inst.id, now);
+                                }
+                                const connectingSince = connectingStateTracker.get(inst.id)!;
+                                if (now - connectingSince > AUTO_RECONNECT_AFTER_MS) {
+                                    connectingStateTracker.delete(inst.id);
+                                    logger.info({ instanceName: inst.instanceName }, 'Auto-restart: CONNECTED instance lost Evo API session, triggering reconnect');
+                                    evolutionApi.restartInstance(inst.instanceName).catch((e: any) => {
+                                        logger.warn({ instanceName: inst.instanceName, err: e?.message }, 'Auto-restart failed');
+                                    });
+                                }
+                            } else {
+                                connectingStateTracker.delete(inst.id);
+                            }
                             return inst;
                         }
 
