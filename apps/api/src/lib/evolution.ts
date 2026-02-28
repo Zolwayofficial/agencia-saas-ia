@@ -123,7 +123,7 @@ export const evolutionApi = {
      */
     async restartInstance(instanceName: string) {
         return evoFetch(`/instance/restart/${instanceName}`, {
-            method: 'PUT',
+            method: 'POST',
         });
     },
 
