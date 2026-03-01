@@ -31,19 +31,6 @@ export const whatsappController = {
 
             const { displayName } = parsed.data;
 
-            // Check plan limit
-            const org = await prisma.organization.findUnique({
-                where: { id: organizationId },
-                include: { plan: true, instances: true },
-            });
-
-            if (!org) throw new AppError(404, 'ORG_NOT_FOUND', 'Organización no encontrada');
-
-            const maxInstances = org.plan?.maxInstances ?? 1;
-            if (org.instances.length >= maxInstances) {
-                throw new AppError(403, 'PLAN_LIMIT_REACHED', `Tu plan permite máximo ${maxInstances} instancia(s).`);
-            }
-
             // Generate unique instance name
             const instanceName = `${org.slug}-wa-${Date.now()}`;
             const webhookUrl = `${env.API_BASE_URL || 'http://localhost:3001'}/api/v1/webhooks/evolution`;
@@ -173,8 +160,7 @@ export const whatsappController = {
 
             res.json({
                 instances: enriched,
-                limit: org?.plan?.maxInstances ?? 1,
-                used: instances.length,
+                total: instances.length,
             });
         } catch (err) {
             next(err);
