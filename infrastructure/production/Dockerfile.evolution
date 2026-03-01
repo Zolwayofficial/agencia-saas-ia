@@ -1,7 +1,7 @@
-FROM atendai/evolution-api:v2.2.3
+FROM evoapicloud/evolution-api:latest
 
-# Update Baileys to latest version compatible with current WhatsApp protocol
-RUN npm install baileys@6.17.16 --prefix /evolution --save
-
-# Remove hardcoded WhatsApp version (let Baileys auto-detect current version)
-RUN sed -i '/CONFIG_SESSION_PHONE_VERSION/d' /evolution/.env 2>/dev/null || true
+# Fix: pre-key upload timeout blocks sendPassiveIq('active') call.
+# When uploadPreKeysToServerIfRequired() throws, sendPassiveIq is skipped
+# and the connection stays open but never receives messages.
+# Fix: add .catch() so pre-key failure is non-blocking.
+RUN sed -i "s/await uploadPreKeysToServerIfRequired();/await uploadPreKeysToServerIfRequired().catch(e => logger.warn({ e }, 'pre-key upload failed, continuing...'));/"     /evolution/node_modules/baileys/lib/Socket/socket.js &&     echo 'Baileys pre-key patch applied:' &&     grep 'uploadPreKeysToServerIfRequired' /evolution/node_modules/baileys/lib/Socket/socket.js | head -3
