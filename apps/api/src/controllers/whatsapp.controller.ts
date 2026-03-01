@@ -32,6 +32,8 @@ export const whatsappController = {
             const { displayName } = parsed.data;
 
             // Generate unique instance name
+            const org = await prisma.organization.findUnique({ where: { id: organizationId } });
+            if (!org) throw new AppError(404, 'ORG_NOT_FOUND', 'Organización no encontrada');
             const instanceName = `${org.slug}-wa-${Date.now()}`;
             const webhookUrl = `${env.API_BASE_URL || 'http://localhost:3001'}/api/v1/webhooks/evolution`;
 
@@ -43,7 +45,7 @@ export const whatsappController = {
             const instance = await prisma.whatsappInstance.create({
                 data: {
                     instanceName,
-                    displayName: displayName || `WhatsApp ${org.instances.length + 1}`,
+                    displayName: displayName || `WhatsApp ${Date.now().toString().slice(-4)}`,
                     organizationId,
                     connectionStatus: 'QR_PENDING',
                 },
